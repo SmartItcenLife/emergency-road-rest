@@ -64,6 +64,15 @@ public class JwtProvider {
     }
   }
 
+  public boolean isTokenValid(String token) {
+    try {
+      parseToken(token);
+      return true;
+    } catch (CustomException e) {
+      return false;
+    }
+  }
+
   public Long getUserId(String token) {
     return Long.parseLong(parseToken(token).getSubject());
   }
