@@ -2,7 +2,11 @@ package com.itcen.emergencyroad.global.jwt;
 
 import com.itcen.emergencyroad.global.exception.CustomException;
 import com.itcen.emergencyroad.global.exception.ExceptionStatus;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,15 +65,6 @@ public class JwtProvider {
       throw new CustomException(ExceptionStatus.EXPIRED_TOKEN);
     } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
       throw new CustomException(ExceptionStatus.INVALID_TOKEN);
-    }
-  }
-
-  public boolean isTokenValid(String token) {
-    try {
-      parseToken(token);
-      return true;
-    } catch (CustomException e) {
-      return false;
     }
   }
 
