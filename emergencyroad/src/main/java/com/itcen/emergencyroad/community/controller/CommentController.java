@@ -1,0 +1,92 @@
+package com.itcen.emergencyroad.community.controller;
+
+import com.itcen.emergencyroad.community.dto.comment.CommentRequestDto;
+import com.itcen.emergencyroad.community.dto.comment.CommentResponseDto;
+import com.itcen.emergencyroad.community.enums.Role;
+import com.itcen.emergencyroad.community.service.CommentService;
+import com.itcen.emergencyroad.global.common.ApiResponseDto;
+import jakarta.validation.Valid;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/hospitals/{hpid}/posts/{postId}/comments")
+@RequiredArgsConstructor
+public class CommentController {
+
+  private static final String ROLE_USER = "USER";
+  private static final String ROLE_PREFIX = "ROLE_";
+
+  private final CommentService commentService;
+
+  // 댓글 목록 조회
+  @GetMapping
+  public ResponseEntity<ApiResponseDto<List<CommentResponseDto>>> getComments(
+      @PathVariable Long postId,
+      @AuthenticationPrincipal Long userId) {
+
+    return ResponseEntity.ok(
+        ApiResponseDto.success("댓글 목록 조회 성공",
+            commentService.getComments(postId, userId))
+    );
+  }
+
+  // 댓글 작성
+  @PostMapping
+  public ResponseEntity<ApiResponseDto<Void>> createComment(
+      @PathVariable Long postId,
+      @Valid @RequestBody CommentRequestDto dto,
+      @AuthenticationPrincipal Long userId) {
+
+    commentService.createComment(postId, dto, userId);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResponseDto.success("댓글이 작성되었습니다."));
+  }
+
+  // 댓글 수정
+  @PutMapping("/{commentId}")
+  public ResponseEntity<ApiResponseDto<Void>> updateComment(
+      @PathVariable Long commentId,
+      @Valid @RequestBody CommentRequestDto dto,
+      @AuthenticationPrincipal Long userId) {
+
+    commentService.updateComment(commentId, dto, userId);
+    return ResponseEntity.ok(ApiResponseDto.success("댓글이 수정되었습니다."));
+  }
+
+  // 댓글 삭제
+  @DeleteMapping("/{commentId}")
+  public ResponseEntity<ApiResponseDto<Void>> deleteComment(
+      @PathVariable Long commentId,
+      @AuthenticationPrincipal Long userId) {
+
+    commentService.deleteComment(commentId, userId, getCurrentUserRole());
+    return ResponseEntity.ok(ApiResponseDto.success("댓글이 삭제되었습니다."));
+  }
+
+  private String getCurrentUserRole() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    if (auth == null) {
+      return String.valueOf(Role.USER);
+    }
+
+    return auth.getAuthorities().stream()
+        .findFirst()
+        .map(a -> a.getAuthority().replace(ROLE_PREFIX, ""))
+        .orElse(ROLE_USER);
+  }
+}
