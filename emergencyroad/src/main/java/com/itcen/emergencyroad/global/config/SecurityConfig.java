@@ -1,10 +1,13 @@
 package com.itcen.emergencyroad.global.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itcen.emergencyroad.global.common.ApiResponseDto;
 import com.itcen.emergencyroad.global.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -25,6 +28,7 @@ import java.util.List;
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final ObjectMapper objectMapper;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,11 +39,18 @@ public class SecurityConfig {
         .cors(cors -> cors
             .configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(auth -> auth
+            // Swagger
+            .requestMatchers(
+                "/swagger-ui/**",
+                "/v3/api-docs/**"
+            ).permitAll()
+
             // 인증 없이 허용
             .requestMatchers(HttpMethod.POST,
                 "/api/auth/signup",
                 "/api/auth/login",
-                "/api/auth/refresh").permitAll()
+                "/api/auth/refresh",
+                "/api/auth/logout").permitAll()
             .requestMatchers(HttpMethod.GET,
                 "/api/auth/kakao").permitAll()
 
@@ -65,6 +76,17 @@ public class SecurityConfig {
             // 나머지
             .anyRequest().authenticated()
         )
+
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint(((request, response, authException) -> {
+              response.setStatus(401);
+              response.setContentType("application/json;charset=UTF-8");
+              response.getWriter().write(
+                  objectMapper.writeValueAsString(
+                      ApiResponseDto.fail(HttpStatus.UNAUTHORIZED, "Access Token required")
+                  )
+              );
+            })))
         .addFilterBefore(jwtAuthenticationFilter,
             UsernamePasswordAuthenticationFilter.class);
 
