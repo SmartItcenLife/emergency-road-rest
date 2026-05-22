@@ -1,6 +1,6 @@
 package com.itcen.emergencyroad.global.exception;
 
-import com.itcen.emergencyroad.global.common.ApiResponse;
+import com.itcen.emergencyroad.global.common.ApiResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,18 +14,18 @@ public class GlobalExceptionHandler {
 
   // 커스텀 예외 (ExceptionStatus 기반)
   @ExceptionHandler(CustomException.class)
-  public ResponseEntity<ApiResponse<Void>> handleCustomException(CustomException e) {
+  public ResponseEntity<ApiResponseDto<Void>> handleCustomException(CustomException e) {
     ExceptionStatus status = e.getExceptionStatus();
     log.warn("[CustomException] {} : {}", status.name(), status.getMessage());
 
     return ResponseEntity
         .status(status.getStatus())
-        .body(ApiResponse.fail(status.getStatus(), status.getMessage()));
+        .body(ApiResponseDto.fail(status.getStatus(), status.getMessage()));
   }
 
   // @Valid 검증 실패
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiResponse<Void>> handleValidationException(
+  public ResponseEntity<ApiResponseDto<Void>> handleValidationException(
       MethodArgumentNotValidException e) {
 
     String message = e.getBindingResult().getFieldErrors().stream()
@@ -37,17 +37,17 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(ApiResponse.fail(HttpStatus.BAD_REQUEST, message));
+        .body(ApiResponseDto.fail(HttpStatus.BAD_REQUEST, message));
   }
 
   // 그 외 예상치 못한 예외
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiResponse<Void>> handleException(Exception e) {
+  public ResponseEntity<ApiResponseDto<Void>> handleException(Exception e) {
     log.error("[Exception] {}", e.getMessage(), e);
 
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(ApiResponse.fail(
+        .body(ApiResponseDto.fail(
             HttpStatus.INTERNAL_SERVER_ERROR,
             ExceptionStatus.INTERNAL_SERVER_ERROR.getMessage()
         ));

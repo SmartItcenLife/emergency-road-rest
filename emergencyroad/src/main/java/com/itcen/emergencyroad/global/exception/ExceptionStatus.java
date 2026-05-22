@@ -14,7 +14,6 @@ public enum ExceptionStatus {
 
   /* 401 UNAUTHORIZED */
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Unauthorized"),
-  BLACKLISTED_TOKEN(HttpStatus.UNAUTHORIZED, "Blacklisted token"),
   INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token"),
   ACCESS_TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "Access token required"),
   TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "Token not found"),
