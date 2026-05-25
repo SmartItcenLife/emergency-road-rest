@@ -1,8 +1,8 @@
 package com.itcen.emergencyroad.community.service;
 
-import com.itcen.emergencyroad.community.dto.LoginRequestDto;
-import com.itcen.emergencyroad.community.dto.SignupRequestDto;
-import com.itcen.emergencyroad.community.dto.UpdateUserRequestDto;
+import com.itcen.emergencyroad.community.dto.auth.LoginRequestDto;
+import com.itcen.emergencyroad.community.dto.auth.SignupRequestDto;
+import com.itcen.emergencyroad.community.dto.auth.UpdateUserRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.AuthTokenResponseDto;
 import com.itcen.emergencyroad.community.dto.auth.UserResponseDto;
 import com.itcen.emergencyroad.community.dto.kakao.KakaoUserInfoDto;

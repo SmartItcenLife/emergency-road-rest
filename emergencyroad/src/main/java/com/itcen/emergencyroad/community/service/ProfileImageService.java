@@ -2,8 +2,9 @@ package com.itcen.emergencyroad.community.service;
 
 import com.itcen.emergencyroad.global.exception.CustomException;
 import com.itcen.emergencyroad.global.exception.ExceptionStatus;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,17 +30,17 @@ public class ProfileImageService {
     }
 
     try{
-      String absoluteUploadDir = System.getProperty("user.dir") + File.separator + UPLOAD_DIR;
-      File uploadDir = new File(absoluteUploadDir);
-      if (!uploadDir.exists()) uploadDir.mkdirs();
+      Path uploadPath = Path.of(System.getProperty("user.dir"),UPLOAD_DIR);
+      Files.createDirectories(uploadPath);
 
-      String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-      File dest = new File(absoluteUploadDir + fileName);
-      file.transferTo(dest);
+      String originalFileName = file.getOriginalFilename();
+      String fileName = UUID.randomUUID() + "_" + originalFileName;
+
+      Path filepath = uploadPath.resolve(fileName);
+      file.transferTo(filepath.toFile());
 
       return "/" + UPLOAD_DIR + fileName;
     }catch (IOException e){
-      log.error("프로필 이미지 저장 실패: {}", e.getMessage());
       throw new CustomException(ExceptionStatus.FILE_UPLOAD_FAILED);
     }
   }

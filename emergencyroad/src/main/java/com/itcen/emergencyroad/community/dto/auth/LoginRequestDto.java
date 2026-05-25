@@ -1,4 +1,4 @@
-package com.itcen.emergencyroad.community.dto;
+package com.itcen.emergencyroad.community.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
