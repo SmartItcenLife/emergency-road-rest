@@ -43,7 +43,7 @@ public enum ExceptionStatus {
 
   /* 500 INTERNAL_SERVER_ERROR */
   INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
-  FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "File upload failed");
+  FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다!");
 
   private final HttpStatus status;
   private final String message;

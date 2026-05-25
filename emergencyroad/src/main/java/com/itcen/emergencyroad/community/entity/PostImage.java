@@ -16,39 +16,25 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "comments")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Entity
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "post_images")
 @Getter
-public class Comment extends BaseEntity {
+public class PostImage extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "comment_id")
+  @Column(name = "image_id")
   private Long id;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "post_id", nullable = false)
   private Post post;
 
-  @Column(name = "content", nullable = false, length = 500)
-  private String content;
+  @Column(name = "image_url", nullable = false, length = 500)
+  private String imageUrl;
 
-  @Column(name = "is_deleted", nullable = false)
-  @Builder.Default
-  private boolean isDeleted = false;
-
-  public void update(String content) {
-    this.content = content;
-  }
-
-  public void delete() {
-    this.isDeleted = true;
-  }
 }
+

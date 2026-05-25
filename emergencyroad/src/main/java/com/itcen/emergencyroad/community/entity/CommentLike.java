@@ -1,6 +1,5 @@
 package com.itcen.emergencyroad.community.entity;
 
-import com.itcen.emergencyroad.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,24 +8,28 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "comments")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Entity
+@Table(name = "comment_likes", uniqueConstraints = @UniqueConstraint(
+    columnNames = {"user_id", "comment_id"}
+))
 @Getter
-public class Comment extends BaseEntity {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+public class CommentLike {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "comment_id")
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -34,21 +37,15 @@ public class Comment extends BaseEntity {
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "post_id", nullable = false)
-  private Post post;
+  @JoinColumn(name = "comment_id", nullable = false)
+  private Comment comment;
 
-  @Column(name = "content", nullable = false, length = 500)
-  private String content;
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private LocalDateTime createdAt;
 
-  @Column(name = "is_deleted", nullable = false)
-  @Builder.Default
-  private boolean isDeleted = false;
-
-  public void update(String content) {
-    this.content = content;
+  @PrePersist
+  protected void onCreate(){
+    this.createdAt = LocalDateTime.now();
   }
 
-  public void delete() {
-    this.isDeleted = true;
-  }
 }
