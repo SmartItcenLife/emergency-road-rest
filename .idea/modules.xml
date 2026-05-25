@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/emergency-road.iml" filepath="$PROJECT_DIR$/.idea/emergency-road.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emergencyroad.iml" filepath="$PROJECT_DIR$/.idea/modules/emergencyroad.iml" group="emergencyroad" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emergencyroad_main.iml" filepath="$PROJECT_DIR$/.idea/modules/emergencyroad_main.iml" group="emergencyroad" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/emergencyroad_test.iml" filepath="$PROJECT_DIR$/.idea/modules/emergencyroad_test.iml" group="emergencyroad" />
     </modules>
   </component>
 </project>
