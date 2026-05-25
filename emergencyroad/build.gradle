@@ -44,7 +44,9 @@ dependencies {
     // REST API 및 내장 Tomcat, Jackson 등
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// DevTools
+    // json 추가하기
+    implementation 'org.json:json:20231013'
+    // DevTools
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	// Test
