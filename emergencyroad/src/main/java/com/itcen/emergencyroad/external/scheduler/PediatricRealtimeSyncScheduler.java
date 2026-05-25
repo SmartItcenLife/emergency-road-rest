@@ -1,0 +1,37 @@
+package com.itcen.emergencyroad.external.scheduler;
+
+import com.itcen.emergencyroad.external.RegionCode;
+import com.itcen.emergencyroad.pediatric.service.PediatricSyncService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+@ConditionalOnProperty(
+        name = "scheduler.api.enabled",
+        havingValue = "true"
+)
+public class PediatricRealtimeSyncScheduler {
+
+    private final PediatricSyncService pediatricSyncService;
+
+    // 3분 주기 + 첫 실행은 서버 켜지고 25초 대기 후 시작 (트래픽 분산)
+    //@Scheduled(initialDelay = 25000, fixedDelay = 180000)
+    public void sync() {
+        log.info("실시간 소아 / 유아 데이터 가져오기 시작");
+
+        for(String sido : RegionCode.MAP.keySet()){
+
+            try{
+                log.info("수집 대상 도시 : " + sido);
+                pediatricSyncService.syncBySidoForPediatric(sido);
+            } catch (Exception e){
+                log.error("{} 지역 데이터를 불러오는데 실패했습니다.",sido,e);
+            }
+        }
+    }
+}
