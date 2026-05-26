@@ -22,7 +22,8 @@ public class MapDisplayStatusDto {
     private MapCongestionGrade grade;   // RELAXED, NORMAL, CROWDED, AVAILABLE, UNAVAILABLE, UNKNOWN
 
     // 사용자에게 보여줄 등급
-    private Integer colorLevel;         // (여유, 보통, 혼잡) / (가능, 불가), 정보없음
+    private String label;         // (여유, 보통, 혼잡) / (가능, 불가), 정보없음
+    private Integer colorLevel;
 
     // 점수형 상태에서 사용할 값
     private Integer score;              // 0 ~ 100 높을수록 여유
