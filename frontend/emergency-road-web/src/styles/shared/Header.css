@@ -1,0 +1,57 @@
+/* Header.css */
+.header {
+  display: flex;
+  justify-content: center; 
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  position: relative;     
+  width: 100%;
+  max-width: 430px;
+  padding: 0 20px;
+  height: 70px;
+  background-color: #ffffff;
+  border-bottom: 2px solid #eef2f7;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.logo-img {
+  height: 50px;
+  width: 50px;;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1e88e5; /* 로고 포인트 컬러 */
+}
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #1e88e5;
+}

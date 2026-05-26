@@ -58,6 +58,9 @@ public class SecurityConfig {
             // 병원/병상 조회 전체 비로그인 허용
             .requestMatchers("/api/hospitals/**").permitAll()
 
+            // 지도 화면 개발 및 Mock API 조회 비로그인 허용
+            .requestMatchers("/api/map/**").permitAll()
+
             // 게시글/댓글 작성·수정·삭제는 로그인 필요
             .requestMatchers(HttpMethod.POST,
                 "/api/hospitals/*/posts",
