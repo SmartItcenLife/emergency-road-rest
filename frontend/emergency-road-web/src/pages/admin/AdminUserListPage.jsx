@@ -18,7 +18,7 @@ function AdminUserListPage(){
 
     return(
         <AdminLayout>
-      <PageHeader title="회원 관리" />
+      {/* <PageHeader title="회원 관리" /> */}
 
       <table>
         <thead>

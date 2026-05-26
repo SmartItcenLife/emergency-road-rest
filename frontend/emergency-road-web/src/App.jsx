@@ -24,7 +24,7 @@ const Layout = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminDashboardPage />} />
-        <Route path="/admin/user" element={<AdminUserListPage />} />
+        <Route path="/admin/users" element={<AdminUserListPage />} />
     
         {/* <Route path="/recommend" element={<Recommend />} />
         <Route path="/community" element={<Community />} /> */}
