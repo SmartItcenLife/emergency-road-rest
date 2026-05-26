@@ -16,4 +16,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
   Page<Post> searchByHospitalId(@Param("hpid") String hpid, @Param("keyword") String keyword, Pageable pageable);
 
 
+  //오늘 생성된 게시글 세기 위한 쿼리
+  long countByCreatedAtAfter(java.time.LocalDateTime startOfDay);
 }
