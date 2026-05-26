@@ -1,6 +1,6 @@
 // 회원 목록 GET /api/admin/users 연결하기
-import AdminLayout from "../../components/admin/AdminLayout";
-import PageHeader from "../../components/admin/PageHeader";
+import AdminLayout from "../../features/admin/components/AdminLayout";
+import PageHeader from "../../features/admin/components/PageHeader";
 import { useEffect, useState } from "react";
 
 function AdminUserListPage(){

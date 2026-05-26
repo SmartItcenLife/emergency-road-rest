@@ -2,8 +2,8 @@
 // 2. 페이지 처음 열릴 때 /api/admin 호출
 // 3. 응답 데이터를 stats에 저장
 // 4. DashboardCardGroup에 stats 넘기기
-import AdminLayout from "../../components/admin/AdminLayout";
-import PageHeader from "../../components/admin/PageHeader";
+import AdminLayout from "../../features/admin/components/AdminLayout";
+import PageHeader from "../../features/admin/components/PageHeader";
 //import DashboardCardGroup from "../../components/admin/DashboardCardGroup";
 import { useEffect, useState } from "react";
 

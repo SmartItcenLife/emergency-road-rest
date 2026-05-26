@@ -2,6 +2,8 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './shared/components/layout/Header';
 import Home from './pages/Home';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage'
+import AdminUserListPage from './pages/admin/AdminUserListPage.jsx'
 
 // 헤더를 감싸는 래퍼 컴포넌트
 const Layout = () => {
@@ -20,6 +22,9 @@ const Layout = () => {
       <Header type={getHeaderType()} />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin/user" element={<AdminUserListPage />} />
+    
         {/* <Route path="/recommend" element={<Recommend />} />
         <Route path="/community" element={<Community />} /> */}
       </Routes>
@@ -31,6 +36,7 @@ function App() {
   return (
     <BrowserRouter>
       <Layout />
+
     </BrowserRouter>
   );
 }
