@@ -1,11 +1,12 @@
 package com.itcen.emergencyroad.findpath.api;
 // 카카오 다중 목적지 길찾기 API 불러오기.
-
+// 임포트 된 것들의 의미가 무엇인지?
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 

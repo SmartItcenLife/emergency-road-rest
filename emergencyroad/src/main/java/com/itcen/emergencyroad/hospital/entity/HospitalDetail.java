@@ -132,4 +132,3 @@ public class HospitalDetail extends BaseEntity {
         this.sundayEndTime = dto.getDutyTime7c();
     }
 }
-
