@@ -3,7 +3,7 @@
 // 3. 응답 데이터를 stats에 저장
 // 4. DashboardCardGroup에 stats 넘기기
 import AdminLayout from "../../features/admin/components/AdminLayout";
-import PageHeader from "../../features/admin/components/PageHeader";
+import PageHeader from "../../features/admin/components/AdminHeader";
 //import DashboardCardGroup from "../../components/admin/DashboardCardGroup";
 import { useEffect, useState } from "react";
 

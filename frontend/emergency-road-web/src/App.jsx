@@ -12,6 +12,7 @@ const Layout = () => {
   // 현재 경로에 따라 헤더 타입을 결정하는 로직
   const getHeaderType = () => {
     if (location.pathname === '/') return 'home';
+    if(location.pathname.startsWith("/admin")){  return "admin";  }
     // if (location.pathname.startsWith('/recommend')) return 'recommend';
     // if (location.pathname.startsWith('/community')) return 'community';
     return 'home';
