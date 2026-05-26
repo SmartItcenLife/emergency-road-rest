@@ -1,8 +1,14 @@
 import React from 'react';
 import '../../../styles/shared/Header.css';
 import logo from '../../../assets/logo.png';
+import AdminHeader from '../../../features/admin/components/AdminHeader';
+
 const Header = ({ type }) =>{
     // 1. 각 타입별 메뉴를 객체로 정의
+    // 관리자면 아예 다른 헤더 반환
+  if(type === "admin"){
+    return <AdminHeader />;
+  }
   const menuConfig = {
     home: (
       <div className="home-menu">
