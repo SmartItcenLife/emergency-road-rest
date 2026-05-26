@@ -1,15 +1,37 @@
-import { useState } from 'react'
-import './App.css'
-import Home from "./pages/Home";
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import Header from './shared/components/layout/Header';
+import Home from './pages/Home';
 
-
-function App() {
+// 헤더를 감싸는 래퍼 컴포넌트
+const Layout = () => {
+  const location = useLocation();
+  
+  // 현재 경로에 따라 헤더 타입을 결정하는 로직
+  const getHeaderType = () => {
+    if (location.pathname === '/') return 'home';
+    // if (location.pathname.startsWith('/recommend')) return 'recommend';
+    // if (location.pathname.startsWith('/community')) return 'community';
+    return 'home';
+  };
 
   return (
     <>
-     <Home/>;
+      <Header type={getHeaderType()} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        {/* <Route path="/recommend" element={<Recommend />} />
+        <Route path="/community" element={<Community />} /> */}
+      </Routes>
     </>
-  )
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
