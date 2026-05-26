@@ -65,7 +65,23 @@ body {
         border-inline: none; /* 모바일에서는 테두리 제거 */
     }
 }
+@font-face {
+    font-family: 'SejongHospital';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/SejonghospitalLight.woff2') format('woff2');
+    font-weight: 300;
+    font-display: swap;
+}
 
+@font-face {
+    font-family: 'SejongHospital';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/SejonghospitalBold.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+
+* {
+    font-family: 'SejongHospital';
+}   
 #root {
   width: 1126px;
   max-width: 100%;
@@ -80,7 +96,6 @@ body {
 
 h1,
 h2 {
-  font-family: var(--heading);
   font-weight: 500;
   color: var(--text-h);
 }

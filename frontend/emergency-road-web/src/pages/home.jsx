@@ -1,11 +1,15 @@
 import { useState } from "react";
 import "../styles/Home.css";
+import location from "../assets/home/location.png"
+import general from "../assets/home/general.png"
+import children from "../assets/home/children.png"
+import pregnant from "../assets/home/pregnant.png"
 
 function Home() {
-  const [message, setMessage] = useState("병원 추천을 위해 현재 위치 정보가 필요합니다.");
+  const [message, setMessage] = useState("버튼을 눌러 내 주변 응급 병원을 확인하세요.");
 
   const getLocation = (category) => {
-    setMessage("📍 위치 정보를 요청 중입니다... 브라우저에서 허용해주세요.");
+    setMessage("위치 정보를 요청 중입니다... 브라우저에서 허용해주세요.");
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -30,13 +34,13 @@ function Home() {
     <div className="page">
       <div className="container">
         <div className= "content">
-        <h1 className="title">응급의료 추천</h1>
+        <h1 className="title">지금 병원이 필요하신가요?</h1>
         <p className="subtitle">
-          현재 위치를 기반으로 가까운 응급 병원을 추천해드립니다.
+          매우 위급한 상황이라면 즉시 119로 신고하세요.
         </p>
-
-        <div className="info-box">
-          📍 정확한 추천을 위해 위치 권한 허용이 필요합니다.
+     <div className="info-box">
+        <img src={location} alt="location icon" className="location-img" />
+         정확한 추천을 위해 위치 권한 허용이 필요합니다.
         </div>
 
         <div className="button-group">
@@ -44,24 +48,34 @@ function Home() {
             className="recommend-button pediatric"
             onClick={() => getLocation("PEDIATRIC")}
           >
-            <span className="emoji">🧒</span>
-            소아 응급 추천
+             <div className="btn-detail">
+            {/* <span className="emoji">🧒</span> */}
+               <img src={children} alt="children icon" className="children-img" />
+               소아 응급
+               </div>
           </button>
 
           <button
             className="recommend-button general"
             onClick={() => getLocation("GENERAL")}
           >
-            <span className="emoji">🚑</span>
-            일반 응급 추천
+            {/* <span className="emoji">🚑</span> */}
+            <div className="btn-detail">
+              <img src={general} alt="general icon" className="general-img" />
+               일반 응급
+            </div>
           </button>
 
           <button
             className="recommend-button pregnant"
             onClick={() => getLocation("PREGNANT")}
           >
-            <span className="emoji">🤰</span>
-            임산부 응급 추천
+            <div className="btn-detail">
+            {/* <span className="emoji">🤰</span> */}
+              <img src={pregnant} alt="pregnant icon" className="pregnant-img" />
+
+            임산부 응급
+            </div>
           </button>
         </div>
 
