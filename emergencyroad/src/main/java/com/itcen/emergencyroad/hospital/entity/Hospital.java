@@ -2,7 +2,10 @@ package com.itcen.emergencyroad.hospital.entity;
 
 import com.itcen.emergencyroad.external.dto.EgytBassDto;
 import com.itcen.emergencyroad.external.dto.EmrDto;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity
@@ -63,5 +66,14 @@ public class Hospital {
         this.latitude = dto.getWgs84Lat();
         this.longitude = dto.getWgs84Lon();
         this.hasEmergency = dto.getDutyEryn();
+    }
+
+
+    //위도 경도 null 확인
+    public boolean isValidLocation(){
+        if(this.latitude == null || this.longitude == null){
+            return false;
+        }
+        return true;
     }
 }

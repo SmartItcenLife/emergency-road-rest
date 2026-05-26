@@ -4,6 +4,7 @@ import com.itcen.emergencyroad.admin.dto.AdminPostListDTO;
 import com.itcen.emergencyroad.admin.dto.AdminUserResponseDTO;
 import com.itcen.emergencyroad.admin.dto.DashboardResponseDto;
 import com.itcen.emergencyroad.community.dto.ReportResponseDTO;
+import com.itcen.emergencyroad.community.entity.Comment;
 import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.Report;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
