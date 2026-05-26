@@ -42,7 +42,8 @@ public class SecurityConfig {
             // Swagger
             .requestMatchers(
                 "/swagger-ui/**",
-                "/v3/api-docs/**"
+                "/v3/api-docs/**",
+                    "/api/recommend/**"
             ).permitAll()
 
             // 인증 없이 허용
