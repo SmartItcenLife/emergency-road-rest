@@ -43,9 +43,12 @@ function KakaoMap() {
 
         mapInstanceRef.current = map;
 
+        // 지도의 중심이 변경될 때마다 병원 마커를 그림
         async function renderHospitalMarkers() {
           const boundsParams = getMapBoundsParams(map);
           const hospitals = await getMapHospitals(boundsParams);
+
+          clearMarkers(); // 기존 마커 제거
 
           hospitals.forEach((hospital) => {
             const position = new window.kakao.maps.LatLng(
@@ -64,7 +67,18 @@ function KakaoMap() {
           });
       }
 
+      // 초기 마커 생성 후 확대 및 이동 시 중복 마커 생성을 방지하기 위해 기존 마커를 제거하는 함수
+      function clearMarkers() {
+        markersRef.current.forEach((marker) => { 
+          marker.setMap(null);
+        });
+        markersRef.current = [];
+      }
+
       renderHospitalMarkers();
+
+      // map 객체가 생성된 뒤에 이벤트를 붙임
+      window.kakao.maps.event.addListener(map, "idle", renderHospitalMarkers);
         });
     };
 
