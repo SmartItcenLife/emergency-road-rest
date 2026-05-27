@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { getMapBoundsParams } from "../utils/mapBounds";
 import { getMapHospitals } from "../api/mapApi";
+import { getMarkerColorByGrade } from "../utils/mapMarkerStyle";
 
 const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 
@@ -58,11 +59,25 @@ function KakaoMap() {
             );
             
             // kakao.maps.Marker 인스턴스를 생성하여 기본 마커를 표시
-            const marker = new window.kakao.maps.Marker({
+            // const marker = new window.kakao.maps.Marker({
+            //   map,
+            //   position,
+            //   title: hospital.hospitalName,
+            // });
+
+            const markerColor = getMarkerColorByGrade(hospital.status?.grade);
+            const markerElement = document.createElement("div");
+            markerElement.className = "map-hospital-marker";
+            markerElement.style.backgroundColor = markerColor;
+            markerElement.title = hospital.hospitalName;
+
+            const marker = new window.kakao.maps.CustomOverlay({
               map,
               position,
-              title: hospital.hospitalName,
-            });
+              content: markerElement,
+              yAnchor: 0.5, // 마커의 y축 앵커를 0.5로 설정하여 마커가 정확히 위치하도록 조정
+              xAnchor: 0.5, // 마커의 x축 앵커를 0.5로 설정하여 마커가 정확히 위치하도록 조정
+            })
           
             markersRef.current.push(marker);
           });
