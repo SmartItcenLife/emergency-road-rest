@@ -1,0 +1,48 @@
+        /* 5. 테이블(표): 투박한 파란색 헤더를 버리고, 연한 회색 헤더와 흰색 본문으로 모던하게 변경 */
+        table { 
+            width: 100%; 
+            border-collapse:separate; 
+            border-spacing: 0; 
+            margin-top: 10px; background: #ffffff; 
+            border-radius: 16px; 
+            border: 1px solid #ebeef2; 
+            overflow: hidden; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02); 
+        }
+
+        th, td { 
+            padding: 16px; 
+            text-align: center; 
+            border-bottom: 1px solid #ebeef2; 
+            font-size: 14px; 
+            color: #333d4b; 
+        }
+
+        th { background-color: #f9fafb; 
+            color: #6b7684; 
+            font-weight: 600; 
+            font-size: 13px; 
+        }
+
+        /* tr:last-child td { border-bottom: none; } */
+
+        tr:hover td { 
+            background-color: #f8f9fa; 
+        }
+
+        /* 7. 버튼(삭제/탈퇴): 위험한 액션은 빨간색 배경의 귀여운 둥근(Pill) 스타일 버튼으로! */
+        .delete-button { 
+            cursor: pointer; 
+            border: none; 
+            background-color: #fee2e2; 
+            color: #ef4444;
+            font-weight: 600; 
+            font-size: 13px; 
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            transition: all 0.2s; 
+        }
+
+        .delete-button:hover{
+            background-color: #fecaca;
+        }
