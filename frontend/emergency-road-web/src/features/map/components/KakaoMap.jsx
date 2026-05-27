@@ -8,6 +8,7 @@ function KakaoMap() {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef([]); // Marker 인스턴스를 저장할 ref
+  const debounceTimeoutRef = useRef(null); // 너무 잦은 API 호출을 막기 위한 디바운스 타임아웃 ref
 
   useEffect(() => {
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
@@ -75,10 +76,21 @@ function KakaoMap() {
         markersRef.current = [];
       }
 
+      // debounce를 적용하여 지도의 중심이 변경될 때마다 너무 잦은 API 호출을 방지
+      function debounceRenderHospitalMarkers() {
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+        debounceTimeoutRef.current = setTimeout(() => {
+          renderHospitalMarkers();
+        }, 500); // 500ms 딜레이
+      }
+
       renderHospitalMarkers();
 
-      // map 객체가 생성된 뒤에 이벤트를 붙임
-      window.kakao.maps.event.addListener(map, "idle", renderHospitalMarkers);
+      // map 객체가 생성된 뒤에 이벤트를 붙임 
+      // idle 이벤트는 
+      window.kakao.maps.event.addListener(map, "idle", debounceRenderHospitalMarkers);
         });
     };
 
