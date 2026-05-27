@@ -1,4 +1,4 @@
-import "./AdminPostListPage.css";
+import "./AdminTable.css";
 import AdminLayout from "../../features/admin/components/AdminLayout";
 import PostTable from "../../features/admin/components/PostTable";
 import { useEffect, useState } from "react";
@@ -7,7 +7,7 @@ function AdminPostListPage(){
     const [posts, setPosts] = useState([]);
 
     const handleDeletePost = async(id)=>{
-    const ok = window.confirm("정말 이 게시을을 삭제 처리 하시겠습니까?");
+    const ok = window.confirm("정말 이 게시글을 삭제 처리 하시겠습니까?");
     if(!ok) return;
 
     const response = await fetch(`http://localhost:8080/api/admin/posts/${id}`,{
@@ -25,6 +25,7 @@ function AdminPostListPage(){
     )
     );
     };
+
     useEffect(()=>{
         const fetchPosts = async()=>{
             const response = await fetch("http://localhost:8080/api/admin/posts");
@@ -37,7 +38,7 @@ function AdminPostListPage(){
 
     return (
         <AdminLayout>
-            <div className="admin-post-page">
+            <div className="admin-list-page">
             <PostTable posts={posts} onDeletePost={handleDeletePost}/>
             </div>
         </AdminLayout>

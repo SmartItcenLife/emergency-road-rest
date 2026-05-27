@@ -2,7 +2,7 @@ import PostTableRow from "./PostTableRow";
 
 function PostTable({posts, onDeletePost}){
     return(
-        <table className="post-table">
+        <table className="admin-table">
             <thead>
                 <tr>
                 <th>글 번호</th>
