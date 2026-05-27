@@ -2,7 +2,7 @@
 // 2. 페이지 처음 열릴 때 /api/admin 호출
 // 3. 응답 데이터를 stats에 저장
 // 4. DashboardCardGroup에 stats 넘기기
-//import AdminLayout from "../../features/admin/components/AdminLayout";
+import AdminLayout from "../../features/admin/components/AdminLayout";
 //import AdminHeader from "../../features/admin/components/AdminHeader";
 import { useEffect, useState } from "react";
 import DashboardCardGroup from "../../features/admin/components/DashboardCardGroup";
@@ -26,10 +26,12 @@ function AdminDashboardPage(){
     }, []);
 
     return (
-        <>
-        <DashboardCardGroup stats={stats}/>
-        </>
-    )
+    <AdminLayout>
+    <div className="admin-dashboard-page">
+      <DashboardCardGroup stats={stats} />
+    </div>
+  </AdminLayout>
+);
 }
 
 export default AdminDashboardPage;

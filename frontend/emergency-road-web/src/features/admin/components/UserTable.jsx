@@ -4,7 +4,7 @@ import UserTableRow from "./UserTableRow";
 
 function UserTable({users, onDeleteUser}){
     return (
-    <table>
+    <table className="user-table">
       <thead>
         <tr>
           <th>순번</th>
