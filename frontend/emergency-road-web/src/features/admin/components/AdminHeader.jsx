@@ -12,7 +12,7 @@ const AdminHeader = () => {
       <nav className="admin-menu">
         <a href="/admin/users">회원관리</a>
         <a href="/admin/report">신고관리</a>
-        <a href="/admin/hospital">커뮤니티 전체보기</a>
+        <a href="/admin/posts">커뮤니티 전체보기</a>
       </nav>
 
       <button>로그아웃</button>
