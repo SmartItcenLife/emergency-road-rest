@@ -1,6 +1,6 @@
 export function getMarkerColorByGrade(grade) {
     switch (grade) {
-        case "RELEXED":
+        case "RELAXED":
             return "#16a34a"; // 초록색
         case "NORMAL":
             return "#2563eb"; // 파란색
