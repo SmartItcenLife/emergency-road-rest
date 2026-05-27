@@ -1,7 +1,13 @@
+.admin-dashboard-page {
+  min-height: calc(100svh - 72px);
+  background-color: #f5f6f8;
+  padding: 40px 50px;
+  box-sizing: border-box;
+}
+
 .dashboard-cards {
   display: flex;
   gap: 20px;
-  padding: 40px 50px;
 }
 
 .card {
