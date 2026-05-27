@@ -1,3 +1,6 @@
-<html>
-    
-</html>
+
+function PostTableRow(){
+
+}
+
+export default PostTableRow;
