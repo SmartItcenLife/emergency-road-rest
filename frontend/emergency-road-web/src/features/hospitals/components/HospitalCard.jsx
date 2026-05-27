@@ -30,11 +30,11 @@ const HospitalCard = ({ hospital, rank, userLat, userLon }) => {
   };
 
  const moveRoute = () => {
-  console.log(userLat);
-console.log(userLon);
-console.log(hospital.hospitalName);
-console.log(hospital.hospitalLatitude);
-console.log(hospital.hospitalLongitude);
+    console.log(userLat);
+    console.log(userLon);
+    console.log(hospital.hospitalName);
+    console.log(hospital.hospitalLatitude);
+    console.log(hospital.hospitalLongitude);
   const url =
     `https://map.kakao.com/link/by/car/` +
     `현재위치,${userLat},${userLon}/` +

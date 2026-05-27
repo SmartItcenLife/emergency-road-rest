@@ -28,7 +28,7 @@ const handleCategoryClick = async (category) => {
   };
 
   return (
-    <div className="page">
+    <div className="mainpage">
       <div className="container">
         <div className= "content">
         <h1 className="title">지금 병원이 필요하신가요?</h1>
