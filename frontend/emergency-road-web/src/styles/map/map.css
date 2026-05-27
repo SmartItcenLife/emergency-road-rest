@@ -1,0 +1,16 @@
+.map-page {
+  width: 100%;
+  min-height: calc(100svh - 80px);
+  background: #f5f7fb;
+}
+
+.map-layout {
+  width: 100%;
+  min-height: calc(100svh - 80px);
+}
+
+.kakao-map {
+  width: 100%;
+  height: calc(100svh - 80px);
+  background: #e5e7eb;
+}
