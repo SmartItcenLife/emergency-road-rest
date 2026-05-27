@@ -19,23 +19,23 @@ public class LikeController {
 
   // 게시글 좋아요 토글
   @PostMapping("/like")
-  public ResponseEntity<ApiResponseDto<Void>> togglePostLike(
+  public ResponseEntity<ApiResponseDto<Boolean>> togglePostLike(
       @PathVariable Long postId,
       @AuthenticationPrincipal Long userId) {
 
     boolean isLiked = likeService.togglePostLike(postId, userId);
     String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
-    return ResponseEntity.ok(ApiResponseDto.success(message));
+    return ResponseEntity.ok(ApiResponseDto.success(message, isLiked));
   }
 
   // 댓글 좋아요 토글
   @PostMapping("/comments/{commentId}/like")
-  public ResponseEntity<ApiResponseDto<Void>> toggleCommentLike(
+  public ResponseEntity<ApiResponseDto<Boolean>> toggleCommentLike(
       @PathVariable Long commentId,
       @AuthenticationPrincipal Long userId) {
 
     boolean isLiked = likeService.toggleCommentLike(commentId, userId);
     String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
-    return ResponseEntity.ok(ApiResponseDto.success(message));
+    return ResponseEntity.ok(ApiResponseDto.success(message, isLiked));
   }
 }

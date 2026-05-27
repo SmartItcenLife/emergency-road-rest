@@ -43,7 +43,8 @@ public class SecurityConfig {
             .requestMatchers(
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
-                    "/api/recommend/**"
+                    "/api/recommend/**",
+                "/uploads/**"
             ).permitAll()
 
             // 인증 없이 허용
@@ -53,7 +54,8 @@ public class SecurityConfig {
                 "/api/auth/refresh",
                 "/api/auth/logout").permitAll()
             .requestMatchers(HttpMethod.GET,
-                "/api/auth/kakao").permitAll()
+                "/api/auth/kakao",
+                "/api/auth/kakao/redirect").permitAll()
 
             // 병원/병상 조회 전체 비로그인 허용
             .requestMatchers("/api/hospitals/**").permitAll()
@@ -106,8 +108,8 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(List.of(
-        // React 개발으로 3000번 포트로 CORS 열어두었습니다.
-        "http://localhost:3000"
+        // React 개발으로 5173번 포트로 CORS 열어두었습니다.
+        "http://localhost:5173"
     ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));

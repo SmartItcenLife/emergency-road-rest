@@ -79,7 +79,7 @@ public class PostImageService {
     try {
       Path uploadPath = Path.of(System.getProperty("user.dir"), UPLOAD_DIR);
 
-      if (Files.exists(uploadPath)) {
+      if (!Files.exists(uploadPath)) {
         Files.createDirectories(uploadPath);
       }
 
@@ -89,7 +89,7 @@ public class PostImageService {
       Path filepath = uploadPath.resolve(fileName);
       file.transferTo(filepath.toFile());
 
-      return "/" + UPLOAD_DIR + "/" + fileName;
+      return "/" + UPLOAD_DIR + fileName;
     } catch (IOException e) {
       throw new CustomException(ExceptionStatus.FILE_UPLOAD_FAILED);
     }
