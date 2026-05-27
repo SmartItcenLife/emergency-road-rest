@@ -75,8 +75,8 @@ public class SecurityConfig {
                 "/api/hospitals/*/posts/*/comments/*").authenticated()
 
             // 어드민(ADMIN 경로는 ROLE을 ADMIN 가진 경우에만 진입할 수 있도록 설정해두었습니다.)
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                //.requestMatchers("/api/admin/**").permitAll() // 임시로 허용했습니다(테스트)_정연
+            //.requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").permitAll() // 임시로 허용했습니다(테스트)_정연
 
 
                 // 나머지
