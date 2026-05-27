@@ -31,7 +31,7 @@ const Layout = () => {
        <Route path="/recommend/:category" element={<HospitalRecommendPage />} />
         {/* <Route path="/community" element={<Community />} /> */}
         <Route path="/map" element={<MapPage />} />
-        <Route path="/community" element={<Community />} /> */}
+        {/* <Route path="/community" element={<Community />} />  */}
       </Routes>
     </>
   );
