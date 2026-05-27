@@ -37,7 +37,9 @@ function AdminPostListPage(){
 
     return (
         <AdminLayout>
+            <div className="admin-post-page">
             <PostTable posts={posts} onDeletePost={handleDeletePost}/>
+            </div>
         </AdminLayout>
     );
 }
