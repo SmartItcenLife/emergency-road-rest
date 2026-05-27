@@ -109,7 +109,7 @@ public class SecurityConfig {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(List.of(
         // React 개발으로 3000번 포트로 CORS 열어두었습니다.
-        "http://localhost:3000"));
+        "http://localhost:5713"));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);

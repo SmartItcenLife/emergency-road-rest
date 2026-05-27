@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5713")
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor

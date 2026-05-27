@@ -4,10 +4,10 @@ import UserTableRow from "./UserTableRow";
 
 function UserTable({users, onDeleteUser}){
     return (
-    <table className="user-table">
+    <table className="admin-table">
       <thead>
         <tr>
-          <th>순번</th>
+          <th>번호</th>
           <th>아이디</th>
           <th>닉네임</th>
           <th>이메일</th>

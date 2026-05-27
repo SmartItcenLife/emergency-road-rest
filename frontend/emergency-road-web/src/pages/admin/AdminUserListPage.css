@@ -1,5 +1,4 @@
-        /* 5. 테이블(표): 투박한 파란색 헤더를 버리고, 연한 회색 헤더와 흰색 본문으로 모던하게 변경 */
-        .user-table { 
+        /* .user-table { 
             width: 100%; 
             border-collapse:separate; 
             border-spacing: 0; 
@@ -26,13 +25,10 @@
             font-size: 13px; 
         }
 
-        /* tr:last-child td { border-bottom: none; } */
-
         tr:hover td { 
             background-color: #f8f9fa; 
         }
 
-        /* 7. 버튼(삭제/탈퇴): 위험한 액션은 빨간색 배경의 귀여운 둥근(Pill) 스타일 버튼으로! */
         .delete-button { 
             cursor: pointer; 
             border: none; 
@@ -47,4 +43,4 @@
 
         .delete-button:hover{
             background-color: #fecaca;
-        }
+        } */

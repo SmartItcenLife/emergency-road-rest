@@ -1,0 +1,78 @@
+/* .admin-post-page {
+  min-height: calc(100svh - 72px);
+  background-color: #f5f6f8;
+  padding: 40px 50px;
+  box-sizing: border-box;
+}
+
+.post-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
+  border: 1px solid #ebeef2;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.post-table th,
+.post-table td {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #ebeef2;
+  font-size: 14px;
+  color: #333d4b;
+  vertical-align: middle;
+}
+
+.post-table th {
+  background-color: #f9fafb;
+  color: #6b7684;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.post-table tr:last-child td {
+  border-bottom: none;
+}
+
+.post-table tr:hover td {
+  background-color: #f8f9fa;
+}
+
+.post-title {
+  color: #2f6cf6;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.post-title:hover {
+  text-decoration: underline;
+}
+
+.status-normal {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.status-deleted {
+  color: #8b95a1;
+  font-weight: 700;
+}
+
+.delete-button {
+  cursor: pointer;
+  border: none;
+  background-color: #fee2e2;
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background-color: #fecaca;
+} */
