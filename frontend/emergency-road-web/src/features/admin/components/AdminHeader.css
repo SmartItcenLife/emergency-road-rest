@@ -19,6 +19,22 @@
   color: #1a1a1a;
 }
 
+.admin-logo a {
+  display: block;
+  padding: 12px 18px;
+  color: #505866;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+
+.admin-logo a:hover {
+  background-color: #f0f4ff;
+  color: #2f6cf6;
+}
+
 .admin-menu {
   display: flex;
   align-items: center;
