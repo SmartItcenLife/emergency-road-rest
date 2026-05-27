@@ -1,18 +1,18 @@
 import React from 'react';
-import '../../../../src/styles/admin/AdminHeader.css';
+import './AdminHeader.css';
 
 const AdminHeader = () => {
   return (
     <header className="admin-header">
 
       <div className="admin-logo">
-        관리자 페이지
+        <a href="/admin">관리자 페이지</a>
       </div>
 
       <nav className="admin-menu">
         <a href="/admin/users">회원관리</a>
         <a href="/admin/report">신고관리</a>
-        <a href="/admin/hospital">병원관리</a>
+        <a href="/admin/hospital">커뮤니티 전체보기</a>
       </nav>
 
       <button>로그아웃</button>

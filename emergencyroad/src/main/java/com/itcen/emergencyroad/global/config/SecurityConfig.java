@@ -76,8 +76,10 @@ public class SecurityConfig {
 
             // 어드민(ADMIN 경로는 ROLE을 ADMIN 가진 경우에만 진입할 수 있도록 설정해두었습니다.)
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                //.requestMatchers("/api/admin/**").permitAll() // 임시로 허용했습니다(테스트)_정연
 
-            // 나머지
+
+                // 나머지
             .anyRequest().authenticated()
         )
 
@@ -107,8 +109,7 @@ public class SecurityConfig {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(List.of(
         // React 개발으로 3000번 포트로 CORS 열어두었습니다.
-        "http://localhost:3000"
-    ));
+        "http://localhost:3000"));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);
