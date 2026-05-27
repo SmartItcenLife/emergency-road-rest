@@ -7,6 +7,7 @@ const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 function KakaoMap() {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const markersRef = useRef([]); // Marker 인스턴스를 저장할 ref
 
   useEffect(() => {
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
@@ -21,6 +22,7 @@ function KakaoMap() {
     }
 
     const createMap = () => {
+      // ?. 옵셔널 체이닝은 windiow.kakao가 존재하는지 확인 후 진행 즉 있으면 window.kakao.maps 없으면 undefined 반환 하도록 하여 예외처리 방지.
       if (!window.kakao?.maps || !mapContainerRef.current) {
         return;
       }
@@ -41,19 +43,29 @@ function KakaoMap() {
 
         mapInstanceRef.current = map;
 
-        async function fetchHospitalsInBounds() {
-        const boundsParams = getMapBoundsParams(map);
-        const hospitals = await getMapHospitals(boundsParams);
-        console.log("지도 범위 내 병원:", hospitals);
+        async function renderHospitalMarkers() {
+          const boundsParams = getMapBoundsParams(map);
+          const hospitals = await getMapHospitals(boundsParams);
+
+          hospitals.forEach((hospital) => {
+            const position = new window.kakao.maps.LatLng(
+              hospital.latitude,
+              hospital.longitude
+            );
+            
+            // kakao.maps.Marker 인스턴스를 생성하여 기본 마커를 표시
+            const marker = new window.kakao.maps.Marker({
+              map,
+              position,
+              title: hospital.hospitalName,
+            });
+          
+            markersRef.current.push(marker);
+          });
       }
 
-      fetchHospitalsInBounds();
-
-        mapInstanceRef.current = new window.kakao.maps.Map(
-          mapContainerRef.current,
-          options
-        );
-      });
+      renderHospitalMarkers();
+        });
     };
 
     const existingScript = document.getElementById(KAKAO_MAP_SDK_ID);

@@ -4,9 +4,9 @@ export function getMapBoundsParams(map) {
     const ne = bounds.getNorthEast();
 
     return {
-        swLat: sw.getLat(),
-        swLng: sw.getLng(),
-        neLat: ne.getLat(),
-        neLng: ne.getLng(),
-    };
+          swLat: sw.getLat(),
+          swLon: sw.getLng(),
+          neLat: ne.getLat(),
+          neLon: ne.getLng(),
+        };
 }
