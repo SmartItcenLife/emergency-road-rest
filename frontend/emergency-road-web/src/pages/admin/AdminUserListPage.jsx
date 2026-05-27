@@ -2,7 +2,8 @@
 import AdminLayout from "../../features/admin/components/AdminLayout";
 import { useEffect, useState } from "react";
 import UserTable from "../../features/admin/components/UserTable";
-import "./AdminUserListPage.css";
+// import "./AdminUserListPage.css";
+import "./AdminTable.css";
 
 function AdminUserListPage(){
     const [users, setUsers] = useState([]);
@@ -35,7 +36,9 @@ function AdminUserListPage(){
 
     return(
         <AdminLayout>
+          <div className="admin-list-page">
           <UserTable users={users} onDeleteUser={handleDeleteUser}/>
+          </div>
     </AdminLayout>
   );
 }
