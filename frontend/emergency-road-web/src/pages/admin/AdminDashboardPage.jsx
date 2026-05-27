@@ -3,9 +3,10 @@
 // 3. 응답 데이터를 stats에 저장
 // 4. DashboardCardGroup에 stats 넘기기
 //import AdminLayout from "../../features/admin/components/AdminLayout";
-import AdminHeader from "../../features/admin/components/AdminHeader";
-//import DashboardCardGroup from "../../components/admin/DashboardCardGroup";
+//import AdminHeader from "../../features/admin/components/AdminHeader";
 import { useEffect, useState } from "react";
+import DashboardCardGroup from "../../features/admin/components/DashboardCardGroup";
+import "./AdminDashboardPage.css";
 
 function AdminDashboardPage(){
     const [stats, setStats] = useState({
@@ -26,30 +27,8 @@ function AdminDashboardPage(){
 
     return (
         <>
-            {/* 
-            이게 없어야 두 줄 아니고 한 줄 나옴 !!!
-            <AdminHeader
-            title="대시보드"
-            description="응급길 시스템 관리자 현황을 한눈에 확인하세요"
-            /> */}
-            
-            <div className="dashboard-cards">
-                <div className="card">
-                    <h3>오늘 가입한 회원</h3>
-                    <p className="number">{stats.todayUsers}</p>
-                </div>
-
-                <div className="card">
-                    <h3>오늘 새 게시글</h3>
-                    <p className="number">{stats.todayPosts}</p>
-                </div>
-
-                <div className="card">
-                    <h3>신고 접수 건</h3>
-                    <p className="number danger">{stats.totalReports}</p>
-                </div>
-            </div>
-            </>
+        <DashboardCardGroup stats={stats}/>
+        </>
     )
 }
 
