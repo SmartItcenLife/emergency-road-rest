@@ -7,7 +7,7 @@ function StatCard({title, number, danger}){
     useEffect(()=>{
         const targetNumber = Number(number) || 0;
         let count = 0;
-        const maxCount = 5;
+        const maxCount = 7;
 
         setRolling(true);
 
