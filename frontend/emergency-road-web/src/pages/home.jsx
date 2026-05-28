@@ -1,37 +1,34 @@
 import { useState } from "react";
-import "../styles/Home.css";
+import "./Home.css";
 import location from "../assets/home/location.png"
 import general from "../assets/home/general.png"
 import children from "../assets/home/children.png"
 import pregnant from "../assets/home/pregnant.png"
+import { useNavigate } from "react-router-dom";
+import { useLocation } from "../features/hospitals/hooks/recommend/useLocation"; // 훅 import
 
 function Home() {
+  const navigate = useNavigate(); // Hook 호출
+  const { getLocation } = useLocation();
   const [message, setMessage] = useState("버튼을 눌러 내 주변 응급 병원을 확인하세요.");
 
-  const getLocation = (category) => {
-    setMessage("위치 정보를 요청 중입니다... 브라우저에서 허용해주세요.");
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-
-          // 페이지 이동 처리
-          window.location.href = `/recommend/rank?category=${category}&lat=${lat}&lon=${lon}`;
-        },
-        (error) => {
-          setMessage("위치 권한이 거부되었습니다. 설정에서 허용해주세요.");
-          console.error("Geolocation error:", error.code, error.message);
-        }
-      );
-    } else {
-      alert("이 브라우저는 위치 정보를 지원하지 않습니다.");
+const handleCategoryClick = async (category) => {
+    setMessage("위치 정보를 가져오는 중입니다...");
+    
+    try {
+      // 훅이 위치 가져오는 복잡한 과정을 처리함
+      const { lat, lon } = await getLocation(); 
+      
+      // 이동
+      navigate(`/recommend/${category.toUpperCase()}?lat=${lat}&lon=${lon}`);
+    } catch (err) {
+      setMessage("위치 정보를 사용할 수 없습니다. 권한을 확인해주세요.");
+      console.error(err);
     }
   };
 
   return (
-    <div className="page">
+    <div className="mainpage">
       <div className="container">
         <div className= "content">
         <h1 className="title">지금 병원이 필요하신가요?</h1>
@@ -46,7 +43,7 @@ function Home() {
         <div className="button-group">
           <button
             className="recommend-button pediatric"
-            onClick={() => getLocation("PEDIATRIC")}
+           onClick={() => handleCategoryClick("PEDIATRIC")}
           >
              <div className="btn-detail">
             {/* <span className="emoji">🧒</span> */}
@@ -57,7 +54,7 @@ function Home() {
 
           <button
             className="recommend-button general"
-            onClick={() => getLocation("GENERAL")}
+           onClick={() => handleCategoryClick("GENERAL")}
           >
             {/* <span className="emoji">🚑</span> */}
             <div className="btn-detail">
@@ -68,7 +65,7 @@ function Home() {
 
           <button
             className="recommend-button pregnant"
-            onClick={() => getLocation("PREGNANT")}
+             onClick={() => handleCategoryClick("PREGNANT")}
           >
             <div className="btn-detail">
             {/* <span className="emoji">🤰</span> */}
