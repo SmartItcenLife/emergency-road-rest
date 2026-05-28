@@ -13,6 +13,7 @@ import AdminPostListPage from "./pages/admin/AdminPostListPage.jsx";
 import AdminReportListPage from "./pages/admin/AdminReportListPage.jsx";
 import HospitalRecommendPage from "./pages/hospital/HospitalRecommendPage.jsx";
 import MapPage from "./pages/map/MapPage";
+import HospitalListPage from './pages/hospital/HospitalListPage.jsx';
 
 import { AuthProvider, useAuthContext } from "./app/providers/AuthProvider.jsx";
 import SignupPage from "./pages/auth/SignupPage";
@@ -46,10 +47,9 @@ const Layout = () => {
 
   // 현재 경로에 따라 헤더 타입을 결정하는 로직
   const getHeaderType = () => {
-    if (location.pathname === "/") return "home";
-    if (location.pathname.startsWith("/admin")) {
-      return "admin";
-    }
+    const path = location.pathname;
+    if (path=== '/') return 'home';
+    if(path.startsWith("/admin")){  return "admin";  }
     // if (location.pathname.startsWith('/recommend')) return 'recommend';
     // if (location.pathname.startsWith('/community')) return 'community';
     return "home";
@@ -109,15 +109,16 @@ const Layout = () => {
           }
         />
 
+        {/* 어드민 */}
         <Route path="/admin" element={<AdminDashboardPage />} />
         <Route path="/admin/users" element={<AdminUserListPage />} />
         <Route path="/admin/posts" element={<AdminPostListPage />} />
-        <Route
-          path="/recommend/:category"
-          element={<HospitalRecommendPage />}
-        />
+        <Route path="/admin/reports" element={<AdminReportListPage/>} />
+        {/* 지도 */}
         <Route path="/map" element={<MapPage />} />
-        <Route path="/admin/reports" element={<AdminReportListPage />} />
+        {/* 추천 및 전체 보기 */}
+        <Route path="/recommend/:category" element={<HospitalRecommendPage />} />
+        <Route path="/:category/hospitals" element={<HospitalListPage />} />
       </Routes>
     </>
   );

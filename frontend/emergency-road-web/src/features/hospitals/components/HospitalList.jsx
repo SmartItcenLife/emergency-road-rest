@@ -1,8 +1,9 @@
 // 병원 리스트(배열)를 받아 map()을 돌려 HospitalCard를 여러 개 렌더링하는 부모 컨테이너.import React from 'react';
 import HospitalCard from './HospitalCard';
 import './HospitalList.css'; 
-
-const HospitalList = ({ hospitals, userLat, userLon, config }) => {
+import HospitalListFooter from './HospitalListFooter.jsx';
+import SortSelect from "../../../features/hospitals/components/SortSelect.jsx";
+const HospitalList = ({ hospitals, userLat, userLon, config, category , sort, showRanking, showDistance, compact}) => {
   // 병원이 없는 경우를 위한 처리
   if (!hospitals || hospitals.length === 0) {
     return (
@@ -14,15 +15,19 @@ const HospitalList = ({ hospitals, userLat, userLon, config }) => {
   }
 
   return (
-
     <section className="hospital-list-section">
-      <div className="section-header">
-        <h2 className="section-title">추천 병원 TOP 3</h2>
-        <p className="section-description">
-          현재 위치로부터 10km 이내,<br />
-          <span className="highlight">진료 가능 여부와 실시간 상황</span>을 종합 분석한 추천 결과입니다.
-        </p>
-      </div>
+     
+      {showRanking && (
+        <div className="section-header">
+          <h2 className="section-title">추천 병원 TOP 3</h2>
+            <p className="section-description">
+                현재 위치로부터 10km 이내,<br />
+                <span className="highlight">진료 가능 여부와 실시간 상황</span>을 종합 분석한 추천 결과입니다.
+            </p>
+        </div>
+        )}
+        
+        <SortSelect sort={sort} />
     <div className="hospital-list">
       {hospitals.map((hospital, index) => (
         <HospitalCard 
@@ -32,9 +37,16 @@ const HospitalList = ({ hospitals, userLat, userLon, config }) => {
             userLat = {userLat}
             userLon = {userLon}
             config = {config}
+            category = {category}
+            showRanking = {showRanking}
+            showDistance = {showDistance}
+            compact = {compact}
         />
       ))}
     </div>
+      {showRanking && (
+         <HospitalListFooter category = {category} userLat = {userLat} userLon = {userLon}/>
+        )}
     </section>
   );
 };

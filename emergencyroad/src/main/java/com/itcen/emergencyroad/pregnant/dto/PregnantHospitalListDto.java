@@ -16,7 +16,7 @@ public class PregnantHospitalListDto {
     private String hospitalName;
 
     // 사용자 위치 기준 병원까지의 거리(km)
-    private Double distanceKm;
+    private Double distance;
 
     // 응급실 연락처
     private String emergencyPhone;
@@ -41,6 +41,8 @@ public class PregnantHospitalListDto {
 
     // 시간
     private Double duration;
+
+    private String tags;
 
     public String getDeliveryAvailableLabel() {
         return toAvailabilityLabel(deliveryAvailable);
@@ -99,7 +101,7 @@ public class PregnantHospitalListDto {
     }
 
     public void updateRouteInfo(Double distanceKm, Integer duration){
-        this.distanceKm = distanceKm;
+        this.distance = distanceKm;
         this.duration = duration != null ? duration.doubleValue() : null;
     }
 }

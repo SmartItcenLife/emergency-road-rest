@@ -16,35 +16,21 @@ export function useLocation() {
                 (position) => {
 
                     const data = {
-
                         lat:
                         position.coords.latitude,
-
                         lon:
                         position.coords.longitude
-
                     };
-
                     setLocation(data);
-
                     resolve(data);
                 },
-
                 (error) => {
-
                     reject(error);
-
                 }
-
             );
-
         });
-
     };
 
-    return {
-        location,
-        getLocation
-    };
+    return {location, getLocation};
 
 }
