@@ -20,7 +20,7 @@ public class MapAreaCongestionResponseDto {
 
     private MapDisplayStatusDto status; // 상태값
 
-    private Integer hospitalCount;  // 핻아 구/동 내 병원 수
+    private Integer hospitalCount;  // 해당 구/동 내 병원 수
 
-    private LocalDateTime updatedAt;    // 집계 기준 시간
+    private LocalDateTime recordedAt;    // 집계 기준 시간
 }

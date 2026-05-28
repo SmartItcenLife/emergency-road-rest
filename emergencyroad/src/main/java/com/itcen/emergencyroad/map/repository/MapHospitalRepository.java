@@ -1,6 +1,7 @@
 package com.itcen.emergencyroad.map.repository;
 
 import com.itcen.emergencyroad.hospital.entity.Hospital;
+import com.itcen.emergencyroad.map.dto.MapAreaCongestionProjection;
 import com.itcen.emergencyroad.map.dto.MapGeneralHospitalMarkerProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -53,4 +54,17 @@ public interface MapHospitalRepository extends JpaRepository<Hospital, String> {
             @Param("neLat") Double neLat,
             @Param("neLon") Double neLon
     );
+
+    @Query("""
+    select
+        h.address as address,
+        gr.emergencyAvailableBeds as emergencyAvailableBeds,
+        gr.emergencyTotalBeds as emergencyTotalBeds,
+        gr.recordedAt as recordedAt
+    from Hospital h
+    left join GeneralRealTimeAndStandard gr on gr.hospital = h
+    where h.hasEmergency = true
+      and h.address is not null
+""")
+    List<MapAreaCongestionProjection> findGeneralAreaCongestionSources();
 }

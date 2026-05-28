@@ -197,7 +197,7 @@ public class MapMockService {
                 .category(MapCategory.GENERAL)
                 .status(createEmergencyBedStatus(availableCount, totalCount))
                 .hospitalCount(hospitalCount)
-                .updatedAt(MOCK_UPDATED_AT)
+                .recordedAt(MOCK_UPDATED_AT)
                 .build();
     }
 

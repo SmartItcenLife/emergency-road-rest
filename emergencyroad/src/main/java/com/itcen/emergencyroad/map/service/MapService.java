@@ -1,22 +1,24 @@
 package com.itcen.emergencyroad.map.service;
 
-import com.itcen.emergencyroad.map.dto.MapDisplayStatusDto;
-import com.itcen.emergencyroad.map.dto.MapGeneralHospitalMarkerProjection;
-import com.itcen.emergencyroad.map.dto.MapHospitalMarkerResponseDto;
-import com.itcen.emergencyroad.map.enums.MapCategory;
-import com.itcen.emergencyroad.map.enums.MapCongestionGrade;
-import com.itcen.emergencyroad.map.enums.MapMetricType;
-import com.itcen.emergencyroad.map.enums.MapStatusType;
+import com.itcen.emergencyroad.map.dto.*;
+import com.itcen.emergencyroad.map.entity.MapArea;
+import com.itcen.emergencyroad.map.enums.*;
+import com.itcen.emergencyroad.map.repository.MapAreaRepository;
 import com.itcen.emergencyroad.map.repository.MapHospitalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MapService {
     private final MapHospitalRepository mapHospitalRepository;
+    private final MapAreaRepository mapAreaRepository;
 
     public List<MapHospitalMarkerResponseDto> getHospitals(
             MapCategory category,
@@ -165,5 +167,66 @@ public class MapService {
         }
 
         return null;
+    }
+    // 구 별 혼잡도 조회 메인 메소드
+    public List<MapAreaCongestionResponseDto> getAreaCongestion(MapCategory category) {
+        validateGeneralCategory(category);
+
+        List<MapArea> areas = mapAreaRepository.findActiveAreasBySidoAndLevel(
+                "11",
+                MapAreaLevel.DISTRICT
+        );
+
+        List<MapAreaCongestionProjection> sources =
+                mapHospitalRepository.findGeneralAreaCongestionSources();
+
+        Map< String, List<MapAreaCongestionProjection> > hospitalsByDistrict =
+                sources.stream()
+                        .filter(source -> extractDistrictName(source.getAddress()) != null)
+                        .collect(Collectors.groupingBy(
+                                source -> extractDistrictName(source.getAddress())
+                        ));
+        return areas.stream()
+                .map(area -> toAreaCongestionResponse(
+                        area,
+                        hospitalsByDistrict.getOrDefault(area.getAreaName(), List.of())
+                ))
+                .toList();
+    }
+
+    // 구별 응답 DTO 변환 메소드
+    private MapAreaCongestionResponseDto toAreaCongestionResponse(
+            MapArea area,
+            List<MapAreaCongestionProjection> hospitals
+    ) {
+        int hospitalCount = hospitals.size();
+
+        int totalAvailableBeds = hospitals.stream()
+                .map(MapAreaCongestionProjection::getEmergencyAvailableBeds)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        int totalBeds = hospitals.stream()
+                .map(MapAreaCongestionProjection::getEmergencyTotalBeds)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        LocalDateTime recordedAt = hospitals.stream()
+                .map(MapAreaCongestionProjection::getRecordedAt)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+
+        return MapAreaCongestionResponseDto.builder()
+                .areaCode(area.getAreaCode())
+                .areaName(area.getAreaName())
+                .areaLevel(area.getAreaLevel())
+                .category(MapCategory.GENERAL)
+                .status(createEmergencyBedStatus(totalAvailableBeds, totalBeds))
+                .hospitalCount(hospitalCount)
+                .recordedAt(recordedAt)
+                .build();
     }
 }
