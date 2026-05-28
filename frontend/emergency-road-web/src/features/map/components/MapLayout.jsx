@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useRef } from "react";
 import KakaoMap from "./KakaoMap";
 import { getMapHospitals } from "../api/mapApi";
 import MapListPanel from "./MapListPanel";
@@ -9,13 +9,34 @@ function MapLayout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  async function handleBoundsChange(boundsParams) {
+  // 지도 이동이 완료된 후 병원 데이터를 불러오기 위한 상태
+  const [pendingBounds, setPendingBounds] = useState(null);
+  const [showSearchButton, setShowSearchButton] = useState(false);
+  
+  const hasSearchedOnceRef = useRef(false);
+
+  // 지도 bounds 변경 시 호출되는 함수
+  function handleBoundsChange(boundsParams) {
+    setPendingBounds(boundsParams);
+
+    if (!hasSearchedOnceRef.current) {
+      hasSearchedOnceRef.current = true;
+      searchHospitals(boundsParams);
+      return;
+    }
+
+    setShowSearchButton(true);
+  }
+
+  // 실제 검색 실시
+  async function searchHospitals(boundsParams) {
     try {
       setLoading(true);
       setError(null);
 
       const data = await getMapHospitals(boundsParams);
       setHospitals(data);
+      setShowSearchButton(false);
     } catch (err) {
       console.error("병원 데이터를 불러오는 중 오류가 발생했습니다:", err);
       setError("병원 정보를 불러오지 못했습니다.");
@@ -24,21 +45,28 @@ function MapLayout() {
     }
   }
 
+  // 버튼 클릭 핸들러
+  function handleSearchCurrentMap() {
+    if (!pendingBounds) {
+      return;
+    }
+
+    searchHospitals(pendingBounds);
+  }
+
   return (
-    // 해당 부분은 임시로 API 결과를 확인하기 위한 임시 UI 입니다.
-    <div className="map-layout">
-      {/* <div className="map-status-panel">
-        {loading && <span>병원 정보를 불러오는 중...</span>}
-        {!loading && !error && <span>표시 병원 {hospitals.length}개</span>}
-        {error && <span>{error}</span>}
-      </div> */}
-      <MapListPanel
-        hospitals={hospitals}
-        selectedHospital={selectedHospital}
-        onSelectHospital={setSelectedHospital}
-        loading={loading}
-        error={error}
-      />
+  <div className="map-layout">
+    <div className="map-content">
+      {showSearchButton && (
+        <button
+          type="button"
+          className="map-search-current-button"
+          onClick={handleSearchCurrentMap}
+        >
+          현 지도에서 검색
+        </button>
+      )}
+
       <KakaoMap
         hospitals={hospitals}
         selectedHospital={selectedHospital}
@@ -46,7 +74,16 @@ function MapLayout() {
         onSelectHospital={setSelectedHospital}
       />
     </div>
-  );
+
+    <MapListPanel
+      hospitals={hospitals}
+      selectedHospital={selectedHospital}
+      onSelectHospital={setSelectedHospital}
+      loading={loading}
+      error={error}
+    />
+  </div>
+);
 }
 
 export default MapLayout;
