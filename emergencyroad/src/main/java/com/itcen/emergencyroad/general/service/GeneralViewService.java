@@ -88,13 +88,14 @@ public class GeneralViewService {
                             .hospitalLongitude(
                                     gDto.getHospitalLongitude()
                             )
-                            .distanceKm(
+                            .distance(
                                     gDto.getDistance()
                             )
                             .duration(gDto.getDuration())
                             .recordedAt(
                                     gDto.getRecordedAt()
                             )
+                            .tags(gDto.getTags())
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -147,7 +148,7 @@ public class GeneralViewService {
             // 가까운 병원부터 보여주기 위해 거리 오름차순으로 정렬
             hospitals.sort(
                     Comparator.comparing(
-                            hospital -> hospital.getDistanceKm(),
+                            hospital -> hospital.getDistance(),
                             Comparator.nullsLast(Comparator.naturalOrder())
                     )
             );
