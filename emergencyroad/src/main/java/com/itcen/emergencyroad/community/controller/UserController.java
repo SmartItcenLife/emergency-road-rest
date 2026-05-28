@@ -6,6 +6,7 @@ import com.itcen.emergencyroad.community.dto.auth.UpdateUserRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.AuthTokenResponseDto;
 import com.itcen.emergencyroad.community.dto.auth.RefreshTokenRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.UserResponseDto;
+import com.itcen.emergencyroad.community.service.KakaoService;
 import com.itcen.emergencyroad.community.service.TokenService;
 import com.itcen.emergencyroad.community.service.UserService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
@@ -39,6 +40,7 @@ public class UserController {
 
   private final UserService userService;
   private final TokenService tokenService;
+  private final KakaoService kakaoService;
 
   @Operation(summary = "회원가입", description = "로컬 회원가입 (multipart/form-data)")
   @ApiResponses({
@@ -78,6 +80,15 @@ public class UserController {
 
     return ResponseEntity.ok(
         ApiResponseDto.success("카카오 로그인 성공", userService.kakaoLogin(code))
+    );
+  }
+
+  @Operation(summary = "카카오 로그인 URL 조회", description = "카카오 인가 URL 반환")
+  @ApiResponse(responseCode = "200", description = "URL 조회 성공")
+  @GetMapping("/kakao/redirect")
+  public ResponseEntity<ApiResponseDto<String>> getKakaoLoginUrl() {
+    return ResponseEntity.ok(
+        ApiResponseDto.success("카카오 로그인 URL", kakaoService.getKakaoLoginUrl())
     );
   }
 
