@@ -57,7 +57,7 @@ public class MapMockService {
                         .areaCode("11140")
                         .areaName("중구")
                         .status(createEmergencyBedStatus(12, 20))
-                        .updatedAt(MOCK_UPDATED_AT)
+                        .recordedAt(MOCK_UPDATED_AT)
                         .build(),
                 MapHospitalMarkerResponseDto.builder()
                         .hpid("A110002")
@@ -70,7 +70,7 @@ public class MapMockService {
                         .areaCode("11680")
                         .areaName("강남구")
                         .status(createEmergencyBedStatus(5, 25))
-                        .updatedAt(MOCK_UPDATED_AT)
+                        .recordedAt(MOCK_UPDATED_AT)
                         .build(),
                 MapHospitalMarkerResponseDto.builder()
                         .hpid("A110003")
@@ -83,7 +83,7 @@ public class MapMockService {
                         .areaCode("11110")
                         .areaName("종로구")
                         .status(createEmergencyBedStatus(1, 10))
-                        .updatedAt(MOCK_UPDATED_AT)
+                        .recordedAt(MOCK_UPDATED_AT)
                         .build()
         );
     }
