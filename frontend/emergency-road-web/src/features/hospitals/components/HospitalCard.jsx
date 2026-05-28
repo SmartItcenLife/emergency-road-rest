@@ -2,34 +2,19 @@ import React, { useState } from 'react';
 import './HospitalCard.css';
 import HospitalDonutChart from './HospitalDonutChart';
 import { getHospitalDetail } from '../api/hospitalDetail';
-
+import HospitalDetail from './HospitalDetail';
 // 아이콘
 import phoneIcon from '../../../assets/hospital/phone.svg';
 import finderIcon from '../../../assets/hospital/finder.svg';
 import communityIcon from '../../../assets/hospital/community.svg';
 import angleIcon from '../../../assets/hospital/angle-brackets.png';
+import { useHospitalDetail } from '../hooks/recommend/useHospitalDetail';
 
 const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [detailData, setDetailData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { detailData, loading, isExpanded, toggleDetail} = useHospitalDetail(category, hospital.hpid);
   const [error, setError] = useState(null);
   const theme = config.theme;
   
-  const handleToggle = async () => {
-    if (!isExpanded && !detailData) {
-      try {
-        setLoading(true);
-        const data = await getHospitalDetail(category, hospital.hpid);
-        setDetailData(data);
-      } catch {
-        setError('상세 정보를 불러오지 못했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    setIsExpanded(!isExpanded);
-  };
 
   const moveRoute = () => {
     const url = `https://map.kakao.com/link/by/car/현재위치,${userLat},${userLon}/${hospital.hospitalName},${hospital.hospitalLatitude},${hospital.hospitalLongitude}`;
@@ -43,98 +28,8 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) =>
     return 'badge-unknown';
   };
 
-  const displayValue = (value) => {
-    if (value === null || value === undefined || value === '') {
-      return '-';
-    }
-    return value;
-  };
 
-  const formatDateTime = (value) => {
-    if (!value) return '-';
-    return value.replace('T', ' ').slice(0, 16);
-  };
-
-  const normalizeAvailability = (value) => {
-    const v = String(value || '').trim().toUpperCase();
-
-    if (v === 'Y' || v === 'YES' || v === 'TRUE' || v === '1' || v === '가능') {
-      return { label: '가능', className: 'capability-available' };
-    }
-    if (v === 'N' || v === 'NO' || v === 'FALSE' || v === '0' || v === '불가') {
-      return { label: '불가', className: 'capability-unavailable' };
-    }
-    return { label: displayValue(value), className: 'capability-unknown' };
-  };
-
-  const formatResource = (current, total) => {
-    const currentValue = displayValue(current);
-    const totalValue = displayValue(total);
-    return totalValue === '-' ? currentValue : `${currentValue} / ${totalValue}`;
-  };
-
-  const renderRowSection = (section) => (
-    <div className="detail-section" key={section.title}>
-      <h3 className="detail-title">{section.title}</h3>
-      {section.items.map((item) => {
-        let value = detailData[item.key];
-        if (item.format === 'datetime') value = formatDateTime(value);
-        return (
-          <div className="detail-row" key={item.key}>
-            <span className="detail-label">{item.label}</span>
-            <span className="detail-value">{displayValue(value)}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-
-  const renderResourceSection = (section) => (
-    <div className="detail-section" key={section.title}>
-      <h3 className="detail-title">{section.title}</h3>
-      <div className="core-resource-grid">
-        {section.items.map((item) => (
-          <div className="detail-resource" key={item.label}>
-            <span className="detail-resource-name">{item.label}</span>
-            <span className="detail-resource-value">
-              {formatResource(detailData[item.currentKey], detailData[item.totalKey])}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderCapabilitySection = (section) => (
-    <div className="detail-section" key={section.title}>
-      <h3 className="detail-title">{section.title}</h3>
-      <div className="capability-grid">
-        {section.items.map((item) => {
-          const status = normalizeAvailability(detailData[item.key]);
-          return (
-            <div key={item.key}>
-              <div className="detail-capability">
-                <span>{item.label}</span>
-                <span className={`capability-badge ${status.className}`}>
-                  {status.label}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  const renderDetailSection = (section) => {
-    switch (section.type) {
-      case 'rows': return renderRowSection(section);
-      case 'resources': return renderResourceSection(section);
-      case 'capabilities': return renderCapabilitySection(section);
-      default: return null;
-    }
-  };
-
+ 
   return (
     <>
       <article className={`hospital-card ${rank === 1 ? 'top1' : ''}`} 
@@ -202,7 +97,7 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) =>
             </div>
           </div>
 
-          <button onClick={handleToggle} className={`detail-toggle ${isExpanded ? 'detail-toggle-open' : ''}`}>
+          <button onClick={toggleDetail} className={`detail-toggle ${isExpanded ? 'detail-toggle-open' : ''}`}>
             <img src={angleIcon} className="detail-toggle-icon" alt="더보기" />
           </button>
         </div>
@@ -213,10 +108,11 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) =>
           {loading && <div className="detail-loading">상세 정보를 불러오는 중입니다...</div>}
           {error && <div className="detail-error">{error}</div>}
           {detailData && (
-            <div className="hospital-detail-panel">
-              {config.detailSections.map((section) => renderDetailSection(section))}
-            </div>
-          )}
+                  <HospitalDetail
+                    detailData={detailData}
+                    config={config}
+                  />
+           )}
         </div>
       )}
     </>

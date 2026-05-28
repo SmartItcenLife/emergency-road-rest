@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { getHospitalDetail } from '../api/hospitalDetail';
+import { getHospitalDetail } from '../../api/hospitalDetail'
 
-export const useHospitalDetail = (hpid) => {
+export const useHospitalDetail = (category,hpid) => {
     const [detailData, setDetailData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -11,7 +11,7 @@ export const useHospitalDetail = (hpid) => {
         if (!isExpanded && !detailData) {
             setLoading(true);
             try {
-                const data = await getHospitalDetail(hpid);
+                const data = await getHospitalDetail(category,hpid);
                 setDetailData(data);
             } catch (error) {
                 console.error("상세 정보 로드 실패", error);
