@@ -1,5 +1,3 @@
-/* 카드 UI와 단일 병원 정보 렌더링 담당. */
-
 body {
     margin: 0;
     background: #ffffff;
@@ -7,7 +5,6 @@ body {
     color: #111827;
 }
 
-/* 전체 컨테이너 (모바일 기준 화면) */
 .page {
     width: 100%;
     min-height: 100vh;
@@ -15,12 +12,6 @@ body {
     padding: 10px 14px 14px 14px;
     box-sizing: border-box;
 }
-
-/*  헤더 영역 */
-
-/* .header {
-    margin-bottom: 16px;
-} */
 
 .title {
     font-size: 22px;
@@ -53,7 +44,7 @@ body {
 .hospital-card {
     display: flex;
     justify-content: space-between;
-    padding: 40px;
+    padding: 25px;
     background: var(--light);
     border: 1px solid var(--border);
     border-radius: 20px;
@@ -61,16 +52,21 @@ body {
     transition: transform 0.2s;
     position: relative;
     margin-bottom: 10px;
+    padding-top: 30px;
 }
 .hospital-card:hover {
     transform: translateY(-4px);
     background: var(--soft);
 }
-/* TOP 1 강조 스타일 */
+
+.hospital-card-compact {
+  padding: 16px;
+  min-height: 110px;
+}
+
 .hospital-card.top1 {
     margin-top: 20px;
     border: 2px solid var(--primary);
-    background: var(--soft);
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
@@ -91,19 +87,16 @@ body {
 .hospital-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
     min-width: 0;
     flex: 1;
     margin-top: 5px;
 }
 
-/* 병원 아이콘 (P 표시) */
-.hospital-icon {
-    width: 30px;
-    height: 30px;
+.hospital-icon img {
+    width: 40px;
+    height: 40px;
     border-radius: 7px;
-    background: var(--icon-bg);
-    color: var(--icon-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -112,7 +105,7 @@ body {
     flex: 0 0 auto;
 }
 
-/* 병원 정보 텍스트 */
+
 .hospital-info {
     font-size: 14px;
     color: #64748b;
@@ -160,7 +153,7 @@ body {
 
 .badge-free {
     background: #dcfce7;
-    color: #16a34a;
+    color: #479a65;
 }
 
 .badge-normal {
@@ -315,167 +308,7 @@ body {
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-/*  상세 정보 패널 */
-.hospital-detail-wrapper {
-    margin-top: -4px;
-    margin-bottom: 10px;
-}
 
-
-.hospital-detail-panel {
-    padding: 12px;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-}
-
-.detail-section+.detail-section {
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #eef2f7;
-}
-
-.detail-title {
-    margin: 0 0 8px;
-    font-size: 13px;
-    font-weight: 800;
-    color: #111827;
-}
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    margin-top: 6px;
-    font-size: 12px;
-    color: #4b5563;
-}
-
-.detail-label {
-    flex: 0 0 auto;
-    color: #6b7280;
-}
-
-.detail-value {
-    min-width: 0;
-    text-align: right;
-    font-weight: 700;
-    color: #1f2937;
-    word-break: keep-all;
-}
-
-
-
-.hospital-actions {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    align-items: center;
-    justify-content: center;
-}
-
-
-.detail-toggle-open .detail-toggle-icon {
-    transform: rotate(90deg);
-    opacity: 1;
-}
-
-
-
-/*  자원 카드  */
-.core-resource-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-/* 소아 중증 수용 가능: 2열 정렬 */
-.capability-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-
-.detail-capability {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    border: 1px solid #e5e7eb;
-}
-
-.detail-resource {
-    padding: 8px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f9fafb;
-    text-align: center;
-}
-
-.detail-resource-name {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 11px;
-    color: #6b7280;
-}
-
-.detail-resource-value {
-    font-size: 13px;
-    font-weight: 800;
-    color: #111827;
-}
-
-/* 장비 가능 여부 및 수용 가능 */
-.capability-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* 2열 배치 */
-    gap: 12px;
-    /* 항목 간 간격 */
-    margin-top: 10px;
-}
-
-.detail-capability {
-    background: #f8fafc;
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-}
-
-/* 가능/불가 배지 */
-.capability-badge {
-    padding: 3px 7px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.capability-available {
-    background: #dcfce7;
-    color: #16a34a;
-}
-
-.capability-unavailable {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.capability-unknown {
-    background: #e5e7eb;
-    color: #6b7280;
-}
-
-.detail-message {
-    margin-top: 4px;
-    font-size: 11px;
-    color: #6b7280;
-}
 
 /* 태그 영역*/
 .tag-wrapper {

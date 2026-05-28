@@ -55,7 +55,8 @@ public class PediatricViewService {
                         .emergencyPhone(p.getEmergencyPhone())
                         .hospitalLatitude(p.getHospitalLatitude())
                         .hospitalLongitude(p.getHospitalLongitude())
-                        .distanceKm(p.getDistance())
+                        .distance(p.getDistance())
+                        .tags(p.getTags())
                         .build()
                 )
                 .collect(Collectors.toList());
@@ -108,7 +109,7 @@ public class PediatricViewService {
             // 가까운 병원부터 보여주기 위해 거리 오름차순으로 정렬한다.
             hospitals.sort(
                     Comparator.comparing(
-                            hospital -> hospital.getDistanceKm(),
+                            hospital -> hospital.getDistance(),
                             Comparator.nullsLast(Comparator.naturalOrder())
                     )
             );

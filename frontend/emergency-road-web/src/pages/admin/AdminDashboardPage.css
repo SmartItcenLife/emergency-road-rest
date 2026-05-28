@@ -37,3 +37,49 @@
 .number.danger {
   color: #dc3545;
 }
+
+.number {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+  color: #2f6cf6;
+  font-variant-numeric: tabular-nums;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.number.rolling {
+  transform: translateY(-2px) scale(1.04);
+  opacity: 0.75;
+}
+
+.dashboard-section {
+  margin-top: 32px;
+}
+
+.dashboard-section-header {
+  /* display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px; */
+
+  position:relative;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.dashboard-section-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.dashboard-section-header a {
+  position:absolute;
+  right: 0;
+  color: #2f6cf6;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 14px;
+top: 50%;
+  transform: translateY(-50%);}

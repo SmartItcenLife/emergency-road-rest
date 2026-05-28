@@ -70,8 +70,11 @@ public class PregnantViewService {
                                         pDto.getHospitalLatitude())
                                 .hospitalLongitude(
                                         pDto.getHospitalLongitude())
-                                .distanceKm(
+                                .distance(
                                         pDto.getDistance())
+                                .tags(
+                                        pDto.getTags()
+                                )
                                 .build()
                 )
                 .collect(Collectors.toList());
@@ -121,7 +124,7 @@ public class PregnantViewService {
 
             hospitals.sort(
                     Comparator.comparing(
-                            hospital -> hospital.getDistanceKm(),
+                            hospital -> hospital.getDistance(),
                             Comparator.nullsLast(Comparator.naturalOrder())
                     )
             );

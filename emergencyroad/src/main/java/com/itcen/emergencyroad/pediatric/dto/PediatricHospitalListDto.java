@@ -19,8 +19,9 @@ public class PediatricHospitalListDto {
 
     private Double hospitalLatitude; // 병원 위도
     private Double hospitalLongitude; // 병원 경도
-    private Double distanceKm; // 사용자 위치 기준 거리
+    private Double distance; // 사용자 위치 기준 거리
     private Double duration; //소요 시간
+    private String tags; //태그
 
     // Repository의 JPQL constructor projection은 기존 9개 인자로 생성하므로
     // duration 필드 추가 후에도 기존 쿼리 검증이 통과되도록 호환 생성자를 둔다.
@@ -43,11 +44,11 @@ public class PediatricHospitalListDto {
         this.emergencyPhone = emergencyPhone;
         this.hospitalLatitude = hospitalLatitude;
         this.hospitalLongitude = hospitalLongitude;
-        this.distanceKm = distanceKm;
+        this.distance = distanceKm;
     }
 
     public void updateDistanceKm(Double distanceKm){
-        this.distanceKm = distanceKm;
+        this.distance = distanceKm;
     }
     // TODO 일반 - 임산부 - 소아 및 유아   모두 사용할 수 있는 메서드들은 공통 유틸로 정의하여 따로 정의
     // 가용 병상 수 퍼센테이지 변환 메서드
@@ -82,7 +83,7 @@ public class PediatricHospitalListDto {
     }
 
     public void updateRouteInfo(Double distanceKm, Integer duration){
-        this.distanceKm = distanceKm;
+        this.distance = distanceKm;
         this.duration = duration != null ? duration.doubleValue() : null;
     }
 }
