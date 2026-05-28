@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminUserListPage from './pages/admin/AdminUserListPage.jsx'
 import AdminPostListPage from './pages/admin/AdminPostListPage.jsx';
-import AdminReportListPage from './pages/admin/AdminReportListPage.jsx';
+// import AdminReportListPage from './pages/admin/AdminReportListPage.jsx';
 import HospitalRecommendPage from './pages/hospital/HospitalRecommendPage.jsx';
 import MapPage from './pages/map/MapPage';
 
@@ -34,7 +34,7 @@ const Layout = () => {
        <Route path="/recommend/:category" element={<HospitalRecommendPage />} />
         {/* <Route path="/community" element={<Community />} /> */}
         <Route path="/map" element={<MapPage />} />
-        <Route path="/admin/reports" element={<AdminReportListPage/>} />
+        {/* <Route path="/admin/reports" element={<AdminReportListPage/>} /> */}
         {/* <Route path="/recommend" element={<Recommend />} />
         <Route path="/community" element={<Community />} /> */}
         {/* <Route path="/community" element={<Community />} />  */}
