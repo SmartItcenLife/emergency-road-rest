@@ -44,7 +44,8 @@ public class SecurityConfig {
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
                     "/api/recommend/**",
-                "/uploads/**"
+                "/uploads/**",
+                "/api/hospitals/**"
             ).permitAll()
 
             // 인증 없이 허용
@@ -55,7 +56,8 @@ public class SecurityConfig {
                 "/api/auth/logout").permitAll()
             .requestMatchers(HttpMethod.GET,
                 "/api/auth/kakao",
-                "/api/auth/kakao/redirect").permitAll()
+                "/api/auth/kakao/redirect",
+                "/api/auth/kakao/url").permitAll()
 
             // 병원/병상 조회 전체 비로그인 허용
             .requestMatchers("/api/hospitals/**").permitAll()
