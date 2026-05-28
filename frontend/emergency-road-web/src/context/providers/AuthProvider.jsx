@@ -1,5 +1,95 @@
-// 전역 관리 
+// 전역 관리
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import {
+  getMe,
+  login as apiLogin,
+  logout as apiLogout,
+  refreshToken,
+} from "../../features/auth/api/api";
 
-<html>
-    
-</html>
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // 앱 시작 시 토큰 복원
+  useEffect(() => {
+    const init = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const me = await getMe();
+        setUser(me);
+      } catch (e) {
+        // AccessToken 만료 → refresh 시도
+        try {
+          const rt = localStorage.getItem("refreshToken");
+          if (!rt) throw new Error("no refresh token");
+          const tokens = await refreshToken(rt);
+          localStorage.setItem("accessToken", tokens.accessToken);
+          localStorage.setItem("refreshToken", tokens.refreshToken);
+          const me = await getMe();
+          setUser(me);
+        } catch {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
+  }, []);
+
+  const login = useCallback(async (credentials) => {
+    const tokens = await apiLogin(credentials);
+    localStorage.setItem("accessToken", tokens.accessToken);
+    localStorage.setItem("refreshToken", tokens.refreshToken);
+    const me = await getMe();
+    setUser(me);
+    return me;
+  }, []);
+
+  const logout = useCallback(async () => {
+    const rt = localStorage.getItem("refreshToken");
+    try {
+      if (rt) await apiLogout(rt);
+    } catch {
+      /* ignore */
+    }
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setUser(null);
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    try {
+      const me = await getMe();
+      setUser(me);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuthContext() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuthContext must be used within AuthProvider");
+  return ctx;
+}
