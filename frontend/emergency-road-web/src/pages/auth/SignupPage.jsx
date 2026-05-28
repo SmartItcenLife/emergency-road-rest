@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { AppBar, Icon } from "../../shared/components/ui/Primitives";
 import { useSignup } from "../../features/auth/hooks/useSignup";
-import { SignupForm } from "../../features/auth/components/SignupForm";
-import { SignupSuccess } from "../../features/auth/components/SignupSuccess";
+import { SignupForm } from "../../features/auth/components/signup/SignupForm";
+import { SignupSuccess } from "../../features/auth/components/signup/SignupSuccess";
 
 const SURFACE = "#FFFFFF";
 const INK1 = "#0F1422";
