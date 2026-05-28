@@ -2,7 +2,8 @@
 import HospitalCard from './HospitalCard';
 import './HospitalList.css'; 
 import HospitalListFooter from './HospitalListFooter.jsx';
-const HospitalList = ({ hospitals, userLat, userLon, config, category }) => {
+import SortSelect from "../../../features/hospitals/components/SortSelect.jsx";
+const HospitalList = ({ hospitals, userLat, userLon, config, category , sort, showRanking, showDistance, compact}) => {
   // 병원이 없는 경우를 위한 처리
   if (!hospitals || hospitals.length === 0) {
     return (
@@ -14,15 +15,19 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category }) => {
   }
 
   return (
-
     <section className="hospital-list-section">
-      <div className="section-header">
-        <h2 className="section-title">추천 병원 TOP 3</h2>
-        <p className="section-description">
-          현재 위치로부터 10km 이내,<br />
-          <span className="highlight">진료 가능 여부와 실시간 상황</span>을 종합 분석한 추천 결과입니다.
-        </p>
-      </div>
+     
+      {showRanking && (
+        <div className="section-header">
+          <h2 className="section-title">추천 병원 TOP 3</h2>
+            <p className="section-description">
+                현재 위치로부터 10km 이내,<br />
+                <span className="highlight">진료 가능 여부와 실시간 상황</span>을 종합 분석한 추천 결과입니다.
+            </p>
+        </div>
+        )}
+        
+        <SortSelect sort={sort} />
     <div className="hospital-list">
       {hospitals.map((hospital, index) => (
         <HospitalCard 
@@ -33,10 +38,15 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category }) => {
             userLon = {userLon}
             config = {config}
             category = {category}
+            showRanking = {showRanking}
+            showDistance = {showDistance}
+            compact = {compact}
         />
       ))}
     </div>
-    <HospitalListFooter category = {category} config = {config}/>
+      {showRanking && (
+         <HospitalListFooter category = {category} userLat = {userLat} userLon = {userLon}/>
+        )}
     </section>
   );
 };

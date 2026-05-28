@@ -9,8 +9,11 @@ import finderIcon from '../../../assets/hospital/finder.svg';
 import communityIcon from '../../../assets/hospital/community.svg';
 import angleIcon from '../../../assets/hospital/angle-brackets.png';
 import { useHospitalDetail } from '../hooks/recommend/useHospitalDetail';
+import mascotGreen from '../../../assets/mascot_green.png';
+import mascotPink from '../../../assets/mascot_pink.png';
+import mascotBlue from '../../../assets/mascot_blue.png';
 
-const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) => {
+const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, showRanking, showDistance, compact }) => {
   const { detailData, loading, isExpanded, toggleDetail} = useHospitalDetail(category, hospital.hpid);
   const [error, setError] = useState(null);
   const theme = config.theme;
@@ -32,7 +35,7 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) =>
  
   return (
     <>
-      <article className={`hospital-card ${rank === 1 ? 'top1' : ''}`} 
+      <article className={`hospital-card ${rank === 1 ? 'top1' : ''}  ${compact ? 'hospital-card-compact' : ''}`} 
       style={{
             '--primary': theme.primary,
             '--light': theme.light,
@@ -41,18 +44,31 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) =>
             '--icon-bg': theme.iconBg,
             '--icon-color': theme.iconColor,
             }}>
-        <div className="top-badge">TOP {rank}</div>
-
+        {showRanking && (
+            <div className="top-badge">
+              TOP {rank}
+            </div>
+        )}
         <div className="hospital-left">
           <div className="hospital-icon">
-            {config.title.includes('소아') ? 'P' : config.title.includes('임산부') ? 'M' : 'H'}
+                {config.title.includes('소아') ? (
+                  <img src={mascotBlue} alt="소아 응급" />
+                ) : config.title.includes('임산부') ? (
+                  <img src={mascotPink} alt="임산부 응급" />
+                ) : (
+                  <img src={mascotGreen} alt="일반 응급" />
+                )}
           </div>
 
           <div className="hospital-info">
             <div className="hospital-name">{hospital.hospitalName}</div>
             <div className="hospital-meta">
-              <span>📍 {hospital.formattedDistance}</span>
-              <span>⏱ {Math.round(hospital.duration)}분</span>
+             {showDistance && (
+                    <>
+                      <span>📍 {hospital.distance}km</span>
+                      <span>⏱ {Math.round(hospital.duration)}분</span>
+                    </>
+              )}
               {hospital.congestionLabel && (
                 <span className={`badge ${getCongestionBadgeClass(hospital.congestionLabel)}`}>
                   {hospital.congestionLabel}
