@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HospitalListFooter.css';
 
-const HospitalListFooter = ({ category }) => {
+const HospitalListFooter = ({ category ,userLat, userLon}) => {
     const navigate = useNavigate();
     const categoryLowerCase = category?.toLowerCase();
 
@@ -15,7 +15,14 @@ const HospitalListFooter = ({ category }) => {
 
             <button
                 className="hospital-footer__button"
-                onClick={() => navigate(`/${categoryLowerCase}/hospitals`)}
+                onClick={() => {
+                        const params = new URLSearchParams();
+                        params.append("sort", "SCORE");
+                        if (userLat) params.append("lat", userLat);
+                        if (userLon) params.append("lon", userLon);
+
+                        navigate(`/${categoryLowerCase}/hospitals?${params.toString()}`);
+                   }}
                 disabled={!categoryLowerCase}
             >
                 전체 병원 보기
