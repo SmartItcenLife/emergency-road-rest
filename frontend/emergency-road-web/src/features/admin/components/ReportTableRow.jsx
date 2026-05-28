@@ -21,7 +21,7 @@ function ReportTableRow({ report, index, type, onDeleteReport }) {
       </td>
       <td>
         {!deleted && (
-          <button className="delete-button" onClick={() => onDeleteReport(report.id)}>
+          <button className="delete-button" onClick={() => onDeleteReport(report)}>
             강제삭제
           </button>
         )}

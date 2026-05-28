@@ -68,7 +68,7 @@ public class MapService {
                         hospital.getEmergencyAvailableBeds(),
                         hospital.getEmergencyTotalBeds()
                 ))
-                .updatedAt(hospital.getRecordedAt())
+                .recordedAt(hospital.getRecordedAt())
                 .build();
     }
 

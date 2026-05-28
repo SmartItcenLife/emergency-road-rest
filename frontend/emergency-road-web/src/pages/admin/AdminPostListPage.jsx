@@ -2,15 +2,19 @@ import "./AdminTable.css";
 import AdminLayout from "../../features/admin/components/AdminLayout";
 import PostTable from "../../features/admin/components/PostTable";
 import { useEffect, useState } from "react";
+import ConfirmModal from "../../shared/components/feedback/ConfirmModal";
 
 function AdminPostListPage(){
     const [posts, setPosts] = useState([]);
+    const [deleteTargetPost, setDeleteTargetPost] = useState(null);
 
-    const handleDeletePost = async(id)=>{
-    const ok = window.confirm("정말 이 게시글을 삭제 처리 하시겠습니까?");
-    if(!ok) return;
+    const handleDeletePost = (id) => {
+    const targetPost = posts.find((post) => post.id === id);
+    setDeleteTargetPost(targetPost);
+    };
 
-    const response = await fetch(`http://localhost:8080/api/admin/posts/${id}`,{
+    const confirmDeletePost = async()=>{
+    const response = await fetch(`http://localhost:8080/api/admin/posts/${deleteTargetPost.id}`,{
       method:"DELETE",
     });
 
@@ -24,6 +28,8 @@ function AdminPostListPage(){
         post.id === id ? { ...post, isDeleted: true, deleted: true } : post
     )
     );
+
+    setDeleteTargetPost(null);
     };
 
     useEffect(()=>{
@@ -40,6 +46,15 @@ function AdminPostListPage(){
         <AdminLayout>
             <div className="admin-list-page">
             <PostTable posts={posts} onDeletePost={handleDeletePost}/>
+
+            <ConfirmModal
+            open={deleteTargetPost !== null}
+            title="게시글 삭제 처리"
+            message={`해당 게시글을 삭제 처리하시겠습니까?`}
+            confirmText="삭제"
+            onConfirm={confirmDeletePost}
+            onCancel={() => setDeleteTargetPost(null)}
+          />
             </div>
         </AdminLayout>
     );
