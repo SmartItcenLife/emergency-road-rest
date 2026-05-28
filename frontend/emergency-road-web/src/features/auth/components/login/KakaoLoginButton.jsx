@@ -1,4 +1,4 @@
-import { Button } from "../../../shared/components/ui/Primitives";
+import { Button } from "../../../../shared/components/ui/Primitives";
 
 const KAKAO_FG = "#181600";
 

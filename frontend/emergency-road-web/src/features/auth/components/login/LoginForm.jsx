@@ -4,7 +4,7 @@ import {
   Field,
   Input,
   Icon,
-} from "../../../shared/components/ui/Primitives";
+} from "../../../../shared/components/ui/Primitives";
 import { KakaoLoginButton } from "./KakaoLoginButton";
 
 const BORDER1 = "#E2E6EE";

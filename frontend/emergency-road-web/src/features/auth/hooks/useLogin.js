@@ -42,7 +42,7 @@ export function useLogin() {
 
   async function onKakao() {
     try {
-      const res = await fetch("/api/auth/kakao/url");
+      const res = await fetch("/api/auth/kakao/redirect");
       const data = await res.json();
       window.location.href = data.data;
     } catch {
