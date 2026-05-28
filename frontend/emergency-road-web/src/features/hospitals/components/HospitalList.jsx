@@ -1,7 +1,7 @@
 // 병원 리스트(배열)를 받아 map()을 돌려 HospitalCard를 여러 개 렌더링하는 부모 컨테이너.import React from 'react';
 import HospitalCard from './HospitalCard';
 import './HospitalList.css'; 
-
+import HospitalListFooter from './HospitalListFooter.jsx';
 const HospitalList = ({ hospitals, userLat, userLon, config, category }) => {
   // 병원이 없는 경우를 위한 처리
   if (!hospitals || hospitals.length === 0) {
@@ -36,6 +36,7 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category }) => {
         />
       ))}
     </div>
+    <HospitalListFooter category = {category} config = {config}/>
     </section>
   );
 };
