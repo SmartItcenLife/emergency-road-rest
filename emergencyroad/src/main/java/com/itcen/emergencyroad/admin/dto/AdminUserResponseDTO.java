@@ -11,6 +11,7 @@ public class AdminUserResponseDTO {
     private String userName;
     private String nickname;
     private String role;
+    private String email;
     private LocalDateTime createdAt;
 
     public AdminUserResponseDTO(User user){
@@ -18,6 +19,7 @@ public class AdminUserResponseDTO {
         this.userName = user.getUserName();
         this.nickname = user.getNickname();
         this.role = user.getRole().name();
+        this.email = user.getEmail();
         this.createdAt = user.getCreatedAt();
     }
 }

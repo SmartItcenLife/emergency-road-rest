@@ -1,0 +1,39 @@
+.admin-dashboard-page {
+  min-height: calc(100svh - 72px);
+  background-color: #f5f6f8;
+  padding: 40px 50px;
+  box-sizing: border-box;
+}
+
+.dashboard-cards {
+  display: flex;
+  gap: 20px;
+}
+
+.card {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #ebeef2;
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.card h3 {
+  margin: 0 0 12px;
+  color: #8b95a1;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.number {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+  color: #2f6cf6;
+}
+
+.number.danger {
+  color: #dc3545;
+}

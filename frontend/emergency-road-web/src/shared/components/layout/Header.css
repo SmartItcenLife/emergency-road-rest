@@ -5,7 +5,6 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  
 }
 
 .header-inner {
@@ -16,9 +15,11 @@
   width: 100%;
   max-width: 430px;
   padding: 0 20px;
+  padding-top: 20px;
   height: 70px;
   background-color: #ffffff;
   border-bottom: 2px solid #eef2f7;
+
 }
 
 .logo-area {
@@ -29,8 +30,8 @@
 }
 
 .logo-img {
-  height: 50px;
-  width: 50px;;
+  height: 80px;
+  width: 80px;;
 }
 
 .logo-text {

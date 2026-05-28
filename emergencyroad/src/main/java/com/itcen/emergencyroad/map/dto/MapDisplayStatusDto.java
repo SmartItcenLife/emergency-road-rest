@@ -26,7 +26,7 @@ public class MapDisplayStatusDto {
     private Integer colorLevel;
 
     // 점수형 상태에서 사용할 값
-    private Integer score;              // 0 ~ 100 높을수록 여유
+    private Integer score;              // 0 ~ 100, 최종 수용 여유도 점수
 
     // 계산 근거
     private Integer availableCount;      // 가용 수

@@ -4,6 +4,11 @@ import Header from './shared/components/layout/Header';
 import Home from './pages/Home';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminUserListPage from './pages/admin/AdminUserListPage.jsx'
+import AdminPostListPage from './pages/admin/AdminPostListPage.jsx';
+import AdminReportListPage from './pages/admin/AdminReportListPage.jsx';
+import HospitalRecommendPage from './pages/hospital/HospitalRecommendPage.jsx';
+import MapPage from './pages/map/MapPage';
+
 
 // 헤더를 감싸는 래퍼 컴포넌트
 const Layout = () => {
@@ -25,9 +30,10 @@ const Layout = () => {
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<AdminDashboardPage />} />
         <Route path="/admin/users" element={<AdminUserListPage />} />
-    
-        {/* <Route path="/recommend" element={<Recommend />} />
-        <Route path="/community" element={<Community />} /> */}
+        <Route path="/admin/posts" element={<AdminPostListPage />} />
+        <Route path="/recommend/:category" element={<HospitalRecommendPage />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/admin/reports" element={<AdminReportListPage/>} />
       </Routes>
     </>
   );
@@ -37,7 +43,6 @@ function App() {
   return (
     <BrowserRouter>
       <Layout />
-
     </BrowserRouter>
   );
 }
