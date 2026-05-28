@@ -152,6 +152,62 @@ public class MapService {
                 .build();
     }
 
+    // 구 별 혼잡도 계산 : 구 별 혼잡도를 확인하기 위해서 병원별 혼잡도를 기준으로 계산
+    private MapDisplayStatusDto createAreaEmergencyBedStatus(
+            Integer availableCount,
+            Integer totalCount
+    ) {
+        if (availableCount == null || totalCount == null || totalCount == 0) {
+            return MapDisplayStatusDto.builder()
+                    .type(MapStatusType.SCORE)
+                    .metricType(MapMetricType.EMERGENCY_BED)
+                    .grade(MapCongestionGrade.UNKNOWN)
+                    .label("정보없음")
+                    .colorLevel(0)
+                    .score(null)
+                    .availableCount(availableCount)
+                    .totalCount(totalCount)
+                    .rate(null)
+                    .build();
+        }
+
+        int rate = (int) Math.round(availableCount * 100.0 / totalCount);
+
+        MapCongestionGrade grade;
+        String label;
+        int colorLevel;
+
+        if (rate >= 30) {
+            grade = MapCongestionGrade.RELAXED;
+            label = "여유";
+            colorLevel = 4;
+        } else if (rate >= 15) {
+            grade = MapCongestionGrade.NORMAL;
+            label = "보통";
+            colorLevel = 3;
+        } else if (rate >= 5) {
+            grade = MapCongestionGrade.CROWDED;
+            label = "혼잡";
+            colorLevel = 2;
+        } else {
+            grade = MapCongestionGrade.VERY_CROWDED;
+            label = "매우 혼잡";
+            colorLevel = 1;
+        }
+
+        return MapDisplayStatusDto.builder()
+                .type(MapStatusType.SCORE)
+                .metricType(MapMetricType.EMERGENCY_BED)
+                .grade(grade)
+                .label(label)
+                .colorLevel(colorLevel)
+                .score(rate)
+                .availableCount(availableCount)
+                .totalCount(totalCount)
+                .rate(rate)
+                .build();
+    }
+
     // TODO : 나중에는 master table 의 컬럼값을 조절하던, hospital district mapping 테이블을 만들던하자.
     private String extractDistrictName(String address) {
         if (address == null || address.isBlank()) {
@@ -224,7 +280,8 @@ public class MapService {
                 .areaName(area.getAreaName())
                 .areaLevel(area.getAreaLevel())
                 .category(MapCategory.GENERAL)
-                .status(createEmergencyBedStatus(totalAvailableBeds, totalBeds))
+//                .status(createEmergencyBedStatus(totalAvailableBeds, totalBeds)) -> 각 병원에서 혼잡도를 표현하기엔 적합하나 구 전체의 혼잡도를 표현하기엔 부적절
+                .status(createAreaEmergencyBedStatus(totalAvailableBeds,totalBeds))
                 .hospitalCount(hospitalCount)
                 .recordedAt(recordedAt)
                 .build();
