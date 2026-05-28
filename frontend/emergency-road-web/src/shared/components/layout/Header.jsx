@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../../styles/shared/Header.css';
+import './Header.css';
 import logo from '../../../assets/logo.png';
 import AdminHeader from '../../../features/admin/components/AdminHeader';
 
@@ -34,7 +34,7 @@ return (
       <div className="header-inner">
         <div className="logo-area">
         <img src={logo} alt="응급길 로고" className="logo-img" />
-        <span className="logo-text">응급길</span>
+        {/* <span className="logo-text">응급길</span> */}
       </div>
      {/* 2. 정의된 객체에서 type에 맞는 메뉴를 가져옴 (없을 시 null) */}
       <nav className="nav-menu">

@@ -7,13 +7,12 @@ body {
 }
 
 /* 화면 전체 중앙 정렬을 위한 래퍼 */
-.page {
+.mainpage {
     height: calc(100svh - 100px);
     display: flex;
     justify-content: center;
     align-items: center; 
     box-sizing: border-box;
-
 }
 
 /* 콘텐츠를 담는 카드 컨테이너 */
@@ -22,7 +21,7 @@ body {
     height: 100%;
     max-width: 430px;
     background: white;
-    padding: 28px 22px;
+    padding: 28px 16px;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 

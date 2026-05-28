@@ -1,0 +1,16 @@
+.hospital-list-section {
+  position: relative;
+  z-index: 1;
+  width: 480px;
+  margin: 0 auto;
+}
+.section-header {
+    background-color: #ffffff;
+    padding: 10px;
+}
+
+.section-title {
+    color: #000000; 
+    font-size: 20px;
+    margin: 0;
+}
