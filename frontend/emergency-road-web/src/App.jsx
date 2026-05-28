@@ -8,7 +8,7 @@ import AdminPostListPage from './pages/admin/AdminPostListPage.jsx';
 import AdminReportListPage from './pages/admin/AdminReportListPage.jsx';
 import HospitalRecommendPage from './pages/hospital/HospitalRecommendPage.jsx';
 import MapPage from './pages/map/MapPage';
-
+import HospitalListPage from './pages/hospital/HospitalListPage.jsx';
 
 // 헤더를 감싸는 래퍼 컴포넌트
 const Layout = () => {
@@ -16,8 +16,9 @@ const Layout = () => {
   
   // 현재 경로에 따라 헤더 타입을 결정하는 로직
   const getHeaderType = () => {
-    if (location.pathname === '/') return 'home';
-    if(location.pathname.startsWith("/admin")){  return "admin";  }
+    const path = location.pathname;
+    if (path=== '/') return 'home';
+    if(path.startsWith("/admin")){  return "admin";  }
     // if (location.pathname.startsWith('/recommend')) return 'recommend';
     // if (location.pathname.startsWith('/community')) return 'community';
     return 'home';
@@ -28,12 +29,16 @@ const Layout = () => {
       <Header type={getHeaderType()} />
       <Routes>
         <Route path="/" element={<Home />} />
+        {/* 어드민 */}
         <Route path="/admin" element={<AdminDashboardPage />} />
         <Route path="/admin/users" element={<AdminUserListPage />} />
         <Route path="/admin/posts" element={<AdminPostListPage />} />
-        <Route path="/recommend/:category" element={<HospitalRecommendPage />} />
-        <Route path="/map" element={<MapPage />} />
         <Route path="/admin/reports" element={<AdminReportListPage/>} />
+        {/* 지도 */}
+        <Route path="/map" element={<MapPage />} />
+        {/* 추천 및 전체 보기 */}
+        <Route path="/recommend/:category" element={<HospitalRecommendPage />} />
+        <Route path="/:category/hospitals" element={<HospitalListPage />} />
       </Routes>
     </>
   );
@@ -42,7 +47,9 @@ const Layout = () => {
 function App() {
   return (
     <BrowserRouter>
-      <Layout />
+        <Routes>
+        <Route path="/*" element={<Layout />} />
+      </Routes>
     </BrowserRouter>
   );
 }
