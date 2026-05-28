@@ -2,7 +2,7 @@
 import HospitalCard from './HospitalCard';
 import './HospitalList.css'; 
 
-const HospitalList = ({ hospitals, userLat, userLon }) => {
+const HospitalList = ({ hospitals, userLat, userLon, config }) => {
   // 병원이 없는 경우를 위한 처리
   if (!hospitals || hospitals.length === 0) {
     return (
@@ -31,6 +31,7 @@ const HospitalList = ({ hospitals, userLat, userLon }) => {
             rank={index+1}
             userLat = {userLat}
             userLon = {userLon}
+            config = {config}
         />
       ))}
     </div>
