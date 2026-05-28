@@ -54,6 +54,17 @@ function MapLayout() {
     searchHospitals(pendingBounds);
   }
 
+  // 병원 선택 핸들러 (선택된 병원을 다시 클릭하면 선택 해제)
+  function handleSelectHospital(hospital) {
+    setSelectedHospital((prev) => {
+      if (prev?.hpid === hospital?.hpid) {
+        return null;
+      }
+
+      return hospital;
+    });
+  }
+
   return (
   <div className="map-layout">
     <div className="map-content">
@@ -71,14 +82,14 @@ function MapLayout() {
         hospitals={hospitals}
         selectedHospital={selectedHospital}
         onBoundsChange={handleBoundsChange}
-        onSelectHospital={setSelectedHospital}
+        onSelectHospital={handleSelectHospital}
       />
     </div>
 
     <MapListPanel
       hospitals={hospitals}
       selectedHospital={selectedHospital}
-      onSelectHospital={setSelectedHospital}
+      onSelectHospital={handleSelectHospital}
       loading={loading}
       error={error}
     />

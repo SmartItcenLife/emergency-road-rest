@@ -15,13 +15,35 @@ function KakaoMap({
   const markersRef = useRef([]);
   const debounceTimeoutRef = useRef(null);
 
+  // hover 상태 관리를 위한 ref
+  // const hoverHospitalIdRef = useRef(null);
+  const infoOverlayRef = useRef([]);
+
+  // 현재 활성화된 정보 오버레이를 추적하기 위한 ref
+  const activeInfoOverlayRef = useRef(null);
+  const ignoreNextMapClickRef = useRef(false);
+
   // 지도에 표시된 마커를 모두 제거하는 함수
   function clearMarkers() {
+    closeActiveInfoOverlay();
+
     markersRef.current.forEach((marker) => {
       marker.setMap(null);
     });
 
+    infoOverlayRef.current.forEach((overlay) => {
+      overlay.setMap(null);
+    });
+
+    infoOverlayRef.current = [];
     markersRef.current = [];
+  }
+  // 활성화된 정보 오버레이가 있다면 닫는 함수
+  function closeActiveInfoOverlay() {
+    if (activeInfoOverlayRef.current) {
+      activeInfoOverlayRef.current.setMap(null);
+      activeInfoOverlayRef.current = null;
+    }
   }
 
   useEffect(() => {
@@ -85,6 +107,16 @@ function KakaoMap({
           "idle",
           emitBoundsChangeWithDebounce
         );
+        
+        window.kakao.maps.event.addListener(map, "click", () => {
+          if (ignoreNextMapClickRef.current) {
+              ignoreNextMapClickRef.current = false;
+              return;
+            }
+          closeActiveInfoOverlay();
+          onSelectHospital(null);
+        });
+
       });
     };
 
@@ -136,8 +168,18 @@ function KakaoMap({
       markerElement.style.backgroundColor = markerColor;
       markerElement.title = hospital.hospitalName;
 
-      markerElement.addEventListener("click", () => {
-        onSelectHospital(hospital);
+      const infoContent = document.createElement("div");
+      infoContent.className = "map-marker-info";
+      infoContent.innerHTML = `
+        <strong>${hospital.hospitalName}</strong>
+        <span>${hospital.status?.label ?? "정보없음"}</span>
+        `;
+
+      const infoOverlay = new window.kakao.maps.CustomOverlay({
+        position,
+        content: infoContent,
+        yAnchor: 1.6,
+        xAnchor: 0.5,
       });
 
       const marker = new window.kakao.maps.CustomOverlay({
@@ -148,7 +190,33 @@ function KakaoMap({
         xAnchor: 0.5,
       });
 
+        markerElement.addEventListener("mouseover", () => {
+          infoOverlay.setMap(map);
+        });
+
+        markerElement.addEventListener("mouseout", () => {
+          if (activeInfoOverlayRef.current !== infoOverlay) {
+            infoOverlay.setMap(null);
+          }
+        });
+
+        markerElement.addEventListener("click", (event) => {
+          event.stopPropagation();
+
+          ignoreNextMapClickRef.current = true;
+          onSelectHospital(hospital);
+        });
+
       markersRef.current.push(marker);
+      
+      infoOverlayRef.current.push(infoOverlay);
+
+      // 선택된 마커를 처리하는 함수
+      if (isSelected){
+        infoOverlay.setMap(map);
+        activeInfoOverlayRef.current = infoOverlay;
+      }
+
     });
   }, [hospitals, selectedHospital, onSelectHospital]);
 
