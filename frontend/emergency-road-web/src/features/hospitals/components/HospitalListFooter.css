@@ -1,0 +1,63 @@
+.hospital-footer {
+  text-align: center;
+  margin: 24px 0 40px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.hospital-footer__text {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+/* 버튼 기본 */
+.hospital-footer__button {
+  padding: 12px 24px;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* hover */
+.hospital-footer__button:hover {
+  opacity: 0.9;
+}
+
+/* ===== 카테고리별 테마 ===== */
+
+/* 임산부 */
+.pregnant {
+  --primary: #db2777;
+  --primary-hover: #fda4af;
+}
+
+/* 소아 */
+.pediatric {
+  --primary: #2563eb;
+  --primary-hover: #0284c7;
+}
+
+/* 일반 */
+.general {
+  --primary: #15803d;
+  --primary-hover: #16a34a;
+}
+
+/* 버튼 색 연결 */
+.general .hospital-footer__button,
+.pediatric .hospital-footer__button,
+.pregnant .hospital-footer__button {
+  background: var(--primary);
+}
+
+.general .hospital-footer__button:hover,
+.pediatric .hospital-footer__button:hover,
+.pregnant .hospital-footer__button:hover {
+  background: var(--primary-hover);
+}
