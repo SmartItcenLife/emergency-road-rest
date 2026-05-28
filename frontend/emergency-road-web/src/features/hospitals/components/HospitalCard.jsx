@@ -9,7 +9,7 @@ import finderIcon from '../../../assets/hospital/finder.svg';
 import communityIcon from '../../../assets/hospital/community.svg';
 import angleIcon from '../../../assets/hospital/angle-brackets.png';
 
-const HospitalCard = ({ hospital, rank, userLat, userLon, config }) => {
+const HospitalCard = ({ hospital, rank, userLat, userLon, config, category }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [detailData, setDetailData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config }) => {
     if (!isExpanded && !detailData) {
       try {
         setLoading(true);
-        const data = await getHospitalDetail(hospital.hpid);
+        const data = await getHospitalDetail(category, hospital.hpid);
         setDetailData(data);
       } catch {
         setError('상세 정보를 불러오지 못했습니다.');

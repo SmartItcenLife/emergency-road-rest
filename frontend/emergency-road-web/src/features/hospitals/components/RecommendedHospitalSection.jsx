@@ -12,7 +12,7 @@ const RecommendedHospitalSection = ({ category, lat, lon }) => {
     if (loading) return <div>병원 목록을 불러오는 중입니다...</div>;
     if (error) return <div>오류가 발생했습니다: {error.message}</div>;
 
-    return <HospitalList hospitals={data} userLat={lat} userLon={lon} config ={config} />;
+    return <HospitalList hospitals={data} userLat={lat} userLon={lon} config ={config} category = {category} />;
 };
 
 export default RecommendedHospitalSection;
