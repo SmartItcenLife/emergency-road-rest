@@ -29,6 +29,9 @@ function KakaoMap({
   // 지도에 구별 혼잡도를 표기하기 위한 상태
   const polygonsRef = useRef([]);
   const areaInfoOverlayRef = useRef(null);
+  const activeAreaOverlayRef = useRef(null);
+  const activeAreaCodeRef = useRef(null);
+
 
   // 지도에 표시된 마커를 모두 제거하는 함수
   function clearMarkers() {
@@ -48,15 +51,24 @@ function KakaoMap({
 
   // 폴리곤 제거 함수
   function clearPolygons() {
-  polygonsRef.current.forEach((polygon) => {
-    polygon.setMap(null);
-  });
+    polygonsRef.current.forEach((polygon) => {
+      polygon.setMap(null);
+    });
 
-  polygonsRef.current = [];
+    polygonsRef.current = [];
 
-  if (areaInfoOverlayRef.current) {
-    areaInfoOverlayRef.current.setMap(null);
-    areaInfoOverlayRef.current = null;
+    if (areaInfoOverlayRef.current) {
+      areaInfoOverlayRef.current.setMap(null);
+      areaInfoOverlayRef.current = null;
+      }
+
+    closeActiveAreaOverlay();
+  }
+
+  function closeActiveAreaOverlay() {
+    if (activeAreaOverlayRef.current) {
+      activeAreaOverlayRef.current.setMap(null);
+      activeAreaOverlayRef.current = null;
     }
   }
 
@@ -67,15 +79,70 @@ function KakaoMap({
     });
   }
 
-
-
-
   // 활성화된 정보 오버레이가 있다면 닫는 함수
   function closeActiveInfoOverlay() {
     if (activeInfoOverlayRef.current) {
       activeInfoOverlayRef.current.setMap(null);
       activeInfoOverlayRef.current = null;
     }
+
+    activeAreaCodeRef.current = null;
+  }
+
+  // 
+  function displayValue(value) {
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    return value;
+  }
+
+  function formatDateTime(value) {
+    if (!value) {
+      return "-";
+    }
+
+    return String(value).replace("T", " ").substring(0, 16);
+  }
+
+  function createAreaInfoContent(areaName, congestion) {
+    const content = document.createElement("div");
+    content.className = "map-area-info";
+
+    content.innerHTML = `
+      <strong>${areaName}</strong>
+      <span>${congestion?.status?.label ?? "정보없음"}</span>
+      <dl>
+        <div>
+          <dt>병원 수</dt>
+          <dd>${displayValue(congestion?.hospitalCount)}개</dd>
+        </div>
+        <div>
+          <dt>가용 병상</dt>
+          <dd>${displayValue(congestion?.status?.availableCount)}개</dd>
+        </div>
+        <div>
+          <dt>전체 병상</dt>
+          <dd>${displayValue(congestion?.status?.totalCount)}개</dd>
+        </div>
+        <div>
+          <dt>가용률</dt>
+          <dd>${
+            congestion?.status?.rate !== null &&
+            congestion?.status?.rate !== undefined
+              ? `${congestion.status.rate}%`
+              : "-"
+          }</dd>
+        </div>
+        <div>
+          <dt>갱신 시간</dt>
+          <dd>${formatDateTime(congestion?.recordedAt)}</dd>
+        </div>
+      </dl>
+    `;
+
+    return content;
   }
 
   useEffect(() => {
@@ -270,6 +337,7 @@ function KakaoMap({
     map.panTo(position);
   }, [selectedHospital]);
 
+  // polygon을 그리기 위한 useEffect  
   useEffect(() => {
   const map = mapInstanceRef.current;
 
@@ -301,18 +369,55 @@ function KakaoMap({
       fillOpacity: 0.22,
     });
 
+    const infoOverlay = new window.kakao.maps.CustomOverlay({
+      content: createAreaInfoContent(areaName, congestion),
+      position: path[0],
+      xAnchor: 0.5,
+      yAnchor: 1.2,
+    });
+
     window.kakao.maps.event.addListener(polygon, "mouseover", (mouseEvent) => {
       polygon.setOptions({
         fillOpacity: 0.38,
       });
+
+      infoOverlay.setPosition(mouseEvent.latLng);
+      infoOverlay.setMap(map);
+    });
+
+    window.kakao.maps.event.addListener(polygon, "mousemove", (mouseEvent) => {
+      infoOverlay.setPosition(mouseEvent.latLng);
     });
 
     window.kakao.maps.event.addListener(polygon, "mouseout", () => {
       polygon.setOptions({
         fillOpacity: 0.22,
-      });
+      })
+
+      infoOverlay.setMap(null);
+
+      if ( activeAreaCodeRef.current === areaCode) {
+        activeAreaCodeRef.current = null;
+        activeAreaOverlayRef.current = null;
+      }
     });
 
+    window.kakao.maps.event.addListener(polygon, "click", (mouseEvent) => {
+      if ( activeAreaCodeRef.current === areaCode) {
+        closeActiveAreaOverlay();
+        return;
+      }
+
+      closeActiveAreaOverlay();
+
+      infoOverlay.setPosition(mouseEvent.latLng);
+      infoOverlay.setMap(map);
+      
+      activeAreaOverlayRef.current = infoOverlay;
+      activeAreaCodeRef.current = areaCode;
+    });
+
+    
     polygonsRef.current.push(polygon);
   });
 }, [areaCongestions]);
