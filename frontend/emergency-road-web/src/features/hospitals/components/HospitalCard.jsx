@@ -107,7 +107,7 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, show
               <button onClick={moveRoute} className="route-button">
                 <img src={finderIcon} className="finder-icon-img" alt="길찾기" />
               </button>
-              <a href={`/hospitals/${hospital.hpid}/posts`} className="community-button">
+              <a href={`/community/${hospital.hpid}`} className="community-button">
                 <img src={communityIcon} className="community-icon-img" alt="커뮤니티" />
               </a>
             </div>
