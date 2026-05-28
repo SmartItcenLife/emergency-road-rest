@@ -25,6 +25,9 @@ function KakaoMap({
   }
 
   useEffect(() => {
+    // Kakao SDK 로드
+    // 지도 객체 생성
+    // idle 이벤트 등록
     const kakaoMapKey = import.meta.env.VITE_KAKAO_MAP_KEY;
 
     if (!kakaoMapKey) {
@@ -107,6 +110,8 @@ function KakaoMap({
   }, [onBoundsChange]);
 
   useEffect(() => {
+    // 기존 마커 제거
+    // hospitals 기반 새 마커 생성
     const map = mapInstanceRef.current;
 
     if (!map || !window.kakao?.maps) {
@@ -148,6 +153,7 @@ function KakaoMap({
   }, [hospitals, selectedHospital, onSelectHospital]);
 
   useEffect(() => {
+    // selectedHospital 위치로 map.panTo
     const map = mapInstanceRef.current;
 
     if (!map || !selectedHospital) {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import KakaoMap from "./KakaoMap";
 import { getMapHospitals } from "../api/mapApi";
+import MapListPanel from "./MapListPanel";
 
 function MapLayout() {
   const [hospitals, setHospitals] = useState([]);
@@ -26,12 +27,18 @@ function MapLayout() {
   return (
     // 해당 부분은 임시로 API 결과를 확인하기 위한 임시 UI 입니다.
     <div className="map-layout">
-      <div className="map-status-panel">
+      {/* <div className="map-status-panel">
         {loading && <span>병원 정보를 불러오는 중...</span>}
         {!loading && !error && <span>표시 병원 {hospitals.length}개</span>}
         {error && <span>{error}</span>}
-      </div>
-
+      </div> */}
+      <MapListPanel
+        hospitals={hospitals}
+        selectedHospital={selectedHospital}
+        onSelectHospital={setSelectedHospital}
+        loading={loading}
+        error={error}
+      />
       <KakaoMap
         hospitals={hospitals}
         selectedHospital={selectedHospital}
