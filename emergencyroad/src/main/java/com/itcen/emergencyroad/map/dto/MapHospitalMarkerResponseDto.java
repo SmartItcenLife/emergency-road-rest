@@ -28,5 +28,5 @@ public class MapHospitalMarkerResponseDto {
 
     private MapDisplayStatusDto status;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime recordedAt;
 }
