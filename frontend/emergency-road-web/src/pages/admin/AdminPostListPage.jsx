@@ -46,10 +46,10 @@ function AdminPostListPage(){
         <AdminLayout>
             <div className="admin-list-page">
             <PostTable posts={posts} onDeletePost={handleDeletePost}/>
-            
+
             <ConfirmModal
             open={deleteTargetPost !== null}
-            title="게시글 탈퇴 처리"
+            title="게시글 삭제 처리"
             message={`해당 게시글을 삭제 처리하시겠습니까?`}
             confirmText="삭제"
             onConfirm={confirmDeletePost}

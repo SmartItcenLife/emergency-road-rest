@@ -68,7 +68,7 @@ function AdminReportListPage(){
             {/*게시글이랑 댓글 처리 다르게*/}
             <ConfirmModal
             open={deleteTargetReport !== null}
-            title={deleteTargetReport?.type === "COMMENT" ? "댓글 삭제 처리" : "게시글 삭제 처리"}
+            title={deleteTargetReport?.targetType === "COMMENT" ? "댓글 삭제 처리" : "게시글 삭제 처리"}
             message={`해당 신고 대상을 삭제 처리하시겠습니까?`}
             confirmText="삭제"
             onConfirm={confirmDeletePost}
