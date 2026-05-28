@@ -18,12 +18,8 @@ function ReportTable({reports, onDeleteReport, type}){
         </tr>
         </thead>
         <tbody>
-            {reports.length === 0 ? (
-            <tr>
-              <td colSpan="7">신고 내역이 없습니다.</td>
-            </tr>
-          ) : (
-            reports.map((report, index)=>(
+            
+            {reports.map((report, index)=>(
                 <ReportTableRow
                 key={report.id}
                 report={report}
@@ -31,8 +27,7 @@ function ReportTable({reports, onDeleteReport, type}){
                 type={type}
                 onDeleteReport={onDeleteReport}
                 />
-            ))
-        )}
+            ))}
         </tbody>
         </table>
         </div>
