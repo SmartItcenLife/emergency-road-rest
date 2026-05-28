@@ -111,7 +111,9 @@ public class SecurityConfig {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(List.of(
         // React 개발으로 5173번 포트로 CORS 열어두었습니다.
-        "http://localhost:5173"
+        "http://localhost:5173",
+        // React package.json 의 설정값에 따라 설정.
+        "http://localhost:5713"
     ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
