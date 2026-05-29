@@ -81,8 +81,45 @@ function KakaoMap({
   if (hoverAreaOverlayRef.current) {
     hoverAreaOverlayRef.current.setMap(null);
     hoverAreaOverlayRef.current = null;
+    }
   }
-}
+  // 사용자 위치로 이동
+  function moveToCurrentLocation() {
+    const map = mapInstanceRef.current;
+
+    if (!map || !window.kakao?.maps) {
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      alert("현재 브라우저에서는 위치 정보를 사용할 수 없습니다.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        const currentPosition = new window.kakao.maps.LatLng(
+          latitude,
+          longitude
+        );
+
+        map.panTo(currentPosition);
+        map.setLevel(5);
+        setMapLevel(5);
+      },
+      (error) => {
+        console.error("현재 위치를 가져오지 못했습니다:", error);
+        alert("현재 위치를 가져오지 못했습니다. 위치 권한을 확인해주세요.");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 30000,
+      }
+    );
+  }
 
 
   
@@ -244,6 +281,10 @@ function KakaoMap({
         );
 
         mapInstanceRef.current = map;
+
+        // kakao maps api controller 
+        const zoomControl = new window.kakao.maps.ZoomControl();
+        map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
 
         const initialLevel = map.getLevel();
         setMapLevel(initialLevel);
@@ -518,11 +559,21 @@ function KakaoMap({
 }, [areaCongestions, mapLevel, shouldRenderPolygons]);
 
   return (
-    <div
-      ref={mapContainerRef}
-      className="kakao-map"
-      aria-label="응급 병원 지도"
-    />
+    <div className="kakao-map-wrapper">
+      <div
+        ref={mapContainerRef}
+        className="kakao-map"
+        aria-label="응급 병원 지도"
+      />
+      <button
+        type="button"
+        className="map-current-location-button"
+        onClick={moveToCurrentLocation}
+        aria-label="현재 위치로 이동"
+        >
+        📍
+        </button>
+      </div>
   );
 }
 
