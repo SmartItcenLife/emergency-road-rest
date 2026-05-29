@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { getMapBoundsParams } from "../utils/mapBounds";
 import { getMarkerColorByGrade } from "../utils/mapMarkerStyle";
+import seoulDistrictPolygons from "../data/seoulDistrictPolygons.json";
+import { getPolygonColor } from "../utils/mapPolygonStyle";
 
 const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 
@@ -9,6 +11,7 @@ function KakaoMap({
   selectedHospital,
   onBoundsChange,
   onSelectHospital,
+  areaCongestions,
 }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -22,6 +25,13 @@ function KakaoMap({
   // 현재 활성화된 정보 오버레이를 추적하기 위한 ref
   const activeInfoOverlayRef = useRef(null);
   const ignoreNextMapClickRef = useRef(false);
+
+  // 지도에 구별 혼잡도를 표기하기 위한 상태
+  const polygonsRef = useRef([]);
+  const areaInfoOverlayRef = useRef(null);
+  const activeAreaOverlayRef = useRef(null);
+  const activeAreaCodeRef = useRef(null);
+
 
   // 지도에 표시된 마커를 모두 제거하는 함수
   function clearMarkers() {
@@ -38,12 +48,101 @@ function KakaoMap({
     infoOverlayRef.current = [];
     markersRef.current = [];
   }
+
+  // 폴리곤 제거 함수
+  function clearPolygons() {
+    polygonsRef.current.forEach((polygon) => {
+      polygon.setMap(null);
+    });
+
+    polygonsRef.current = [];
+
+    if (areaInfoOverlayRef.current) {
+      areaInfoOverlayRef.current.setMap(null);
+      areaInfoOverlayRef.current = null;
+      }
+
+    closeActiveAreaOverlay();
+  }
+
+  function closeActiveAreaOverlay() {
+    if (activeAreaOverlayRef.current) {
+      activeAreaOverlayRef.current.setMap(null);
+      activeAreaOverlayRef.current = null;
+    }
+  }
+
+  // GeoJson 좌표를 Kakao LatLng 배열로 변환하는 함수 ( 경도,위도 -> 위도,경도 )
+  function convertCoordinatesToPath(coordinates) {
+  return coordinates.map(([lon, lat]) => {
+    return new window.kakao.maps.LatLng(lat, lon);
+    });
+  }
+
   // 활성화된 정보 오버레이가 있다면 닫는 함수
   function closeActiveInfoOverlay() {
     if (activeInfoOverlayRef.current) {
       activeInfoOverlayRef.current.setMap(null);
       activeInfoOverlayRef.current = null;
     }
+
+    activeAreaCodeRef.current = null;
+  }
+
+  // 
+  function displayValue(value) {
+    if (value === null || value === undefined || value === "") {
+      return "-";
+    }
+
+    return value;
+  }
+
+  function formatDateTime(value) {
+    if (!value) {
+      return "-";
+    }
+
+    return String(value).replace("T", " ").substring(0, 16);
+  }
+
+  function createAreaInfoContent(areaName, congestion) {
+    const content = document.createElement("div");
+    content.className = "map-area-info";
+
+    content.innerHTML = `
+      <strong>${areaName}</strong>
+      <span>${congestion?.status?.label ?? "정보없음"}</span>
+      <dl>
+        <div>
+          <dt>병원 수</dt>
+          <dd>${displayValue(congestion?.hospitalCount)}개</dd>
+        </div>
+        <div>
+          <dt>가용 병상</dt>
+          <dd>${displayValue(congestion?.status?.availableCount)}개</dd>
+        </div>
+        <div>
+          <dt>전체 병상</dt>
+          <dd>${displayValue(congestion?.status?.totalCount)}개</dd>
+        </div>
+        <div>
+          <dt>가용률</dt>
+          <dd>${
+            congestion?.status?.rate !== null &&
+            congestion?.status?.rate !== undefined
+              ? `${congestion.status.rate}%`
+              : "-"
+          }</dd>
+        </div>
+        <div>
+          <dt>갱신 시간</dt>
+          <dd>${formatDateTime(congestion?.recordedAt)}</dd>
+        </div>
+      </dl>
+    `;
+
+    return content;
   }
 
   useEffect(() => {
@@ -237,6 +336,91 @@ function KakaoMap({
     const position = new window.kakao.maps.LatLng(latitude, longitude);
     map.panTo(position);
   }, [selectedHospital]);
+
+  // polygon을 그리기 위한 useEffect  
+  useEffect(() => {
+  const map = mapInstanceRef.current;
+
+  if (!map || !window.kakao?.maps) {
+    return;
+  }
+
+  clearPolygons();
+
+  const congestionMap = new Map(
+    areaCongestions.map((area) => [area.areaCode, area])
+  );
+
+  seoulDistrictPolygons.features.forEach((feature) => {
+    const areaCode = feature.properties.SIG_CD;
+    const areaName = feature.properties.SIG_KOR_NM;
+    const congestion = congestionMap.get(areaCode);
+
+    const polygonColor = getPolygonColor(congestion?.status?.grade);
+    const path = convertCoordinatesToPath(feature.geometry.coordinates[0]);
+
+    const polygon = new window.kakao.maps.Polygon({
+      map,
+      path,
+      strokeWeight: 2,
+      strokeColor: polygonColor,
+      strokeOpacity: 0.9,
+      fillColor: polygonColor,
+      fillOpacity: 0.22,
+    });
+
+    const infoOverlay = new window.kakao.maps.CustomOverlay({
+      content: createAreaInfoContent(areaName, congestion),
+      position: path[0],
+      xAnchor: 0.5,
+      yAnchor: 1.2,
+    });
+
+    window.kakao.maps.event.addListener(polygon, "mouseover", (mouseEvent) => {
+      polygon.setOptions({
+        fillOpacity: 0.38,
+      });
+
+      infoOverlay.setPosition(mouseEvent.latLng);
+      infoOverlay.setMap(map);
+    });
+
+    window.kakao.maps.event.addListener(polygon, "mousemove", (mouseEvent) => {
+      infoOverlay.setPosition(mouseEvent.latLng);
+    });
+
+    window.kakao.maps.event.addListener(polygon, "mouseout", () => {
+      polygon.setOptions({
+        fillOpacity: 0.22,
+      })
+
+      infoOverlay.setMap(null);
+
+      if ( activeAreaCodeRef.current === areaCode) {
+        activeAreaCodeRef.current = null;
+        activeAreaOverlayRef.current = null;
+      }
+    });
+
+    window.kakao.maps.event.addListener(polygon, "click", (mouseEvent) => {
+      if ( activeAreaCodeRef.current === areaCode) {
+        closeActiveAreaOverlay();
+        return;
+      }
+
+      closeActiveAreaOverlay();
+
+      infoOverlay.setPosition(mouseEvent.latLng);
+      infoOverlay.setMap(map);
+      
+      activeAreaOverlayRef.current = infoOverlay;
+      activeAreaCodeRef.current = areaCode;
+    });
+
+    
+    polygonsRef.current.push(polygon);
+  });
+}, [areaCongestions]);
 
   return (
     <div
