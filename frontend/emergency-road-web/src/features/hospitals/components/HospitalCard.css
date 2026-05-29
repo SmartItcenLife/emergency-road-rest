@@ -107,12 +107,15 @@ body {
 
 
 .hospital-info {
+    display: flex;
+    flex-direction: column;
     font-size: 14px;
     color: #64748b;
-    gap: 8px;
+    gap: 3px;
      min-width: 0; 
      width: 200px;
      margin-top: 20px;
+    
 }
 
 /* 병원 이름 */
@@ -239,8 +242,8 @@ body {
 .call-button,
 .route-button,
 .community-button {
-    width: 28px;
-    height: 28px;
+    width: 33px;
+    height: 33px;
     border-radius: 50%;
     background: #f1f5f9;
     /* 기본 배경: 회색 */
