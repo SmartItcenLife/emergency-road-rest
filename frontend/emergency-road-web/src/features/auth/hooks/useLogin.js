@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../../app/providers/AuthProvider";
 
 /**
@@ -14,6 +14,7 @@ import { useAuthContext } from "../../../app/providers/AuthProvider";
  */
 export function useLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuthContext();
 
   const [id, setId] = useState("");
@@ -32,7 +33,9 @@ export function useLogin() {
     setLoading(true);
     try {
       await login({ userName: id.trim(), password: pw });
-      navigate("/", { replace: true });
+      const from = (location.state?.from || "/").replace(/\/$/, "");
+      const safeTo = from === "/login" ? "/" : from;
+      navigate(safeTo, { replace: true });
     } catch (error) {
       setErr(error.message || "아이디 또는 비밀번호를 확인해 주세요");
     } finally {
@@ -42,6 +45,11 @@ export function useLogin() {
 
   async function onKakao() {
     try {
+      const from = (location.state?.from || location.pathname).replace(
+        /\/$/,
+        "",
+      );
+      sessionStorage.setItem("loginFrom", from);
       const res = await fetch("/api/auth/kakao/redirect");
       const data = await res.json();
       window.location.href = data.data;

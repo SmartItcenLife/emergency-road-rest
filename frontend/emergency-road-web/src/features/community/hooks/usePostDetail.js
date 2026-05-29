@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   getPost,
   togglePostLike,
@@ -19,10 +19,12 @@ import {
  */
 export function usePostDetail(hpid, postId, user) {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -41,7 +43,10 @@ export function usePostDetail(hpid, postId, user) {
   }, [hpid, postId]);
 
   async function handleLike() {
-    if (!user) return navigate("/login");
+    if (!user)
+      return navigate("/login", {
+        state: { from: location.pathname.replace(/\/$/, "") },
+      });
     const isLiked = await togglePostLike(hpid, postId);
     setPost((p) => ({
       ...p,
@@ -51,7 +56,10 @@ export function usePostDetail(hpid, postId, user) {
   }
 
   async function handleCommentLike(commentId) {
-    if (!user) return navigate("/login");
+    if (!user)
+      return navigate("/login", {
+        state: { from: location.pathname.replace(/\/$/, "") },
+      });
     const isLiked = await toggleCommentLike(hpid, postId, commentId);
     setComments((cs) =>
       cs.map((c) =>
@@ -68,37 +76,63 @@ export function usePostDetail(hpid, postId, user) {
     setComments(cs);
   }
 
-  async function handleEditComment(comment) {
-    const newContent = prompt("댓글을 수정해 주세요", comment.content);
-    if (!newContent || newContent === comment.content) return;
-    await updateComment(hpid, postId, comment.id, newContent);
+  function handleStartEdit(comment) {
+    setEditing(comment);
+  }
+
+  function handleCancelEdit() {
+    setEditing(null);
+  }
+
+  // 수정 저장
+  async function handleSubmitEdit(newContent) {
+    if (!editing) return;
+    await updateComment(hpid, postId, editing.id, newContent);
     setComments((cs) =>
-      cs.map((c) => (c.id === comment.id ? { ...c, content: newContent } : c)),
+      cs.map((c) => (c.id === editing.id ? { ...c, content: newContent } : c)),
     );
+    setEditing(null);
   }
 
-  async function handleDeleteComment(commentId) {
-    if (!confirm("댓글을 삭제할까요?")) return;
-    await deleteComment(hpid, postId, commentId);
-    setComments((cs) => cs.filter((c) => c.id !== commentId));
+  // 댓글 삭제 확인 요청
+  function handleAskDeleteComment(commentId) {
+    setConfirmTarget({ kind: "comment", target: commentId });
   }
 
-  async function handleDeletePost() {
-    if (!confirm("이 글을 삭제할까요? 삭제하면 되돌릴 수 없어요.")) return;
-    await deletePost(hpid, postId);
-    navigate(`/community/${hpid}`, { replace: true });
+  // 게시글 삭제 확인 요청
+  function handleAskDeletePost() {
+    setConfirmTarget({ kind: "post", target: postId });
+  }
+
+  // 확인 모달 승인
+  async function handleConfirmDelete() {
+    if (!confirmTarget) return;
+    if (confirmTarget.kind === "post") {
+      await deletePost(hpid, postId);
+      navigate(`/community/${hpid}`, { replace: true });
+    } else {
+      await deleteComment(hpid, postId, confirmTarget.target);
+      setComments((cs) => cs.filter((c) => c.id !== confirmTarget.target));
+    }
+    setConfirmTarget(null);
   }
 
   return {
     post,
     comments,
     loading,
+    editing,
+    confirmTarget,
+    setConfirmTarget,
     handleLike,
     handleCommentLike,
     handleAddComment,
-    handleEditComment,
-    handleDeleteComment,
-    handleDeletePost,
+    handleStartEdit,
+    handleCancelEdit,
+    handleSubmitEdit,
+    handleAskDeleteComment,
+    handleAskDeletePost,
+    handleConfirmDelete,
   };
 }
 

@@ -13,7 +13,7 @@ import AdminPostListPage from "./pages/admin/AdminPostListPage.jsx";
 import AdminReportListPage from "./pages/admin/AdminReportListPage.jsx";
 import HospitalRecommendPage from "./pages/hospital/HospitalRecommendPage.jsx";
 import MapPage from "./pages/map/MapPage";
-import HospitalListPage from './pages/hospital/HospitalListPage.jsx';
+import HospitalListPage from "./pages/hospital/HospitalListPage.jsx";
 
 import { AuthProvider, useAuthContext } from "./app/providers/AuthProvider.jsx";
 import SignupPage from "./pages/auth/SignupPage";
@@ -32,7 +32,13 @@ const PrivateRoute = ({ children }) => {
 
 const GuestRoute = ({ children }) => {
   const { user, loading } = useAuthContext();
+  const location = useLocation();
   if (loading) return null;
+  if (user) {
+    const from = (location.state?.from || "/").replace(/\/$/, "");
+    const safeTo = from === "/login" ? "/" : from;
+    return <Navigate to={safeTo} replace />;
+  }
   return user ? <Navigate to="/" replace /> : children;
 };
 
@@ -48,8 +54,10 @@ const Layout = () => {
   // 현재 경로에 따라 헤더 타입을 결정하는 로직
   const getHeaderType = () => {
     const path = location.pathname;
-    if (path=== '/') return 'home';
-    if(path.startsWith("/admin")){  return "admin";  }
+    if (path === "/") return "home";
+    if (path.startsWith("/admin")) {
+      return "admin";
+    }
     // if (location.pathname.startsWith('/recommend')) return 'recommend';
     // if (location.pathname.startsWith('/community')) return 'community';
     return "home";
@@ -113,11 +121,14 @@ const Layout = () => {
         <Route path="/admin" element={<AdminDashboardPage />} />
         <Route path="/admin/users" element={<AdminUserListPage />} />
         <Route path="/admin/posts" element={<AdminPostListPage />} />
-        <Route path="/admin/reports" element={<AdminReportListPage/>} />
+        <Route path="/admin/reports" element={<AdminReportListPage />} />
         {/* 지도 */}
         <Route path="/map" element={<MapPage />} />
         {/* 추천 및 전체 보기 */}
-        <Route path="/recommend/:category" element={<HospitalRecommendPage />} />
+        <Route
+          path="/recommend/:category"
+          element={<HospitalRecommendPage />}
+        />
         <Route path="/:category/hospitals" element={<HospitalListPage />} />
       </Routes>
     </>

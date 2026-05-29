@@ -6,7 +6,12 @@ import { PostLikeBar } from "../../features/community/components/PostLikeBar";
 import { MoreMenu } from "../../features/community/components/MoreMenu";
 import { CommentItem } from "../../features/community/components/CommentItem";
 import { CommentComposer } from "../../features/community/components/CommentComposer";
-import { AppBar, Avatar, Icon } from "../../shared/components/ui/Primitives";
+import {
+  AppBar,
+  Avatar,
+  Icon,
+  ConfirmModal,
+} from "../../shared/components/ui/Primitives";
 import { formatDate } from "../../features/community/utils/dateFormat";
 
 const BORDER1 = "#E2E6EE";
@@ -23,12 +28,18 @@ export default function PostDetailPage() {
     post,
     comments,
     loading,
+    editing,
+    confirmTarget,
+    setConfirmTarget,
     handleLike,
     handleCommentLike,
     handleAddComment,
-    handleEditComment,
-    handleDeleteComment,
-    handleDeletePost,
+    handleStartEdit,
+    handleCancelEdit,
+    handleSubmitEdit,
+    handleAskDeleteComment,
+    handleAskDeletePost,
+    handleConfirmDelete,
   } = usePostDetail(hpid, postId, user);
 
   if (loading)
@@ -45,6 +56,14 @@ export default function PostDetailPage() {
     );
 
   const isMyPost = user?.userId === post.userId;
+
+  function handleComposerSubmit(text) {
+    if (editing) {
+      handleSubmitEdit(text);
+    } else {
+      handleAddComment(text);
+    }
+  }
 
   return (
     <div
@@ -79,7 +98,7 @@ export default function PostDetailPage() {
           isMyPost && (
             <MoreMenu
               onEdit={() => navigate(`/community/${hpid}/posts/${postId}/edit`)}
-              onDelete={handleDeletePost}
+              onDelete={handleAskDeletePost}
             />
           )
         }
@@ -186,15 +205,36 @@ export default function PostDetailPage() {
             key={c.id}
             c={c}
             onLike={handleCommentLike}
-            onEdit={handleEditComment}
-            onDelete={handleDeleteComment}
+            onEdit={handleStartEdit}
+            onDelete={handleAskDeleteComment}
             myId={user?.userId}
           />
         ))
       )}
 
       <div style={{ height: 80 }} />
-      <CommentComposer onSubmit={handleAddComment} disabled={!user} />
+      <CommentComposer
+        editing={editing}
+        onSubmit={handleComposerSubmit}
+        onCancelEdit={handleCancelEdit}
+        disabled={!user}
+      />
+
+      {/* 삭제 확인 모달 */}
+      <ConfirmModal
+        open={!!confirmTarget}
+        title={confirmTarget?.kind === "post" ? "게시글 삭제" : "댓글 삭제"}
+        message={
+          confirmTarget?.kind === "post"
+            ? "이 게시글을 삭제할까요?"
+            : "댓글을 삭제할까요?"
+        }
+        confirmLabel="삭제"
+        cancelLabel="취소"
+        danger
+        onConfirm={handleConfirmDelete}
+        onClose={() => setConfirmTarget(null)}
+      />
     </div>
   );
 }
