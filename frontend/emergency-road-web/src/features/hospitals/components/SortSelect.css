@@ -1,10 +1,11 @@
 .sort-container{
-    display: flex;
+  display: flex;
   justify-content: flex-end;
-  margin-bottom: 16px;
+  margin-top: 16px;
 }
 
 .sort-content {
+
   height: 38px;
   min-width: 120px;
   padding: 0 40px 0 14px;
