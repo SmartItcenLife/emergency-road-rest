@@ -97,7 +97,8 @@ function MapLayout() {
   }
 
   return (
-  <div className="map-layout">
+  <div 
+    className={selectedHospital? "map-layout detail-mode" : "map-layout"}>
     <div className="map-content">
       {showSearchButton && (
         <button

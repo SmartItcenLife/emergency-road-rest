@@ -10,7 +10,8 @@ function MapSidePanel({
   error,
 }) {
   return (
-    <aside className="map-side-panel">
+    <aside
+       className={selectedHospital ? "map-side-panel detail-mode" : "map-side-panel"}>
       {selectedHospital ? (
         <MapHospitalDetailPanel
           hospital={selectedHospital}
