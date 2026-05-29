@@ -4,6 +4,7 @@ import DashboardCardGroup from "../../features/admin/components/DashboardCardGro
 import "./AdminDashboardPage.css";
 import RecentPostTable from "../../features/admin/components/RecentPostTable"
 import "../../pages/admin/AdminTable.css"
+import {getDashboardStats, getDashboardPosts} from "../../features/admin/api/adminApi";
 
 function AdminDashboardPage(){
     const [stats, setStats] = useState({
@@ -15,13 +16,16 @@ function AdminDashboardPage(){
 
     useEffect(()=>{
         const fetchDashboardData = async()=>{
-            const statsResponse = await fetch("/api/admin");
-            const statsData = await statsResponse.json();
-            setStats(statsData);
-            
-            const postsResponse = await fetch("http://localhost:8080/api/admin/posts");
-            const postsData = await postsResponse.json();
-            setRecentPosts(postsData.slice(0,5));
+            try{
+                const statsResponse = await getDashboardStats();
+                setStats(statsResponse);
+                
+                const postsResponse = await getDashboardPosts();
+                setRecentPosts(postsResponse.slice(0,5));
+            }catch(error){
+                console.error(error);
+                alert("대시보드 데이터를 불러오지 못했습니다.");
+            }
         };
         fetchDashboardData();
         
