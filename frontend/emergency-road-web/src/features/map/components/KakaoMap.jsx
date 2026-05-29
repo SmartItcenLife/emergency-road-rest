@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getMapBoundsParams } from "../utils/mapBounds";
 import { getMarkerColorByGrade } from "../utils/mapMarkerStyle";
 import seoulDistrictPolygons from "../data/seoulDistrictPolygons.json";
@@ -19,7 +19,6 @@ function KakaoMap({
   const debounceTimeoutRef = useRef(null);
 
   // hover 상태 관리를 위한 ref
-  // const hoverHospitalIdRef = useRef(null);
   const infoOverlayRef = useRef([]);
 
   // 현재 활성화된 정보 오버레이를 추적하기 위한 ref
@@ -32,7 +31,17 @@ function KakaoMap({
   const activeAreaOverlayRef = useRef(null);
   const activeAreaCodeRef = useRef(null);
 
+  
+  const POLYGON_HIDE_LEVEL = 5;
+  
+  // 지도 맵 레벨을 관리하기 위한 상태
+  const AREA_MODE_LEVEL = 7; 
+  
+  const [mapLevel, setMapLevel] = useState(AREA_MODE_LEVEL);
 
+  const shouldRenderPolygons = mapLevel > POLYGON_HIDE_LEVEL;
+
+  
   // 지도에 표시된 마커를 모두 제거하는 함수
   function clearMarkers() {
     closeActiveInfoOverlay();
@@ -65,11 +74,54 @@ function KakaoMap({
     closeActiveAreaOverlay();
   }
 
+  
+  // 줌 레벨에 따른 폴리곤 및 마커 색상 투명도 조절을 위한 상수 및 함수
+  const polygonOpacity = getPolygonOpacityByLevel(mapLevel);
+  const markerOpacity = getMarkerOpacityByLevel(mapLevel);
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function getPolygonOpacityByLevel(level) {
+    if (level <= 3) {
+      return {
+        fillOpacity: 0,
+        strokeOpacity: 0,
+      };
+    }
+
+    const normalized = clamp((level - 3) / 5, 0, 1);
+
+    return {
+      fillOpacity: 0.06 + normalized * 0.26,
+      strokeOpacity: 0.15 + normalized * 0.45,
+    };
+  }
+  
+  function getMarkerOpacityByLevel(level) {
+    if (level <= 3) {
+      return 1;
+    }
+
+    if (level <= 5) {
+      return 0.85;
+    }
+
+    if (level <= 7) {
+      return 0.6;
+    }
+
+    return 0.25;
+  }
+
+
   function closeActiveAreaOverlay() {
     if (activeAreaOverlayRef.current) {
       activeAreaOverlayRef.current.setMap(null);
       activeAreaOverlayRef.current = null;
     }
+    activeAreaCodeRef.current = null;
   }
 
   // GeoJson 좌표를 Kakao LatLng 배열로 변환하는 함수 ( 경도,위도 -> 위도,경도 )
@@ -85,8 +137,6 @@ function KakaoMap({
       activeInfoOverlayRef.current.setMap(null);
       activeInfoOverlayRef.current = null;
     }
-
-    activeAreaCodeRef.current = null;
   }
 
   // 
@@ -184,6 +234,9 @@ function KakaoMap({
 
         mapInstanceRef.current = map;
 
+        const initialLevel = map.getLevel();
+        setMapLevel(initialLevel);
+
         function emitBoundsChange() {
           const boundsParams = getMapBoundsParams(map);
           onBoundsChange(boundsParams);
@@ -206,6 +259,11 @@ function KakaoMap({
           "idle",
           emitBoundsChangeWithDebounce
         );
+
+        window.kakao.maps.event.addListener(map, "zoom_changed", () => {
+          const currentLevel = map.getLevel();
+          setMapLevel(currentLevel);
+        });
         
         window.kakao.maps.event.addListener(map, "click", () => {
           if (ignoreNextMapClickRef.current) {
@@ -251,6 +309,7 @@ function KakaoMap({
 
     clearMarkers();
 
+
     hospitals.forEach((hospital) => {
       const position = new window.kakao.maps.LatLng(
         hospital.latitude,
@@ -265,6 +324,7 @@ function KakaoMap({
         ? "map-hospital-marker selected"
         : "map-hospital-marker";
       markerElement.style.backgroundColor = markerColor;
+      markerElement.style.opacity = isSelected ? 1 : markerOpacity; // 선택된 병원이 더 잘 보이게
       markerElement.title = hospital.hospitalName;
 
       const infoContent = document.createElement("div");
@@ -317,7 +377,7 @@ function KakaoMap({
       }
 
     });
-  }, [hospitals, selectedHospital, onSelectHospital]);
+  }, [hospitals, selectedHospital, onSelectHospital, markerOpacity]);
 
   useEffect(() => {
     // selectedHospital 위치로 map.panTo
@@ -347,6 +407,10 @@ function KakaoMap({
 
   clearPolygons();
 
+  if (!shouldRenderPolygons) {
+    return;
+  }
+
   const congestionMap = new Map(
     areaCongestions.map((area) => [area.areaCode, area])
   );
@@ -364,9 +428,9 @@ function KakaoMap({
       path,
       strokeWeight: 2,
       strokeColor: polygonColor,
-      strokeOpacity: 0.9,
+      strokeOpacity: polygonOpacity.strokeOpacity,
       fillColor: polygonColor,
-      fillOpacity: 0.22,
+      fillOpacity: polygonOpacity.fillOpacity,
     });
 
     const infoOverlay = new window.kakao.maps.CustomOverlay({
@@ -378,7 +442,7 @@ function KakaoMap({
 
     window.kakao.maps.event.addListener(polygon, "mouseover", (mouseEvent) => {
       polygon.setOptions({
-        fillOpacity: 0.38,
+        fillOpacity: Math.min(polygonOpacity.fillOpacity + 0.16, 0.55),
       });
 
       infoOverlay.setPosition(mouseEvent.latLng);
@@ -391,7 +455,7 @@ function KakaoMap({
 
     window.kakao.maps.event.addListener(polygon, "mouseout", () => {
       polygon.setOptions({
-        fillOpacity: 0.22,
+        fillOpacity: polygonOpacity.fillOpacity
       })
 
       infoOverlay.setMap(null);
@@ -420,7 +484,7 @@ function KakaoMap({
     
     polygonsRef.current.push(polygon);
   });
-}, [areaCongestions]);
+}, [areaCongestions, mapLevel, shouldRenderPolygons]);
 
   return (
     <div
