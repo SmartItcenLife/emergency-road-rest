@@ -1,6 +1,6 @@
 import React from 'react';
 import './AdminHeader.css';
-import logo from '../../../assets/logo.png'
+import logo from '../../assets/logo.png'
 const AdminHeader = () => {
   return (
     <header className="admin-header">
