@@ -9,6 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 /** 이미지 URL 정규화 — 상대경로 → 절대경로, 이중 슬래시 제거 */
 function normalizeImageUrl(url) {
   if (!url) return null;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
   const clean = url.replace(/\/\/+/g, "/"); // // → /
   return clean.startsWith("/") ? `${API_URL}${clean}` : clean;
 }
