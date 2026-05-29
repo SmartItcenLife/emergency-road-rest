@@ -293,3 +293,54 @@
 .map-current-location-button:hover {
   background-color: #f9fafb;
 }
+
+.map-current-location-marker {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+}
+
+.map-current-location-marker::before,
+.map-current-location-marker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background-color: rgba(37, 99, 235, 0.22);
+  animation: current-location-pulse 1.8s ease-out infinite;
+}
+
+.map-current-location-marker::after {
+  animation-delay: 0.9s;
+}
+
+.map-current-location-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background-color: #2563eb;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
+@keyframes current-location-pulse {
+  0% {
+    transform: scale(0.35);
+    opacity: 0.9;
+  }
+
+  70% {
+    opacity: 0.18;
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}

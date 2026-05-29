@@ -33,6 +33,9 @@ function KakaoMap({
 
   // 폴리곤 hover 상태 관리를 위한 ref
   const hoverAreaOverlayRef = useRef(null);
+
+  // 사용자 위치를 관리하기 위한 Ref
+  const currentLocationOverlayRef = useRef(null);
  
   const POLYGON_HIDE_LEVEL = 5;
   const AREA_CLICK_ZOOM_LEVEL = 5;
@@ -108,6 +111,8 @@ function KakaoMap({
         map.panTo(currentPosition);
         map.setLevel(5);
         setMapLevel(5);
+
+        showCurrentLocationMarker(currentPosition);
       },
       (error) => {
         console.error("현재 위치를 가져오지 못했습니다:", error);
@@ -119,6 +124,38 @@ function KakaoMap({
         maximumAge: 30000,
       }
     );
+  }
+
+  // 사용자 위치 overlay 구성 함수
+  function showCurrentLocationMarker(position){
+    const map = mapInstanceRef.current;
+
+    if (!map || !window.kakao?.maps) {
+      return;
+    }
+
+    if (currentLocationOverlayRef.current) {
+      currentLocationOverlayRef.current.setMap(null);
+    }
+
+    const markerElement = document.createElement("div");
+    markerElement.className = "map-current-location-marker";
+    markerElement.setAttribute("aria-label", "현재 위치");
+
+    const markerDot = document.createElement("span");
+    markerDot.className = "map-current-location-dot";
+
+    markerElement.appendChild(markerDot);
+
+    const currentLocationOverlay = new window.kakao.maps.CustomOverlay({
+      map,
+      position,
+      content: markerElement,
+      xAnchor: 0.5,
+      yAnchor: 0.5,
+  });
+
+  currentLocationOverlayRef.current = currentLocationOverlay;
   }
 
 
