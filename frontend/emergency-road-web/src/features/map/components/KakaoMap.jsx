@@ -31,8 +31,11 @@ function KakaoMap({
   const activeAreaOverlayRef = useRef(null);
   const activeAreaCodeRef = useRef(null);
 
-  
+  // 폴리곤 hover 상태 관리를 위한 ref
+  const hoverAreaOverlayRef = useRef(null);
+ 
   const POLYGON_HIDE_LEVEL = 5;
+  const AREA_CLICK_ZOOM_LEVEL = 5;
   
   // 지도 맵 레벨을 관리하기 위한 상태
   const AREA_MODE_LEVEL = 7; 
@@ -73,6 +76,14 @@ function KakaoMap({
 
     closeActiveAreaOverlay();
   }
+
+  function closeHoverAreaOverlay() {
+  if (hoverAreaOverlayRef.current) {
+    hoverAreaOverlayRef.current.setMap(null);
+    hoverAreaOverlayRef.current = null;
+  }
+}
+
 
   
   // 줌 레벨에 따른 폴리곤 및 마커 색상 투명도 조절을 위한 상수 및 함수
@@ -270,6 +281,8 @@ function KakaoMap({
               ignoreNextMapClickRef.current = false;
               return;
             }
+          closeHoverAreaOverlay();
+          closeActiveAreaOverlay();
           closeActiveInfoOverlay();
           onSelectHospital(null);
         });
@@ -447,6 +460,7 @@ function KakaoMap({
 
       infoOverlay.setPosition(mouseEvent.latLng);
       infoOverlay.setMap(map);
+      hoverAreaOverlayRef.current = infoOverlay;
     });
 
     window.kakao.maps.event.addListener(polygon, "mousemove", (mouseEvent) => {
@@ -454,17 +468,29 @@ function KakaoMap({
     });
 
     window.kakao.maps.event.addListener(polygon, "mouseout", () => {
-      polygon.setOptions({
-        fillOpacity: polygonOpacity.fillOpacity
-      })
+        polygon.setOptions({
+          fillOpacity: polygonOpacity.fillOpacity
+        })
+      
+        infoOverlay.setMap(null);
+      
+        if ( activeAreaCodeRef.current === areaCode) {
+            activeAreaCodeRef.current = null;
+            activeAreaOverlayRef.current = null;
+          }
+        if (hoverAreaOverlayRef.current === infoOverlay) {
+          hoverAreaOverlayRef.current = null;
+        }
+      });
+    
+      window.kakao.maps.event.addListener(map, "zoom_changed", () => {
+        closeActiveAreaOverlay();
+        closeActiveInfoOverlay();
+        closeHoverAreaOverlay();
 
-      infoOverlay.setMap(null);
-
-      if ( activeAreaCodeRef.current === areaCode) {
-        activeAreaCodeRef.current = null;
-        activeAreaOverlayRef.current = null;
-      }
-    });
+        const currentLevel = map.getLevel();
+        setMapLevel(currentLevel);
+      });
 
     window.kakao.maps.event.addListener(polygon, "click", (mouseEvent) => {
       if ( activeAreaCodeRef.current === areaCode) {
@@ -479,6 +505,11 @@ function KakaoMap({
       
       activeAreaOverlayRef.current = infoOverlay;
       activeAreaCodeRef.current = areaCode;
+
+      map.panTo(mouseEvent.latLng);
+      map.setLevel(AREA_CLICK_ZOOM_LEVEL, {
+        anchor : mouseEvent.latLng
+      });
     });
 
     
