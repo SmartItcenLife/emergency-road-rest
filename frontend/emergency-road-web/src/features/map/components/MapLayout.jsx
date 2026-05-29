@@ -1,7 +1,8 @@
 import { useState,useRef } from "react";
 import KakaoMap from "./KakaoMap";
-import { getMapHospitals } from "../api/mapApi";
+import { getAreaCongestion, getMapHospitals } from "../api/mapApi";
 import MapListPanel from "./MapListPanel";
+import { useEffect } from "react";
 
 function MapLayout() {
   const [hospitals, setHospitals] = useState([]);
@@ -14,6 +15,15 @@ function MapLayout() {
   const [showSearchButton, setShowSearchButton] = useState(false);
   
   const hasSearchedOnceRef = useRef(false);
+
+  // Polygon 데이터 및 구별 혼잡도 정보 상태
+  const [areaCongestions, setAreaCongestions] = useState([]);
+  const [areaCongestionLoading, setAreaCongestionLoading] = useState(false);
+  const [areaCongestionError, setAreaCongestionError] = useState(null);
+
+  useEffect(() => {
+    loadAreaCongestions();
+  }, []);
 
   // 지도 bounds 변경 시 호출되는 함수
   function handleBoundsChange(boundsParams) {
@@ -42,6 +52,22 @@ function MapLayout() {
       setError("병원 정보를 불러오지 못했습니다.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  // 구별 혼잡도 조회
+  async function loadAreaCongestions() {
+    try {
+      setAreaCongestionLoading(true);
+      setAreaCongestionError(null);
+
+      const data = await getAreaCongestion();
+      setAreaCongestions(data);
+    } catch (err) {
+      console.error("구별 혼잡도 정보를 불러오는 중 오류가 발생했습니다:", err);
+      setAreaCongestionError("구별 혼잡도 정보를 불러오지 못했습니다.");
+    } finally {
+      setAreaCongestionLoading(false);
     }
   }
 
@@ -80,6 +106,7 @@ function MapLayout() {
 
       <KakaoMap
         hospitals={hospitals}
+        areaCongestions={areaCongestions}
         selectedHospital={selectedHospital}
         onBoundsChange={handleBoundsChange}
         onSelectHospital={handleSelectHospital}
