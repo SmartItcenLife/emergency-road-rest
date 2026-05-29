@@ -1,4 +1,4 @@
-package com.itcen.emergencyroad.community.dto;
+package com.itcen.emergencyroad.community.dto.post;
 
 import com.itcen.emergencyroad.community.entity.Report;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
