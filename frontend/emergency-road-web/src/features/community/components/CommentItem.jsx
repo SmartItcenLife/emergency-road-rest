@@ -10,7 +10,7 @@ const ACCENT = "#2563EB";
 /**
  * CommentItem — 댓글 아이템
  */
-export function CommentItem({ c, onLike, onEdit, onDelete, myId }) {
+export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId }) {
   return (
     <div
       style={{
@@ -88,6 +88,30 @@ export function CommentItem({ c, onLike, onEdit, onDelete, myId }) {
             />{" "}
             {c.likeCount}
           </button>
+
+          {myId && myId !== c.userId && (
+            <button
+            type="button"
+            onClick={() => onReport(c.id)}
+            style={
+              {
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                padding: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                fontSize: 12,
+                color: "#DC2626",
+                fontWeight: 600,
+                margin: "0 0 0 10px"
+              }
+            }
+            >
+              <Icon name="flag" size={13}/>
+            </button>
+          )}
         </div>
       </div>
     </div>

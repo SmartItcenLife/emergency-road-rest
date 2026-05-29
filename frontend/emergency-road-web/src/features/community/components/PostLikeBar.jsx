@@ -1,5 +1,6 @@
 import { Icon } from "../../../shared/components/ui/Primitives";
 
+
 const BORDER1 = "#E2E6EE";
 const INK2 = "#404757";
 const ACCENT = "#2563EB";
@@ -7,7 +8,7 @@ const ACCENT = "#2563EB";
 /**
  * PostLikeBar — 좋아요 / 댓글수 액션바
  */
-export function PostLikeBar({ isLiked, recommendCount, commentCount, onLike }) {
+export function PostLikeBar({ isLiked, recommendCount, commentCount, onLike, handleAskReportPost }) {
   return (
     <div
       style={{
@@ -46,6 +47,8 @@ export function PostLikeBar({ isLiked, recommendCount, commentCount, onLike }) {
       <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
         <Icon name="message" size={16} /> {commentCount}
       </span>
+
+      
     </div>
   );
 }
