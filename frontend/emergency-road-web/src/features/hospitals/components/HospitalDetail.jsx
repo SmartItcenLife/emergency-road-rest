@@ -41,6 +41,9 @@ const HospitalDetail = ({ detailData, config }) => {
       : `${currentValue} / ${totalValue}`;
   };
 
+  const theme = config.theme;
+  
+
   const renderRowSection = (section) => (
     <div className="detail-section" key={section.title}>
       <h3 className="detail-title">{section.title}</h3>
@@ -126,7 +129,9 @@ const HospitalDetail = ({ detailData, config }) => {
   };
 
   return (
-    <div className="hospital-detail-panel">
+    <div className="hospital-detail-panel" style={{
+            '--primary': theme.primary,
+            }}>
       {config.detailSections.map((section) =>
         renderDetailSection(section)
       )}

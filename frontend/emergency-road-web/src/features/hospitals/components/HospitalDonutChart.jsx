@@ -60,7 +60,7 @@ const HospitalDonutChart = ({
   // 하단 텍스트
   const bottomText = isDeliveryMode
     ? config.donut.label
-    : `전체 ${total ?? 0} 병상`;
+    : `(전체 ${total ?? 0} 병상)`;
 
   // glow 효과
   const glowEffect = isDeliveryMode

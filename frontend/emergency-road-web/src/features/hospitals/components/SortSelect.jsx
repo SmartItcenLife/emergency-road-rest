@@ -13,7 +13,7 @@ const SortSelect = ({ sort }) => {
   return (
     <div className ="sort-container">
     <select className="sort-content" value={sort} onChange={handleChange}>
-      <option value="SCORE">점수순</option>
+      <option value="SCORE">추천순</option>
       <option value="BED">병상여유순</option>
       <option value="DISTANCE">거리순</option>
     </select>
