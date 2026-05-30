@@ -3,6 +3,7 @@ import { getMapBoundsParams } from "../utils/mapBounds";
 import { getMapStatusToneByGrade } from "../utils/mapStatusStyle";
 import seoulDistrictPolygons from "../data/seoulDistrictPolygons.json";
 import { getPolygonColor } from "../utils/mapPolygonStyle";
+import locationIcon from "../../../assets/location.svg";
 
 const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 
@@ -124,6 +125,30 @@ function KakaoMap({
         maximumAge: 30000,
       }
     );
+  }
+
+  function zoomIn() {
+    const map = mapInstanceRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const nextLevel = Math.max(map.getLevel() - 1, 1);
+    map.setLevel(nextLevel);
+    setMapLevel(nextLevel);
+  }
+
+  function zoomOut() {
+    const map = mapInstanceRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const nextLevel = map.getLevel() + 1;
+    map.setLevel(nextLevel);
+    setMapLevel(nextLevel);
   }
 
   // 사용자 위치 overlay 구성 함수
@@ -318,10 +343,6 @@ function KakaoMap({
         );
 
         mapInstanceRef.current = map;
-
-        // kakao maps api controller 
-        const zoomControl = new window.kakao.maps.ZoomControl();
-        map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT);
 
         const initialLevel = map.getLevel();
         setMapLevel(initialLevel);
@@ -608,14 +629,35 @@ function KakaoMap({
         className="kakao-map"
         aria-label="응급 병원 지도"
       />
-      <button
-        type="button"
-        className="map-current-location-button"
-        onClick={moveToCurrentLocation}
-        aria-label="현재 위치로 이동"
+      <div
+        className="map-control-stack"
+        aria-label="지도 조작 컨트롤"
         >
-        📍
+        <button
+          type="button"
+          className="map-control-button"
+          onClick={zoomIn}
+          aria-label="지도 확대"
+        >
+          +
         </button>
+        <button
+          type="button"
+          className="map-control-button"
+          onClick={zoomOut}
+          aria-label="지도 축소"
+        >
+          -
+        </button>
+        <button
+          type="button"
+          className="map-control-button map-current-location-button"
+          onClick={moveToCurrentLocation}
+          aria-label="현재 위치로 이동"
+        >
+          <img src={locationIcon} alt="" />
+        </button>
+      </div>
       </div>
   );
 }
