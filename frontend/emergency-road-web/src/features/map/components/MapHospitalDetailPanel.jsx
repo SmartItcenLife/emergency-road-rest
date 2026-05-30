@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { getHospitalDetail } from "../../hospitals/api/hospitalDetail";
+import {
+  getMapStatusColorByTone,
+  getMapStatusRateForDisplay,
+  getMapStatusToneByGrade,
+} from "../utils/mapStatusStyle";
 
 
 function displayValue(value) {
@@ -16,25 +21,6 @@ function formatDateTime(value) {
   }
 
   return String(value).replace("T", " ").substring(0, 16);
-}
-
-// 상태 색상 표현 함수
-function getStatusTone(grade) {
-  switch (grade) {
-    case "RELAXED":
-      return "relaxed";
-
-    case "NORMAL":
-      return "normal";
-
-    case "CROWDED":
-    case "VERY_CROWDED":
-      return "crowded";
-
-    case "UNKNOWN":
-    default:
-      return "unknown";
-  }
 }
 
 // 디테일 값 전처리 
@@ -55,7 +41,7 @@ function normalizeAvailableStatus(value) {
 function MapHospitalDetailPanel({ hospital, onBack }) {
   const statusGrade = hospital.status?.grade ?? "UNKNOWN";
   const statusLabel = hospital.status?.label ?? "정보없음";
-  const statusTone = getStatusTone(statusGrade);
+  const statusTone = getMapStatusToneByGrade(statusGrade);
 
   // 사용자의 좌표값이 안들어올 경우에 대한 안전장치
   const hasLocation =
@@ -82,6 +68,10 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
   const totalBeds = hospital.status?.totalCount;
   const rate = hospital.status?.rate;
   const recordedAt = hospital.recordedAt;
+
+  // 도넛 차트를 위한 변수 선언
+  const donutRate = getMapStatusRateForDisplay(rate);
+  const donutRateText = rate !== null && rate !== undefined ? `${rate}%` : "-";
   
   // DetailAPI 에서 가져온 항목 - 자원 가능 항목
   const availableResources = [
@@ -167,6 +157,7 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
       status: normalizeAvailableStatus(hospitalDetail?.angioAdultAvailable),
     },
   ];
+  const donutColor = getMapStatusColorByTone(statusTone);
     
   // hpid 가 바뀔 때 값 마다 잘가져오는지 확인
   useEffect(() => {
@@ -210,40 +201,25 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
         <strong>병원 상세</strong>
       </div>
       <div className="map-detail-info-card">
-        <section className={`map-detail-summary-card ${statusTone}`}>
-          <div className="map-detail-summary-top">
-            <div className="map-detail-summary-main">
+        <section className="map-detail-hospital-summary">
+          <div className={`map-detail-hospital-icon ${statusTone}`}>
+            <span className="map-list-hospital-symbol" aria-hidden="true" />
+          </div>
+
+          <div className="map-detail-hospital-content">
+            <div className="map-detail-hospital-title-row">
+              <h2>{hospitalName}</h2>
+
               <span className={`map-status-badge ${statusTone}`}>
                 {statusLabel}
               </span>
-
-              <h2>{hospitalName}</h2>
-
-              <p>{address ?? "주소 정보 없음"}</p>
             </div>
 
-            <div className={`map-bed-count ${statusTone}`}>
-              <strong>{displayValue(availableBeds)}</strong>
-              <span>/ {displayValue(totalBeds)}</span>
-            </div>
-          </div>
+            <p>{address ?? "주소 정보 없음"}</p>
 
-          <div className="map-detail-bed-meta">
-            <div>
-              <span>가용 병상</span>
-              <strong>{displayValue(availableBeds)}개</strong>
-            </div>
-
-            <div>
-              <span>전체 병상</span>
-              <strong>{displayValue(totalBeds)}개</strong>
-            </div>
-
-            <div>
-              <span>가용률</span>
-              <strong>
-                {rate !== null && rate !== undefined ? `${rate}%` : "-"}
-              </strong>
+            <div className="map-detail-hospital-phone">
+              <span>☎</span>
+              <strong>{displayValue(emergencyPhone)}</strong>
             </div>
           </div>
         </section>
@@ -293,43 +269,31 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
         </div>
 
         <section className="map-detail-section">
-          <h3 className="map-detail-title">기본 정보</h3>
-
-          <div className="map-detail-row">
-            <span>주소</span>
-            <strong>{displayValue(address)}</strong>
+          <div className="map-detail-section-header">
+            <h3 className="map-detail-title">응급실 병상 현황</h3>
+            <span>{formatDateTime(recordedAt)} 기준</span>
           </div>
 
-          <div className="map-detail-row">
-            <span>응급실 번호</span>
-            <strong>{displayValue(emergencyPhone)}</strong>
-          </div>
-        </section>
-
-        <section className="map-detail-section">
-          <h3 className="map-detail-title">응급실 병상</h3>
-
-          <div className="map-detail-resource-grid">
-            <div className="map-detail-resource">
-              <span>가용 병상</span>
-              <strong>{displayValue(availableBeds)}개</strong>
-            </div>
-
-            <div className="map-detail-resource">
-              <span>전체 병상</span>
-              <strong>{displayValue(totalBeds)}개</strong>
-            </div>
-
-            <div className="map-detail-resource">
-              <span>가용률</span>
+          <div className="map-detail-bed-status">
+            <div className="map-detail-bed-count-card">
               <strong>
-                {rate !== null &&
-                rate !== undefined
-                  ? `${rate}%`
-                  : "-"}
+                {displayValue(availableBeds)} / {displayValue(totalBeds)}
               </strong>
+              <span>가용 병상 / 전체 병상</span>
             </div>
+
+            <div
+              className="map-detail-donut"
+              style={{
+                background: `conic-gradient(${donutColor} ${donutRate}%, #edf2f7 0)`,
+              }}
+            >
+              <div className="map-detail-donut-inner">
+                <strong>{donutRateText}</strong>
+                <span>{statusLabel}</span>
+              </div>
             </div>
+          </div>
         </section>
 
         <section className="map-detail-section">
@@ -372,15 +336,6 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
               ))}
             </div>
           )}
-        </section>
-
-        <section className="map-detail-section">
-          <h3 className="map-detail-title">갱신 정보</h3>
-
-          <div className="map-detail-row">
-            <span>갱신 시간</span>
-            <strong>{formatDateTime(recordedAt)}</strong>
-          </div>
         </section>
       </div>
     </div>

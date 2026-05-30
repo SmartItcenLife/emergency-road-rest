@@ -45,18 +45,9 @@
 .map-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  padding: 12px;
 }
-/* 
-.map-list-item {
-  width: 100%;
-  padding: 12px 16px;
-  border: 0;
-  border-bottom: 1px solid #f1f5f9;
-  background: #ffffff;
-  color: #111827;
-  text-align: left;
-  cursor: pointer;
-} */
 
 .map-list-item:hover {
   background: #f8fafc;
@@ -98,40 +89,183 @@
 
 .map-list-item-summary {
   width: 100%;
-  padding: 14px 16px;
-  border: 0;
-  background: transparent;
+  min-height: 104px;
+  padding: 14px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
   color: #111827;
   text-align: left;
   cursor: pointer;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
-.map-list-item-summary strong {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 15px;
-  font-weight: 700;
-  color: #111827;
+
+.map-list-item-summary.relaxed {
+  border-left: 4px solid #16a34a;
 }
-.map-list-item-summary span {
-  display: inline-block;
-  margin-bottom: 6px;
-  padding: 2px 7px;
+
+.map-list-item-summary.normal {
+  border-left: 4px solid #2563eb;
+}
+
+.map-list-item-summary.crowded {
+  border-left: 4px solid #f97316;
+}
+
+.map-list-item-summary.very-crowded {
+  border-left: 4px solid #dc2626;
+}
+
+.map-list-item-summary.unknown {
+  border-left: 4px solid #6b7280;
+}
+
+.map-list-hospital-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor;
+  background: #ffffff;
+}
+
+.map-list-hospital-icon span:not(.map-list-hospital-symbol) {
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
-  background-color: #eef2ff;
-  color: #3730a3;
-  font-size: 12px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: currentColor;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.map-list-hospital-icon.relaxed {
+  color: #16a34a;
+}
+
+.map-list-hospital-icon.normal {
+  color: #2563eb;
+}
+
+.map-list-hospital-icon.crowded {
+  color: #f97316;
+}
+
+.map-list-hospital-icon.very-crowded {
+  color: #dc2626;
+}
+
+.map-list-hospital-icon.unknown {
+  color: #6b7280;
+}
+
+.map-list-hospital-content {
+  min-width: 0;
+}
+
+.map-list-hospital-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-list-hospital-title-row strong {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-list-hospital-title-row .map-status-badge {
+  flex-shrink: 0;
+  padding: 3px 7px;
+  font-size: 11px;
+}
+
+.map-list-hospital-symbol {
+  width: 20px;
+  height: 20px;
+  display: block;
+  color: inherit;
+  background-color: currentColor;
+  mask-image: url("../../assets/hospital/hospital.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url("../../assets/hospital/hospital.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
 }
 
 .map-list-item-summary p {
-  margin: 0;
+  margin: 6px 0 0;
   color: #6b7280;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .map-list-item-summary:hover {
-  background-color: #f9fafb;
+  border-color: #bfdbfe;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.09);
+  transform: translateY(-1px);
+}
+
+.map-list-status-donut {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  padding: 6px;
+  justify-self: end;
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 235, 0.65);
+}
+
+.map-list-status-donut-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.map-list-status-donut-inner strong {
+  color: #111827;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.map-list-status-donut-inner span {
+  margin-top: 3px;
+  color: #4b5563;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .map-list-item.selected .map-list-item-summary {
@@ -144,10 +278,119 @@
   background-color: #f8fbff;
 }
 
+.map-detail-section {
+  padding: 16px;
+}
+
 .map-detail-section + .map-detail-section {
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 0;
+  padding-top: 16px;
   border-top: 1px solid #e5e7eb;
+}
+
+.map-detail-hospital-summary {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  padding: 18px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.map-detail-hospital-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor;
+  background: #ffffff;
+}
+
+.map-detail-hospital-icon span:not(.map-list-hospital-symbol) {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: currentColor;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.map-detail-hospital-icon .map-list-hospital-symbol {
+  width: 24px;
+  height: 24px;
+}
+
+.map-detail-hospital-icon.relaxed {
+  color: #16a34a;
+}
+
+.map-detail-hospital-icon.normal {
+  color: #2563eb;
+}
+
+.map-detail-hospital-icon.crowded {
+  color: #f97316;
+}
+
+.map-detail-hospital-icon.very-crowded {
+  color: #dc2626;
+}
+
+.map-detail-hospital-icon.unknown {
+  color: #6b7280;
+}
+
+.map-detail-hospital-content {
+  min-width: 0;
+}
+
+.map-detail-hospital-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.map-detail-hospital-title-row h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.map-detail-hospital-title-row .map-status-badge {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.map-detail-hospital-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.map-detail-hospital-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #2563eb;
+  font-size: 13px;
+}
+
+.map-detail-hospital-phone strong {
+  color: #374151;
+  font-weight: 800;
 }
 
 .map-detail-title {
@@ -182,40 +425,12 @@
   content: "-";
 }
 .map-detail-info-card {
-  margin: 0 16px 16px;
-  padding: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   background: #ffffff;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
-}
-
-.map-detail-resource-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.map-detail-resource {
-  padding: 10px 8px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #f8fafc;
-  text-align: center;
-}
-
-.map-detail-resource span {
-  display: block;
-  margin-bottom: 6px;
-  color: #6b7280;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.map-detail-resource strong {
-  color: #111827;
-  font-size: 14px;
-  font-weight: 900;
+  box-shadow: none;
 }
 
 .kakao-map {
@@ -471,61 +686,6 @@
   cursor: pointer;
 }
 
-.map-detail-summary-card {
-  margin: 16px;
-  padding: 16px;
-  border: 2px solid #e5e7eb;
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
-}
-
-.map-detail-summary-card.relaxed {
-  border-color: #22c55e;
-  background: #f0fdf4;
-}
-
-.map-detail-summary-card.normal {
-  border-color: #f59e0b;
-  background: #fffbeb;
-}
-
-.map-detail-summary-card.crowded {
-  border-color: #ef4444;
-  background: #fef2f2;
-}
-
-.map-detail-summary-card.unknown {
-  border-color: #9ca3af;
-  background: #f9fafb;
-}
-
-.map-detail-summary-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.map-detail-summary-main {
-  min-width: 0;
-}
-
-.map-detail-summary-main h2 {
-  margin: 8px 0 6px;
-  color: #111827;
-  font-size: 20px;
-  font-weight: 900;
-  line-height: 1.35;
-  word-break: keep-all;
-}
-
-.map-detail-summary-main p {
-  margin: 0;
-  color: #6b7280;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
 .map-status-badge {
   display: inline-flex;
   align-items: center;
@@ -541,13 +701,18 @@
 }
 
 .map-status-badge.normal {
-  background: #fef3c7;
-  color: #d97706;
+  background: #dbeafe;
+  color: #2563eb;
 }
 
 .map-status-badge.crowded {
-  background: #fee2e2;
+  color: #f97316;
+  background-color: #ffedd5;
+}
+
+.map-status-badge.very-crowded {
   color: #dc2626;
+  background-color: #fee2e2;
 }
 
 .map-status-badge.unknown {
@@ -555,83 +720,11 @@
   color: #6b7280;
 }
 
-.map-bed-count {
-  flex: 0 0 auto;
-  width: 74px;
-  height: 74px;
-  border-radius: 999px;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  box-shadow: inset 0 0 0 8px rgba(229, 231, 235, 0.55);
-}
-
-.map-bed-count strong {
-  color: #111827;
-  font-size: 22px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.map-bed-count span {
-  margin-top: 4px;
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.map-bed-count.relaxed strong {
-  color: #16a34a;
-}
-
-.map-bed-count.normal strong {
-  color: #d97706;
-}
-
-.map-bed-count.crowded strong {
-  color: #dc2626;
-}
-
-.map-bed-count.unknown strong {
-  color: #6b7280;
-}
-
-.map-detail-bed-meta {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 14px;
-}
-
-.map-detail-bed-meta div {
-  padding: 10px 8px;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
-  text-align: center;
-}
-
-.map-detail-bed-meta span {
-  display: block;
-  margin-bottom: 4px;
-  color: #6b7280;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.map-detail-bed-meta strong {
-  color: #111827;
-  font-size: 14px;
-  font-weight: 900;
-}
-
 .map-detail-actions {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin: 0 16px 16px;
+  margin: 14px 16px 18px;
 }
 
 .map-detail-action-button {
@@ -664,14 +757,15 @@
 .map-detail-chip-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .map-detail-chip {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 700;
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
   border: 1px solid #dbeafe;
 }
 
@@ -703,23 +797,90 @@
   color: #ef4444;
 }
 
+.map-detail-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.map-detail-section-header span {
+  font-size: 12px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.map-detail-bed-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: center;
+  gap: 18px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #f9fafb;
+}
+
+.map-detail-bed-count-card {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.map-detail-bed-count-card strong {
+  font-size: 28px;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: 0;
+}
+
+.map-detail-bed-count-card span {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
+.map-detail-donut {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  padding: 9px;
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 235, 0.65);
+}
+
+.map-detail-donut-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-detail-donut-inner strong {
+  font-size: 20px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.map-detail-donut-inner span {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
 @media (max-width: 768px) {
-  .map-detail-summary-card {
-    margin: 14px;
-    padding: 14px;
-  }
-
-  .map-detail-summary-main h2 {
+  .map-detail-hospital-title-row h2 {
     font-size: 18px;
-  }
-
-  .map-bed-count {
-    width: 66px;
-    height: 66px;
-  }
-
-  .map-bed-count strong {
-    font-size: 20px;
   }
   
   .map-side-panel.detail-mode {
@@ -743,5 +904,30 @@
 
   .map-side-panel {
   overflow-y: auto;
+  }
+
+  .map-detail-bed-status {
+    grid-template-columns: 1fr 84px;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .map-detail-bed-count-card strong {
+    font-size: 24px;
+  }
+
+  .map-detail-donut {
+    width: 84px;
+    height: 84px;
+    padding: 8px;
+  }
+
+  .map-detail-chip-list {
+    gap: 5px;
+  }
+
+  .map-detail-chip {
+    padding: 4px 7px;
+    font-size: 11px;
   }
 }
