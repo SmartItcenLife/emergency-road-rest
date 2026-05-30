@@ -5,13 +5,65 @@
 }
 
 .map-hospital-marker {
-  width: 18px;
-  height: 18px;
-  border: 3px solid #ffffff;
-  border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+  position: relative;
+  width: 86px;
+  height: 120px;
   cursor: pointer;
+  color: #6b7280;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 4px 7px rgba(15, 23, 42, 0.28));
 }
+
+.map-hospital-marker.relaxed {
+  color: #16a34a;
+}
+
+.map-hospital-marker.normal {
+  color: #2563eb;
+}
+
+.map-hospital-marker.crowded {
+  color: #f97316;
+}
+
+.map-hospital-marker.very-crowded {
+  color: #dc2626;
+}
+
+.map-hospital-marker.unknown {
+  color: #6b7280;
+}
+
+.map-hospital-marker.selected {
+  transform: scale(1.12);
+  filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.34));
+}
+
+.map-hospital-marker-shape {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  mask-image: url("../../assets/hospital/hospital_marker.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url("../../assets/hospital/hospital_marker.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.map-hospital-marker-count {
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .map-layout {
   position: relative;
   display: flex;

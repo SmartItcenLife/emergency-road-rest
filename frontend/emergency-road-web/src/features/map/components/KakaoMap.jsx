@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getMapBoundsParams } from "../utils/mapBounds";
-import { getMarkerColorByGrade } from "../utils/mapMarkerStyle";
+import { getMapStatusToneByGrade } from "../utils/mapStatusStyle";
 import seoulDistrictPolygons from "../data/seoulDistrictPolygons.json";
 import { getPolygonColor } from "../utils/mapPolygonStyle";
 
@@ -407,22 +407,28 @@ function KakaoMap({
         hospital.longitude
       );
 
-      const markerColor = getMarkerColorByGrade(hospital.status?.grade);
       const isSelected = selectedHospital?.hpid === hospital.hpid;
+      // Marker 
+      const statusTone = getMapStatusToneByGrade(hospital.status?.grade);
+      const availableBeds = hospital.status?.availableCount
+      const availableBedsText = typeof availableBeds == 'number' ? availableBeds : "정보없음";
 
+      
       const markerElement = document.createElement("div");
       markerElement.className = isSelected
-        ? "map-hospital-marker selected"
-        : "map-hospital-marker";
-      markerElement.style.backgroundColor = markerColor;
+        ? `map-hospital-marker ${statusTone} selected`
+        : `map-hospital-marker ${statusTone}`;
       markerElement.style.opacity = isSelected ? 1 : markerOpacity; // 선택된 병원이 더 잘 보이게
-      markerElement.title = hospital.hospitalName;
+      markerElement.title = hospital.hospitalName
+      markerElement.innerHTML = `
+        <span class="map-hospital-marker-shape"></span>
+        <strong class="map-hospital-marker-count">${availableBedsText}</strong>
+      `;
 
       const infoContent = document.createElement("div");
       infoContent.className = "map-marker-info";
       infoContent.innerHTML = `
         <strong>${hospital.hospitalName}</strong>
-        <span>${hospital.status?.label ?? "정보없음"}</span>
         `;
 
       const infoOverlay = new window.kakao.maps.CustomOverlay({
@@ -436,7 +442,7 @@ function KakaoMap({
         map,
         position,
         content: markerElement,
-        yAnchor: 0.5,
+        yAnchor: 1,
         xAnchor: 0.5,
       });
 
