@@ -55,7 +55,7 @@ export function CommentItem({ c, onLike, onEdit, onDelete, myId }) {
         </div>
         <p
           style={{
-            margin: "0 0 6px",
+            margin: "0",
             fontSize: 14,
             color: INK1,
             lineHeight: 1.55,

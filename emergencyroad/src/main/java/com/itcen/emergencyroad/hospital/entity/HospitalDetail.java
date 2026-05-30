@@ -86,16 +86,6 @@ public class HospitalDetail extends BaseEntity {
     @Column(name = "duty_time7c")
     private String sundayEndTime;
 
-//    // 스케줄러가 점수와 병상 수 업데이트할 때 사용 메서드
-//    public void updateRealtimeStatus(
-//            Integer availableEmergencyBedCount,
-//            Double baseScore,
-//            Boolean isAvailableNow
-//    ) {
-//        this.availableEmergencyBedCount = availableEmergencyBedCount;
-//        this.baseScore = baseScore;
-//        this.isAvailableNow = isAvailableNow;
-//    }
 
     // 5번 API - 더티 체크를 위한 업데이트 메서드
     public void updateDetail(EgytBassDto dto) {

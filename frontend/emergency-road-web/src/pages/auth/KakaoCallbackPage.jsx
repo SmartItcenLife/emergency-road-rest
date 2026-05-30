@@ -28,7 +28,11 @@ export default function KakaoCallbackPage() {
         localStorage.setItem("accessToken", data.data.accessToken);
         localStorage.setItem("refreshToken", data.data.refreshToken);
         await refreshUser();
-        navigate("/", { replace: true }); // ← 바로 홈으로
+
+        // 로그인 성공후 로직
+        const from = sessionStorage.getItem("loginFrom") || "/";
+        sessionStorage.removeItem("loginFrom"); // 사용 후 삭제
+        navigate(from, { replace: true });
       })
       .catch((err) => setError(err.message || "카카오 로그인에 실패했어요."));
   }, []);

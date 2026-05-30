@@ -21,6 +21,7 @@ import {
   INK2,
   INK3,
   ACCENT,
+  ConfirmModal,
 } from "../../shared/components/ui/Primitives";
 
 export default function MyPage() {
@@ -33,6 +34,7 @@ export default function MyPage() {
   const [profileFile, setProfileFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const fileRef = useRef(null);
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
 
   // user 정보 갱신 시 previewUrl 동기화
   useEffect(() => {
@@ -77,7 +79,6 @@ export default function MyPage() {
   }
 
   async function handleLogout() {
-    if (!confirm("로그아웃 할까요?")) return;
     await logout();
     navigate("/", { replace: true });
   }
@@ -270,12 +271,24 @@ export default function MyPage() {
         <Button
           variant="danger"
           fullWidth
-          onClick={handleLogout}
+          onClick={() => setLogoutConfirm(true)}
           leftIcon="logout"
         >
           로그아웃
         </Button>
       </div>
+
+      {/* 로그아웃 확인 모달 */}
+      <ConfirmModal
+        open={logoutConfirm}
+        title="로그아웃"
+        message="로그아웃 할까요?"
+        confirmLabel="로그아웃"
+        cancelLabel="취소"
+        danger={false}
+        onConfirm={handleLogout}
+        onClose={() => setLogoutConfirm(false)}
+      />
     </div>
   );
 }

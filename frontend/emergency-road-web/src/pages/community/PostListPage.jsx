@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../app/providers/AuthProvider";
 import { usePostList } from "../../features/community/hooks/usePostList";
 import { HospitalHeader } from "../../features/community/components/HospitalHeader";
@@ -21,6 +21,7 @@ const ACCENT = "#2563EB";
 export default function PostListPage() {
   const { hpid } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthContext();
   const {
     posts,
@@ -82,7 +83,9 @@ export default function PostListPage() {
             </button>
           ) : (
             <button
-              onClick={() => navigate("/login")}
+              onClick={() =>
+                navigate("/login", { state: { from: location.pathname } })
+              }
               style={{
                 background: "transparent",
                 border: "none",
