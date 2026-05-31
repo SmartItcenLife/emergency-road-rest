@@ -3,7 +3,7 @@ package com.itcen.emergencyroad.findpath.service;
 import com.itcen.emergencyroad.findpath.api.TmapApiClient;
 import com.itcen.emergencyroad.findpath.dto.LocationRequestDto;
 import com.itcen.emergencyroad.findpath.dto.PathResponseDto;
-import com.itcen.emergencyroad.hospital.entity.Hospital;
+import com.itcen.emergencyroad.hospital.dto.HospitalApiDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -20,12 +20,12 @@ public class TmapService {
 
     private final TmapApiClient tmapApiClient;
 
-    public List<PathResponseDto> findHospitalsWithDistanceTmap(LocationRequestDto requestDto, List<Hospital> hospitals) {
+    public List<PathResponseDto> findHospitalsWithDistanceTmap(LocationRequestDto requestDto, List<HospitalApiDto>  hospitals) {
 
         // 1. 위도/경도가 모두 있는 유효한 병원만 추려내기 (응답 결과와 매칭하기 위함)
-        List<Hospital> validHospitals = new ArrayList<>();
-        for (Hospital hospital : hospitals) {
-            if (hospital.getLongitude() != null && hospital.getLatitude() != null) {
+        List<HospitalApiDto> validHospitals = new ArrayList<>();
+        for (HospitalApiDto hospital : hospitals) {
+            if (hospital.lon() != null && hospital.lat() != null) {
                 validHospitals.add(hospital);
                 // 티맵 매트릭스는 출발지 1개일 때 목적지 최대 50개까지 권장하므로 제한을 50개로 둡니다.
                 if (validHospitals.size() >= 50) break;
@@ -50,10 +50,10 @@ public class TmapService {
 
         // [목적지 배열 조립]
         JSONArray destinations = new JSONArray();
-        for (Hospital hospital : validHospitals) {
+        for (HospitalApiDto hospital : validHospitals) {
             JSONObject dest = new JSONObject();
-            dest.put("lon", String.valueOf(hospital.getLongitude())); // 병원 경도
-            dest.put("lat", String.valueOf(hospital.getLatitude()));  // 병원 위도
+            dest.put("lon", String.valueOf(hospital.lon())); // 병원 경도
+            dest.put("lat", String.valueOf(hospital.lat()));  // 병원 위도
             destinations.put(dest);
         }
         requestBody.put("destinations", destinations);
@@ -67,7 +67,7 @@ public class TmapService {
     }
 
     // 티맵이 던져준 결과를 파싱하는 로직
-    private List<PathResponseDto> parseTmapResponse(String jsonResponse, List<Hospital> validHospitals) {
+    private List<PathResponseDto> parseTmapResponse(String jsonResponse, List<HospitalApiDto> validHospitals) {
         List<PathResponseDto> resultList = new ArrayList<>();
         JSONObject responseObj = new JSONObject(jsonResponse);
 
@@ -84,7 +84,7 @@ public class TmapService {
                 // 💡 핵심 로직: 응답의 destinationIndex를 사용해 어떤 병원인지 매칭!
                 // validHospitals 배열에 넣은 순서 그대로 Index 번호가 반환됩니다.
                 int destIndex = route.getInt("destinationIndex");
-                Hospital matchedHospital = validHospitals.get(destIndex);
+                HospitalApiDto  matchedHospital = validHospitals.get(destIndex);
 
                 // 티맵 응답 데이터 (거리는 m, 소요시간은 sec 단위)
                 double distanceKm = route.getInt("distance") / 1000.0;
@@ -95,8 +95,8 @@ public class TmapService {
 
                 // DTO 조립 후 리스트에 담기
                 resultList.add(PathResponseDto.builder()
-                        .hospitalName(matchedHospital.getHospitalName())
-                        .hpid(matchedHospital.getHpid())
+                        .hospitalName(matchedHospital.name())
+                        .hpid(matchedHospital.hpid())
                         .distance(distanceKm)
                         .duration(durationMin)
                         .build());

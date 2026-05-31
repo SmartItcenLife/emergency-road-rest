@@ -3,6 +3,7 @@ package com.itcen.emergencyroad.findpath.controller;
 import com.itcen.emergencyroad.findpath.dto.LocationRequestDto;
 import com.itcen.emergencyroad.findpath.dto.PathResponseDto;
 import com.itcen.emergencyroad.findpath.service.TmapService;
+import com.itcen.emergencyroad.hospital.dto.HospitalApiDto;
 import com.itcen.emergencyroad.hospital.entity.Hospital;
 import com.itcen.emergencyroad.hospital.repository.HospitalRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,12 @@ public class TmapController {
 
         // 1. DB에 저장되어 있는 전체 병원 리스트를 가져옵니다.
         List<Hospital> hospitals = hospitalRepository.findAll();
-
+        // 호출부 코드
+        List<HospitalApiDto> apiDtoList = hospitals.stream()
+                .map(h -> new HospitalApiDto(h.getHpid(), h.getLatitude(), h.getLongitude(), h.getHospitalName()))
+                .toList();
         // 2. TmapService에게 사용자 위치와 병원 리스트를 전달하여 거리/시간을 계산합니다.
-        List<PathResponseDto> resultList = tmapService.findHospitalsWithDistanceTmap(requestDto, hospitals);
+        List<PathResponseDto> resultList = tmapService.findHospitalsWithDistanceTmap(requestDto, apiDtoList);
 
         // 3. 계산된 결과 리스트를 반환합니다.
         return ResponseEntity.ok(resultList);
