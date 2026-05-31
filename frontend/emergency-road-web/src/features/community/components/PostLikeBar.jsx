@@ -8,7 +8,7 @@ const ACCENT = "#2563EB";
 /**
  * PostLikeBar — 좋아요 / 댓글수 액션바
  */
-export function PostLikeBar({ isLiked, recommendCount, commentCount, onLike, handleAskReportPost }) {
+export function PostLikeBar({ isLiked, recommendCount, commentCount, onLike }) {
   return (
     <div
       style={{

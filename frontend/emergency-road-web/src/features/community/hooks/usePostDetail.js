@@ -120,7 +120,7 @@ export function usePostDetail(hpid, postId, user) {
   }
 
   const [reportTarget, setReportTarget] = useState(null);
-
+// 신고 메서드(1.게시글, 2.댓글)
   function handleAskReportPost(){
     if(!user){
       return navigate("/login",{
@@ -148,7 +148,7 @@ export function usePostDetail(hpid, postId, user) {
       target: commentId
     });
   }
-
+// 신고 처리 메서드(type 별로 나눔)
   async function handleSubmitReport(reason){
     if(!reportTarget) return;
 
