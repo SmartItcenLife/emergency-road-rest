@@ -3,13 +3,13 @@ package com.itcen.emergencyroad.recommend.service;
 import com.itcen.emergencyroad.hospital.entity.Hospital;
 import com.itcen.emergencyroad.hospital.entity.HospitalDetail;
 import com.itcen.emergencyroad.hospital.repository.HospitalRepository;
+import com.itcen.emergencyroad.pediatric.entity.PediatricRealtime;
+import com.itcen.emergencyroad.pediatric.entity.PediatricStandard;
 import com.itcen.emergencyroad.pregnant.entity.Pregnant;
 import com.itcen.emergencyroad.pregnant.entity.PregnantRealtime;
 import com.itcen.emergencyroad.pregnant.entity.PregnantStandard;
 import com.itcen.emergencyroad.recommend.dto.projection.PregnantHospitalProjection;
-import com.itcen.emergencyroad.recommend.entity.HospitalCategory;
-import com.itcen.emergencyroad.recommend.entity.HospitalScore;
-import com.itcen.emergencyroad.recommend.entity.WeightPregnantConfiguration;
+import com.itcen.emergencyroad.recommend.entity.*;
 import com.itcen.emergencyroad.recommend.repository.HospitalScoreRepository;
 import com.itcen.emergencyroad.recommend.repository.WeightPregnantConfigurationRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -66,15 +67,37 @@ public class PregnantRecommendationStrategy implements RecommendationStrategy {
             HospitalScore scoreEntity,
             WeightPregnantConfiguration config
     ) {
+
+        PregnantInfo info = PregnantInfo.builder()
+                // [Pregnant 엔티티]
+                .deliveryAvailable(Optional.ofNullable(pregnant).map(Pregnant::getDeliveryAvailable).orElse("N"))
+                .nicuAvailable(Optional.ofNullable(pregnant).map(Pregnant::getNicuAvailable).orElse("N"))
+                .obstetricSurgeryAvailable(Optional.ofNullable(pregnant).map(Pregnant::getObstetricSurgeryAvailable).orElse("N"))
+                .gynecologySurgeryAvailable(Optional.ofNullable(pregnant).map(Pregnant::getGynecologySurgeryAvailable).orElse("N"))
+                .emergencyDialysisAvailable(Optional.ofNullable(pregnant).map(Pregnant::getEmergencyDialysisAvailable).orElse("N"))
+
+                // [PregnantRealtime 엔티티]
+                .isDeliveryRoomAvailable(Optional.ofNullable(realtime).map(PregnantRealtime::getIsDeliveryRoomAvailable).orElse("N"))
+                .nicuBedCount(Optional.ofNullable(realtime).map(PregnantRealtime::getNicuBedCount).orElse(0))
+                .incubatorAvailableP(Optional.ofNullable(realtime).map(PregnantRealtime::getIncubatorAvailable).orElse("N"))
+                .prematureVentilatorAvailable(Optional.ofNullable(realtime).map(PregnantRealtime::getPrematureVentilatorAvailable).orElse("N"))
+
+                // [PregnantStandard 엔티티]
+                .deliveryRoomStandard(Optional.ofNullable(standard).map(PregnantStandard::getDeliveryRoomStandard).orElse(0))
+                .nicuStandard(Optional.ofNullable(standard).map(PregnantStandard::getNicuStandard).orElse(0))
+                .ventilatorStandard(Optional.ofNullable(standard).map(PregnantStandard::getVentilatorStandard).orElse(0))
+                .incubatorStandard(Optional.ofNullable(standard).map(PregnantStandard::getIncubatorStandard).orElse(0))
+                .build();
+
         // [필터] 응급실 만석 체크
         if (detail == null || detail.getAvailableEmergencyBedCount() == null || detail.getAvailableEmergencyBedCount() <= 0) {
-            scoreEntity.updatePregnantScore(0.0, "응급실만석");
+            scoreEntity.updatePregnantScore(0.0, "응급실만석", info);
             return;
         }
 
         // [필터] 분만 불가 체크
         if (pregnant == null || !isAvailable(pregnant.getDeliveryAvailable())) {
-            scoreEntity.updatePregnantScore(0.0, "분만불가");
+            scoreEntity.updatePregnantScore(0.0, "분만불가", info);
             return;
         }
 
@@ -99,7 +122,7 @@ public class PregnantRecommendationStrategy implements RecommendationStrategy {
         // 점수가 0 미만이 되지 않도록 보정
         finalScore = Math.max(0.0, finalScore);
 
-        scoreEntity.updatePregnantScore(finalScore, String.join(" | ", tags));
+        scoreEntity.updatePregnantScore(finalScore, String.join(" | ", tags),info);
     }
 
     private double calculateAvailability(
