@@ -42,7 +42,7 @@ public class EmrDto {
     private Integer hvs16; // 흉부외과 중환자실 전체 병상 수
 
     private String hvctayn;
-    private String hvmariayn;
+    private String hvmriayn;
     private String hvventiayn;
     private String hvcrrtayn;
     private String hvecmoayn;

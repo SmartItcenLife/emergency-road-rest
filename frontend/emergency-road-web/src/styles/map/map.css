@@ -5,13 +5,65 @@
 }
 
 .map-hospital-marker {
-  width: 18px;
-  height: 18px;
-  border: 3px solid #ffffff;
-  border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.35);
+  position: relative;
+  width: 86px;
+  height: 120px;
   cursor: pointer;
+  color: #6b7280;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 4px 7px rgba(15, 23, 42, 0.28));
 }
+
+.map-hospital-marker.relaxed {
+  color: #16a34a;
+}
+
+.map-hospital-marker.normal {
+  color: #2563eb;
+}
+
+.map-hospital-marker.crowded {
+  color: #f97316;
+}
+
+.map-hospital-marker.very-crowded {
+  color: #dc2626;
+}
+
+.map-hospital-marker.unknown {
+  color: #6b7280;
+}
+
+.map-hospital-marker.selected {
+  transform: scale(1.12);
+  filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.34));
+}
+
+.map-hospital-marker-shape {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  mask-image: url("../../assets/hospital/hospital_marker.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url("../../assets/hospital/hospital_marker.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.map-hospital-marker-count {
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .map-layout {
   position: relative;
   display: flex;
@@ -20,7 +72,7 @@
   min-height: calc(100svh - 80px);
 }
 
-.map-list-panel {
+.map-side-panel {
   width: 320px;
   flex-shrink: 0;
   height: calc(100svh - 80px);
@@ -45,18 +97,9 @@
 .map-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  padding: 12px;
 }
-/* 
-.map-list-item {
-  width: 100%;
-  padding: 12px 16px;
-  border: 0;
-  border-bottom: 1px solid #f1f5f9;
-  background: #ffffff;
-  color: #111827;
-  text-align: left;
-  cursor: pointer;
-} */
 
 .map-list-item:hover {
   background: #f8fafc;
@@ -98,40 +141,183 @@
 
 .map-list-item-summary {
   width: 100%;
-  padding: 14px 16px;
-  border: 0;
-  background: transparent;
+  min-height: 104px;
+  padding: 14px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
   color: #111827;
   text-align: left;
   cursor: pointer;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
-.map-list-item-summary strong {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 15px;
-  font-weight: 700;
-  color: #111827;
+
+.map-list-item-summary.relaxed {
+  border-left: 4px solid #16a34a;
 }
-.map-list-item-summary span {
-  display: inline-block;
-  margin-bottom: 6px;
-  padding: 2px 7px;
+
+.map-list-item-summary.normal {
+  border-left: 4px solid #2563eb;
+}
+
+.map-list-item-summary.crowded {
+  border-left: 4px solid #f97316;
+}
+
+.map-list-item-summary.very-crowded {
+  border-left: 4px solid #dc2626;
+}
+
+.map-list-item-summary.unknown {
+  border-left: 4px solid #6b7280;
+}
+
+.map-list-hospital-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor;
+  background: #ffffff;
+}
+
+.map-list-hospital-icon span:not(.map-list-hospital-symbol) {
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
-  background-color: #eef2ff;
-  color: #3730a3;
-  font-size: 12px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: currentColor;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.map-list-hospital-icon.relaxed {
+  color: #16a34a;
+}
+
+.map-list-hospital-icon.normal {
+  color: #2563eb;
+}
+
+.map-list-hospital-icon.crowded {
+  color: #f97316;
+}
+
+.map-list-hospital-icon.very-crowded {
+  color: #dc2626;
+}
+
+.map-list-hospital-icon.unknown {
+  color: #6b7280;
+}
+
+.map-list-hospital-content {
+  min-width: 0;
+}
+
+.map-list-hospital-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-list-hospital-title-row strong {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-list-hospital-title-row .map-status-badge {
+  flex-shrink: 0;
+  padding: 3px 7px;
+  font-size: 11px;
+}
+
+.map-list-hospital-symbol {
+  width: 20px;
+  height: 20px;
+  display: block;
+  color: inherit;
+  background-color: currentColor;
+  mask-image: url("../../assets/hospital/hospital.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url("../../assets/hospital/hospital.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
 }
 
 .map-list-item-summary p {
-  margin: 0;
+  margin: 6px 0 0;
   color: #6b7280;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .map-list-item-summary:hover {
-  background-color: #f9fafb;
+  border-color: #bfdbfe;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.09);
+  transform: translateY(-1px);
+}
+
+.map-list-status-donut {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  padding: 6px;
+  justify-self: end;
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 235, 0.65);
+}
+
+.map-list-status-donut-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.map-list-status-donut-inner strong {
+  color: #111827;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.map-list-status-donut-inner span {
+  margin-top: 3px;
+  color: #4b5563;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .map-list-item.selected .map-list-item-summary {
@@ -144,10 +330,119 @@
   background-color: #f8fbff;
 }
 
+.map-detail-section {
+  padding: 16px;
+}
+
 .map-detail-section + .map-detail-section {
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 0;
+  padding-top: 16px;
   border-top: 1px solid #e5e7eb;
+}
+
+.map-detail-hospital-summary {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  padding: 18px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.map-detail-hospital-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor;
+  background: #ffffff;
+}
+
+.map-detail-hospital-icon span:not(.map-list-hospital-symbol) {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  background: currentColor;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.map-detail-hospital-icon .map-list-hospital-symbol {
+  width: 24px;
+  height: 24px;
+}
+
+.map-detail-hospital-icon.relaxed {
+  color: #16a34a;
+}
+
+.map-detail-hospital-icon.normal {
+  color: #2563eb;
+}
+
+.map-detail-hospital-icon.crowded {
+  color: #f97316;
+}
+
+.map-detail-hospital-icon.very-crowded {
+  color: #dc2626;
+}
+
+.map-detail-hospital-icon.unknown {
+  color: #6b7280;
+}
+
+.map-detail-hospital-content {
+  min-width: 0;
+}
+
+.map-detail-hospital-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.map-detail-hospital-title-row h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.map-detail-hospital-title-row .map-status-badge {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.map-detail-hospital-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.map-detail-hospital-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #2563eb;
+  font-size: 13px;
+}
+
+.map-detail-hospital-phone strong {
+  color: #374151;
+  font-weight: 800;
 }
 
 .map-detail-title {
@@ -180,6 +475,14 @@
 
 .map-detail-row strong:empty::before {
   content: "-";
+}
+.map-detail-info-card {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
 }
 
 .kakao-map {
@@ -266,3 +569,439 @@
   font-weight: 700;
 }
 
+.kakao-map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map-control-stack {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
+}
+
+.map-control-button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.map-control-button:last-child {
+  border-bottom: 0;
+}
+
+.map-control-button:hover {
+  background-color: #f9fafb;
+}
+
+.map-current-location-button img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.map-current-location-marker {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+}
+
+.map-current-location-marker::before,
+.map-current-location-marker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background-color: rgba(37, 99, 235, 0.22);
+  animation: current-location-pulse 1.8s ease-out infinite;
+}
+
+.map-current-location-marker::after {
+  animation-delay: 0.9s;
+}
+
+.map-current-location-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background-color: #2563eb;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
+@keyframes current-location-pulse {
+  0% {
+    transform: scale(0.35);
+    opacity: 0.9;
+  }
+
+  70% {
+    opacity: 0.18;
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+ /* 모바일 용 CSS 지정  */
+@media (max-width: 768px) {
+  .map-page {
+    min-height: calc(100svh - 120px);
+  }
+
+  .map-layout {
+    display: block;
+    position: relative;
+    width: 100%;
+    min-height: calc(100svh - 120px);
+    overflow: hidden;
+  }
+
+  .map-content {
+    width: 100%;
+    height: calc(100svh - 120px);
+  }
+
+  .map-side-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 30;
+    width: 100%;
+    height: 34svh;
+    min-height: 220px;
+    max-height: 420px;
+    overflow-y: auto;
+    border-left: 0;
+    border-top: 1px solid #e5e7eb;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.16);
+  }
+
+  .map-list-header {
+    padding: 12px 16px;
+  }
+
+  .map-search-current-button {
+    top: 12px;
+    max-width: calc(100% - 120px);
+    white-space: nowrap;
+  }
+
+  .map-control-stack {
+    right: 12px;
+    bottom: calc(34svh + 16px);
+  }
+
+  .map-area-info {
+    max-width: 220px;
+  }
+}
+.map-detail-panel {
+  min-height: 100%;
+  background: #ffffff;
+}
+
+.map-detail-panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.map-detail-panel-header strong {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.map-detail-back-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.map-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.map-status-badge.relaxed {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.map-status-badge.normal {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.map-status-badge.crowded {
+  color: #f97316;
+  background-color: #ffedd5;
+}
+
+.map-status-badge.very-crowded {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.map-status-badge.unknown {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+.map-detail-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 14px 16px 18px;
+}
+
+.map-detail-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.map-detail-action-button:hover {
+  background: #eff6ff;
+}
+
+.map-detail-action-button.disabled,
+.map-detail-action-button:disabled {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.map-detail-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.map-detail-chip {
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+  border: 1px solid #dbeafe;
+}
+
+.map-detail-chip.available {
+  color: #16a34a;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.map-detail-chip.unavailable {
+  color: #ef4444;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.map-detail-chip.unknown {
+  color: #6b7280;
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.map-detail-message {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.map-detail-message.error {
+  color: #ef4444;
+}
+
+.map-detail-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.map-detail-section-header span {
+  font-size: 12px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.map-detail-bed-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: center;
+  gap: 18px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #f9fafb;
+}
+
+.map-detail-bed-count-card {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.map-detail-bed-count-card strong {
+  font-size: 28px;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: 0;
+}
+
+.map-detail-bed-count-card span {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
+.map-detail-donut {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  padding: 9px;
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 235, 0.65);
+}
+
+.map-detail-donut-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-detail-donut-inner strong {
+  font-size: 20px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.map-detail-donut-inner span {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .map-detail-hospital-title-row h2 {
+    font-size: 18px;
+  }
+  
+  .map-side-panel.detail-mode {
+    height: 64svh;
+    max-height: 72svh;
+  }
+  
+  .map-layout.detail-mode .map-content {
+    height: calc(100svh - 120px - 64svh);
+    min-height: 260px;
+  }
+
+  .map-layout.detail-mode .map-side-panel {
+    height: 64svh;
+    max-height: 72svh;
+  }
+
+  .map-side-panel {
+    transition: height 300ms ease;
+  }
+
+  .map-side-panel {
+  overflow-y: auto;
+  }
+
+  .map-detail-bed-status {
+    grid-template-columns: 1fr 84px;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .map-detail-bed-count-card strong {
+    font-size: 24px;
+  }
+
+  .map-detail-donut {
+    width: 84px;
+    height: 84px;
+    padding: 8px;
+  }
+
+  .map-detail-chip-list {
+    gap: 5px;
+  }
+
+  .map-detail-chip {
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+}

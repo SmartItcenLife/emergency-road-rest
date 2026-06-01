@@ -226,7 +226,7 @@ public class EmrMapper {
                 .chestIcuTotalBeds(dto.getHvs16())
 
                 .ctAvailable(dto.getHvctayn())
-                .mriAvailable(dto.getHvmariayn())
+                .mriAvailable(dto.getHvmriayn())
                 .ventilatorAvailable(dto.getHvventiayn())
                 .crrtAvailable(dto.getHvcrrtayn())
                 .ecmoAvailable(dto.getHvecmoayn())
@@ -252,7 +252,7 @@ public class EmrMapper {
         entity.setChestIcuTotalBeds(dto.getHvs16());
 
         entity.setCtAvailable(dto.getHvctayn());
-        entity.setMriAvailable(dto.getHvmariayn());
+        entity.setMriAvailable(dto.getHvmriayn());
         entity.setVentilatorAvailable(dto.getHvventiayn());
         entity.setCrrtAvailable(dto.getHvcrrtayn());
         entity.setEcmoAvailable(dto.getHvecmoayn());
