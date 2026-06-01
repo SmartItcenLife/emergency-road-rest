@@ -140,7 +140,7 @@ public class MapService {
             MapPregnantHospitalMarkerProjection hospital
     ) {
         return baseMarkerBuilder(hospital, MapCategory.PREGNANT)
-                .status(createPregnantNicuStatus(
+                .status(createPregnantStatus(
                         hospital.getNicuBedCount(),
                         hospital.getNicuStandard(),
                         hospital.getDeliveryAvailable()
@@ -311,21 +311,11 @@ public class MapService {
                 .build();
     }
 
-    private MapDisplayStatusDto createPregnantNicuStatus(
+    private MapDisplayStatusDto createPregnantStatus(
             Integer nicuBedCount,
             Integer nicuStandard,
             String deliveryAvailable
     ) {
-        MapDisplayStatusDto status = createResourceRateStatus(
-                MapMetricType.NICU,
-                nicuBedCount,
-                nicuStandard
-        );
-
-        if (status.getGrade() != MapCongestionGrade.UNKNOWN) {
-            return status;
-        }
-
         String deliveryLabel = toAvailabilityLabel(deliveryAvailable);
 
         if ("가능".equals(deliveryLabel)) {
@@ -356,8 +346,13 @@ public class MapService {
                     .build();
         }
 
-        return status;
+        return createResourceRateStatus(
+                MapMetricType.NICU,
+                nicuBedCount,
+                nicuStandard
+        );
     }
+
 
     private String toAvailabilityLabel(String value) {
         if (value == null || value.isBlank()) {
