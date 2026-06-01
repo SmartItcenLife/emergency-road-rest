@@ -1,6 +1,6 @@
 package com.itcen.emergencyroad.community.controller;
 
-import com.itcen.emergencyroad.community.dto.post.ReportRequestDTO;
+import com.itcen.emergencyroad.community.dto.report.ReportRequestDTO;
 import com.itcen.emergencyroad.community.dto.post.PostRequestDto;
 import com.itcen.emergencyroad.community.dto.post.PostResponseDto;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;

@@ -3,7 +3,7 @@ package com.itcen.emergencyroad.admin.controller;
 import com.itcen.emergencyroad.admin.dto.AdminPostListDTO;
 import com.itcen.emergencyroad.admin.dto.AdminUserResponseDTO;
 import com.itcen.emergencyroad.admin.dto.DashboardResponseDto;
-import com.itcen.emergencyroad.community.dto.post.ReportResponseDTO;
+import com.itcen.emergencyroad.community.dto.report.ReportResponseDTO;
 import org.springframework.http.ResponseEntity;
 import com.itcen.emergencyroad.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
