@@ -273,6 +273,7 @@ function KakaoMap({
   function createAreaInfoContent(areaName, congestion) {
     const content = document.createElement("div");
     content.className = "map-area-info";
+    const metricLabels = getMapHospitalLabels(congestion?.category ?? "GENERAL");
 
     content.innerHTML = `
       <strong>${areaName}</strong>
@@ -283,15 +284,15 @@ function KakaoMap({
           <dd>${displayValue(congestion?.hospitalCount)}개</dd>
         </div>
         <div>
-          <dt>가용 병상</dt>
-          <dd>${displayValue(congestion?.status?.availableCount)}개</dd>
+          <dt>${metricLabels.availableLabel}</dt>
+          <dd>${displayValue(congestion?.status?.availableCount)}${metricLabels.countSuffix}</dd>
         </div>
         <div>
-          <dt>전체 병상</dt>
-          <dd>${displayValue(congestion?.status?.totalCount)}개</dd>
+          <dt>${metricLabels.totalLabel}</dt>
+          <dd>${displayValue(congestion?.status?.totalCount)}${metricLabels.countSuffix}</dd>
         </div>
         <div>
-          <dt>가용률</dt>
+          <dt>${metricLabels.ratioLabel}</dt>
           <dd>${
             congestion?.status?.rate !== null &&
             congestion?.status?.rate !== undefined

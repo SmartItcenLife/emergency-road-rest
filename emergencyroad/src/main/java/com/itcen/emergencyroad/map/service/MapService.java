@@ -373,14 +373,16 @@ public class MapService {
     }
 
     // 구 별 혼잡도 계산 : 구 별 혼잡도를 확인하기 위해서 병원별 혼잡도를 기준으로 계산
-    private MapDisplayStatusDto createAreaEmergencyBedStatus(
+    private MapDisplayStatusDto createAreaResourceStatus(
+            MapMetricType metricType,
             Integer availableCount,
-            Integer totalCount
+            Integer totalCount,
+            Integer hospitalCount
     ) {
         if (availableCount == null || totalCount == null || totalCount == 0) {
             return MapDisplayStatusDto.builder()
                     .type(MapStatusType.SCORE)
-                    .metricType(MapMetricType.EMERGENCY_BED)
+                    .metricType(metricType)
                     .grade(MapCongestionGrade.UNKNOWN)
                     .label("정보없음")
                     .colorLevel(0)
@@ -392,20 +394,28 @@ public class MapService {
         }
 
         int rate = (int) Math.round(availableCount * 100.0 / totalCount);
+        int validHospitalCount = hospitalCount == null || hospitalCount <= 0 ? 1 : hospitalCount;
+        double averageAvailable = availableCount / (double) validHospitalCount;
+        int averageAvailableScore = (int) Math.round(
+                Math.min(averageAvailable, getAreaAverageAvailableCap(metricType))
+                        / getAreaAverageAvailableCap(metricType)
+                        * 100
+        );
+        int finalScore = (int) Math.round(rate * 0.7 + averageAvailableScore * 0.3);
 
         MapCongestionGrade grade;
         String label;
         int colorLevel;
 
-        if (rate >= 30) {
+        if (finalScore >= 70) {
             grade = MapCongestionGrade.RELAXED;
             label = "여유";
             colorLevel = 4;
-        } else if (rate >= 15) {
+        } else if (finalScore >= 40) {
             grade = MapCongestionGrade.NORMAL;
             label = "보통";
             colorLevel = 3;
-        } else if (rate >= 5) {
+        } else if (finalScore >= 15) {
             grade = MapCongestionGrade.CROWDED;
             label = "혼잡";
             colorLevel = 2;
@@ -417,15 +427,24 @@ public class MapService {
 
         return MapDisplayStatusDto.builder()
                 .type(MapStatusType.SCORE)
-                .metricType(MapMetricType.EMERGENCY_BED)
+                .metricType(metricType)
                 .grade(grade)
                 .label(label)
                 .colorLevel(colorLevel)
-                .score(rate)
+                .score(finalScore)
                 .availableCount(availableCount)
                 .totalCount(totalCount)
                 .rate(rate)
                 .build();
+    }
+
+    private int getAreaAverageAvailableCap(MapMetricType metricType) {
+        return switch (metricType) {
+            case EMERGENCY_BED -> 20;
+            case PEDIATRIC_BED -> 5;
+            case NICU -> 3;
+            case DELIVERY_ROOM -> 1;
+        };
     }
 
     // TODO : 나중에는 master table 의 컬럼값을 조절하던, hospital district mapping 테이블을 만들던하자.
@@ -446,17 +465,12 @@ public class MapService {
     }
     // 구 별 혼잡도 조회 메인 메소드
     public List<MapAreaCongestionResponseDto> getAreaCongestion(MapCategory category) {
-        if (category != MapCategory.GENERAL) {
-            return List.of();
-        }
-
         List<MapArea> areas = mapAreaRepository.findActiveAreasBySidoAndLevel(
                 "11",
                 MapAreaLevel.DISTRICT
         );
 
-        List<MapAreaCongestionProjection> sources =
-                mapHospitalRepository.findGeneralAreaCongestionSources();
+        List<MapAreaCongestionProjection> sources = getAreaCongestionSources(category);
 
         Map< String, List<MapAreaCongestionProjection> > hospitalsByDistrict =
                 sources.stream()
@@ -466,27 +480,37 @@ public class MapService {
                         ));
         return areas.stream()
                 .map(area -> toAreaCongestionResponse(
+                        category,
                         area,
                         hospitalsByDistrict.getOrDefault(area.getAreaName(), List.of())
                 ))
                 .toList();
     }
 
+    private List<MapAreaCongestionProjection> getAreaCongestionSources(MapCategory category) {
+        return switch (category) {
+            case GENERAL -> mapHospitalRepository.findGeneralAreaCongestionSources();
+            case PEDIATRIC -> mapHospitalRepository.findPediatricAreaCongestionSources();
+            case PREGNANT -> mapHospitalRepository.findPregnantAreaCongestionSources();
+        };
+    }
+
     // 구별 응답 DTO 변환 메소드
     private MapAreaCongestionResponseDto toAreaCongestionResponse(
+            MapCategory category,
             MapArea area,
             List<MapAreaCongestionProjection> hospitals
     ) {
         int hospitalCount = hospitals.size();
 
         int totalAvailableBeds = hospitals.stream()
-                .map(MapAreaCongestionProjection::getEmergencyAvailableBeds)
+                .map(MapAreaCongestionProjection::getAvailableCount)
                 .filter(Objects::nonNull)
                 .mapToInt(Integer::intValue)
                 .sum();
 
         int totalBeds = hospitals.stream()
-                .map(MapAreaCongestionProjection::getEmergencyTotalBeds)
+                .map(MapAreaCongestionProjection::getTotalCount)
                 .filter(Objects::nonNull)
                 .mapToInt(Integer::intValue)
                 .sum();
@@ -501,11 +525,24 @@ public class MapService {
                 .areaCode(area.getAreaCode())
                 .areaName(area.getAreaName())
                 .areaLevel(area.getAreaLevel())
-                .category(MapCategory.GENERAL)
+                .category(category)
 //                .status(createEmergencyBedStatus(totalAvailableBeds, totalBeds)) -> 각 병원에서 혼잡도를 표현하기엔 적합하나 구 전체의 혼잡도를 표현하기엔 부적절
-                .status(createAreaEmergencyBedStatus(totalAvailableBeds,totalBeds))
+                .status(createAreaResourceStatus(
+                        getAreaMetricType(category),
+                        totalAvailableBeds,
+                        totalBeds,
+                        hospitalCount
+                ))
                 .hospitalCount(hospitalCount)
                 .recordedAt(recordedAt)
                 .build();
+    }
+
+    private MapMetricType getAreaMetricType(MapCategory category) {
+        return switch (category) {
+            case GENERAL -> MapMetricType.EMERGENCY_BED;
+            case PEDIATRIC -> MapMetricType.PEDIATRIC_BED;
+            case PREGNANT -> MapMetricType.NICU;
+        };
     }
 }

@@ -152,8 +152,8 @@ public interface MapHospitalRepository extends JpaRepository<Hospital, String> {
     @Query("""
     select
         h.address as address,
-        gr.emergencyAvailableBeds as emergencyAvailableBeds,
-        gr.emergencyTotalBeds as emergencyTotalBeds,
+        gr.emergencyAvailableBeds as availableCount,
+        gr.emergencyTotalBeds as totalCount,
         gr.recordedAt as recordedAt
     from Hospital h
     left join GeneralRealTimeAndStandard gr on gr.hospital = h
@@ -161,4 +161,34 @@ public interface MapHospitalRepository extends JpaRepository<Hospital, String> {
       and h.address is not null
 """)
     List<MapAreaCongestionProjection> findGeneralAreaCongestionSources();
+
+    @Query("""
+        select
+            h.address as address,
+            pr.pediatricBedCount as availableCount,
+            ps.pediatricBedStandard as totalCount,
+            pr.recordedAt as recordedAt
+        from Hospital h
+        left join PediatricRealtime pr on pr.hospital = h
+        left join PediatricStandard ps on ps.hospital = h
+        where h.address is not null
+          and ps.pediatricBedStandard is not null
+          and ps.pediatricBedStandard > 0
+    """)
+    List<MapAreaCongestionProjection> findPediatricAreaCongestionSources();
+
+    @Query("""
+        select
+            h.address as address,
+            pr.nicuBedCount as availableCount,
+            ps.nicuStandard as totalCount,
+            pr.updatedAt as recordedAt
+        from Hospital h
+        left join PregnantRealtime pr on pr.hospital = h
+        left join PregnantStandard ps on ps.hospital = h
+        where h.address is not null
+          and ps.nicuStandard is not null
+          and ps.nicuStandard > 0
+    """)
+    List<MapAreaCongestionProjection> findPregnantAreaCongestionSources();
 }
