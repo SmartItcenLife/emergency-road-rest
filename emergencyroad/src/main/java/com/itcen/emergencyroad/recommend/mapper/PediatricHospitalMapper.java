@@ -4,7 +4,9 @@ import com.itcen.emergencyroad.hospital.entity.Hospital;
 import com.itcen.emergencyroad.pediatric.entity.PediatricRealtime;
 import com.itcen.emergencyroad.pediatric.entity.PediatricStandard;
 import com.itcen.emergencyroad.recommend.dto.PediatricHospitalResponseDto;
+import com.itcen.emergencyroad.recommend.entity.GeneralInfo;
 import com.itcen.emergencyroad.recommend.entity.HospitalScore;
+import com.itcen.emergencyroad.recommend.entity.PediatricInfo;
 import com.itcen.emergencyroad.recommend.service.PediatricCongestionCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -26,21 +28,13 @@ public class PediatricHospitalMapper {
             double duration
     ) {
 
-        var realtime = score.getPediatricRealtime();
-        var standard = score.getPediatricStandard();
         Hospital hospital = score.getHospital();
 
-        Integer bed = Optional.ofNullable(realtime)
-                .map(PediatricRealtime::getPediatricBedCount)
-                .orElse(0);
+        PediatricInfo info = score.getPediatricInfo();
 
-        Integer total = Optional.ofNullable(standard)
-                .map(PediatricStandard::getPediatricBedStandard)
-                .orElse(0);
-
-        String incubator = Optional.ofNullable(realtime)
-                .map(PediatricRealtime::getIncubatorResourceAvailable)
-                .orElse("N");
+        Integer bed = info.getPediatricBedCount();
+        Integer total = info.getPediatricBedStandard();
+        String incubator = info.getIncubatorAvailable();
 
         double percent = congestionCalculator.getPercentage(bed, total);
         String label = congestionCalculator.getLabel(bed, total);

@@ -12,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -61,23 +63,37 @@ public class PediatricRecommendationStrategy implements RecommendationStrategy {
             HospitalScore scoreEntity,
             WeightPediatricConfiguration config
     ) {
-        if (row.getPediatricRealtime() == null) {
-            scoreEntity.updatePediatricScore(0.0, "소아 실시간 정보 없음");
+        PediatricRealtime realtime = row.getPediatricRealtime();
+        PediatricStandard standard = row.getPediatricStandard();
+
+        // 1. 공통으로 사용할 Info와 Time 생성
+        PediatricInfo info = PediatricInfo.builder()
+                .pediatricBedCount(Optional.ofNullable(realtime).map(PediatricRealtime::getPediatricBedCount).orElse(0))
+                .pediatricBedStandard(Optional.ofNullable(standard).map(PediatricStandard::getPediatricBedStandard).orElse(0))
+                .incubatorAvailable(Optional.ofNullable(realtime).map(PediatricRealtime::getIncubatorAvailable).orElse("N"))
+                .build();
+
+        LocalDateTime recordedAt = (realtime != null && realtime.getRecordedAt() != null)
+                ? realtime.getRecordedAt()
+                : LocalDateTime.now();
+
+        // 2. 실시간 정보가 없는 경우 처리
+        if (realtime == null) {
+            scoreEntity.updatePediatricScore(0.0, "소아 실시간 정보 없음", info, recordedAt);
             return;
         }
 
+        // 3. 점수 및 태그 계산
         List<String> tags = new ArrayList<>();
-
         double availabilityScore = calculateAvailabilityScore(row, config, tags);
         double medicalScore = calculateMedicalScore(row.getPediatricRealtime(), config, tags);
         double specialScore = calculateSpecialScore(row.getPediatricMkioskty(), config, tags);
 
-        double finalScore = Math.min( availabilityScore + medicalScore + specialScore, 100.0);
+        double finalScore = Math.min(availabilityScore + medicalScore + specialScore, 100.0);
 
-        log.debug("병원: {}, 최종 점수: {}, 태그: {}", row.getHospital().getHospitalName(), finalScore, tags);
-        scoreEntity.updatePediatricScore(finalScore, String.join(" | ", tags));
+        // 4. 수정: 여기서 info와 recordedAt을 정상적으로 전달
+        scoreEntity.updatePediatricScore(finalScore, String.join(" | ", tags), info, recordedAt);
     }
-
 
     private double calculateAvailabilityScore(PediatricHospitalProjection row, WeightPediatricConfiguration config, List<String> tags) {
         PediatricRealtime realtime = row.getPediatricRealtime();

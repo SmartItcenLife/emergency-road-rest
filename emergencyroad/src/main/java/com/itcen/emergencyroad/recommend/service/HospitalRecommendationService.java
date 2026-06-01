@@ -3,7 +3,8 @@ package com.itcen.emergencyroad.recommend.service;
 import com.itcen.emergencyroad.findpath.dto.LocationRequestDto;
 import com.itcen.emergencyroad.findpath.dto.PathResponseDto;
 import com.itcen.emergencyroad.findpath.service.TmapService;
-import com.itcen.emergencyroad.findpath.service.cacaoService;
+import com.itcen.emergencyroad.findpath.service.KakaoMobilityService;
+import com.itcen.emergencyroad.hospital.dto.HospitalApiDto;
 import com.itcen.emergencyroad.hospital.entity.Hospital;
 import com.itcen.emergencyroad.recommend.dto.*;
 import com.itcen.emergencyroad.recommend.entity.HospitalCategory;
@@ -29,7 +30,7 @@ public class HospitalRecommendationService {
     private final HospitalScoreRepository hospitalScoreRepository;
 
     private final TmapService tmapService;
-    private final cacaoService cacaoService;
+    private final KakaoMobilityService KakaoMobilityService;
 
     private final GeneralHospitalMapper generalHospitalMapper;
     private final PediatricHospitalMapper pediatricHospitalMapper;
@@ -56,7 +57,7 @@ public class HospitalRecommendationService {
         }
         return hospitalScores.stream()
                 .filter(s -> s.getHospital().isValidLocation())
-                .filter(s -> calculateDirectDistance(lat,lon, s.getHospital().getLatitude(), s.getHospital().getLongitude()) <= MAX_RADIUS_KM)
+                .filter(s -> calculateDirectDistance(lat, lon, s.getHospital().getLatitude(), s.getHospital().getLongitude()) <= MAX_RADIUS_KM)
                 .toList();
 
     }
@@ -88,6 +89,7 @@ public class HospitalRecommendationService {
         }
         return result;
     }
+
     // 2. 핵심 추천 로직
     public List<HospitalResponseDto> getRecommendations(
             HospitalCategory category,
@@ -184,22 +186,28 @@ public class HospitalRecommendationService {
             Double lat,
             Double lon
     ) {
-        LocationRequestDto userLocation =
-                new LocationRequestDto(lat, lon);
+        LocationRequestDto userLocation = new LocationRequestDto(lat, lon);
 
-        List<Hospital> hospitals = new ArrayList<>();
-        for (HospitalScore score : baseScores) {
-            hospitals.add(score.getHospital());
-        }
+//        List<Hospital> hospitals = new ArrayList<>();
+//        for (HospitalScore score : baseScores) {
+//            hospitals.add(score.getHospital());
+//        }
+        List<HospitalApiDto> apiDtoList = baseScores.stream()
+                .map(s -> new HospitalApiDto(
+                        s.getHospital().getHpid(),
+                        s.getHospital().getLatitude(),
+                        s.getHospital().getLongitude(),
+                        s.getHospital().getHospitalName()))
+                .toList();
 
         Map<String, PathResponseDto> routeMap = new HashMap<>();
 
         try {
             // 1차로 카카오 다중 목적지 API를 호출하고, 성공한 병원만 routeMap에 저장
             List<PathResponseDto> kakaoPaths =
-                    cacaoService.findHospitalsWithDistance(
+                    KakaoMobilityService.findHospitalsWithDistance(
                             userLocation,
-                            hospitals
+                            apiDtoList
                     );
             if (kakaoPaths != null) {
                 for (PathResponseDto path : kakaoPaths) {
@@ -211,10 +219,10 @@ public class HospitalRecommendationService {
         }
 
         // 카카오가 일부만 혹은 전부 실패한 경우 Tmap을 이용하여 실패/누락 병원의 거리 및 시간을 계산
-        List<Hospital> missingHospitals = hospitals.stream()
-                .filter(hospital -> hospital.getLatitude() != null)
-                .filter(hospital -> hospital.getLongitude() != null)
-                .filter(hospital -> !routeMap.containsKey(hospital.getHpid()))
+        List<HospitalApiDto> missingHospitals = apiDtoList.stream()
+                .filter(hospital -> hospital.lat() != null)
+                .filter(hospital -> hospital.lon() != null)
+                .filter(hospital -> !routeMap.containsKey(hospital.hpid()))
                 .toList();
 
         if (!missingHospitals.isEmpty()) {
@@ -266,7 +274,7 @@ public class HospitalRecommendationService {
                 hospital.getLongitude()
         );
 
-        double duration = (distance /AVG_SPEED_KMH) * 60.0;
+        double duration = (distance / AVG_SPEED_KMH) * 60.0;
 
         return new HospitalRouteInfo(
                 distance,
@@ -274,6 +282,7 @@ public class HospitalRecommendationService {
                 calculateTimeWeight(duration)
         );
     }
+
     // 7. 전체보기 병원 리스트
     public Map<String, PathResponseDto> getDistanceAndDurationMap(
             HospitalCategory category,

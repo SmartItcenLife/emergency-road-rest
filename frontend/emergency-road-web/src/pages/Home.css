@@ -68,18 +68,18 @@ body {
 }
 
 /* 버튼 내 공통 아이콘 간격 및 위치 조절 */
- .children-img, .general-img, .pregnant-img{
+ .pediatric-img, .general-img, .pregnant-img{
     width: 20px;
-    margin-right: 10px;
+    margin-right: 5px;
     position: relative;
     bottom: 1px;
     right: 2px;
 }
 
 /* 버튼 내 아이콘의 실제 표시 크기 고정 */
-.children-img, .general-img, .pregnant-img {
-    width: 50px;        
-    height: 50px;
+.pediatric-img, .general-img, .pregnant-img {
+    width: 80px;        
+    height: 80px;
     flex-shrink: 0;
 }
 /* 버튼들을 묶는 그룹 레이아웃 */
@@ -118,6 +118,10 @@ body {
     gap: 15px;           
     position: relative;
     right: 7px;
+}
+
+#btnDetail_wrap{
+    margin-left: 15px;
 }
 
 /* 버튼 hover 시 위로 살짝 떠오르는 효과 */
