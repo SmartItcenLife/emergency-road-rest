@@ -1,12 +1,14 @@
 import { useState,useRef } from "react";
 import KakaoMap from "./KakaoMap";
 import { getAreaCongestion, getMapHospitals } from "../api/mapApi";
-import MapListPanel from "./MapListPanel";
+import MapSidePanel from "./MapSidePanel";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-function MapLayout() {
+function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
+  const navigate = useNavigate();
   const [hospitals, setHospitals] = useState([]);
-  const [selectedHospital, setSelectedHospital] = useState(null);
+  const [selectedHospital, setSelectedHospital] = useState(initialHospital);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -15,6 +17,7 @@ function MapLayout() {
   const [showSearchButton, setShowSearchButton] = useState(false);
   
   const hasSearchedOnceRef = useRef(false);
+  const normalizedCategory = initialCategory?.toUpperCase() || "GENERAL";
 
   // Polygon 데이터 및 구별 혼잡도 정보 상태
   const [areaCongestions, setAreaCongestions] = useState([]);
@@ -24,6 +27,33 @@ function MapLayout() {
   useEffect(() => {
     loadAreaCongestions();
   }, []);
+
+  useEffect(() => {
+    if ( !selectedHospital?.hpid || hospitals.length == 0) {
+      return;
+    }
+
+    const matchedHospital = hospitals.find(
+      (hospital) => hospital.hpid === selectedHospital.hpid
+    );
+
+    if(!matchedHospital) {
+      return;
+    }
+
+    setSelectedHospital((prev) => {
+      if (!prev?.hpid || prev.hpid !== matchedHospital.hpid) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        ...matchedHospital,
+        latitude: matchedHospital.latitude ?? prev.latitude,
+        longitude: matchedHospital.longitude ?? prev.longitude,
+      };
+    });
+  }, [hospitals, selectedHospital?.hpid]);
 
   // 지도 bounds 변경 시 호출되는 함수
   function handleBoundsChange(boundsParams) {
@@ -44,7 +74,7 @@ function MapLayout() {
       setLoading(true);
       setError(null);
 
-      const data = await getMapHospitals(boundsParams);
+      const data = await getMapHospitals(normalizedCategory, boundsParams);
       setHospitals(data);
       setShowSearchButton(false);
     } catch (err) {
@@ -61,7 +91,7 @@ function MapLayout() {
       setAreaCongestionLoading(true);
       setAreaCongestionError(null);
 
-      const data = await getAreaCongestion();
+      const data = await getAreaCongestion(normalizedCategory);
       setAreaCongestions(data);
     } catch (err) {
       console.error("구별 혼잡도 정보를 불러오는 중 오류가 발생했습니다:", err);
@@ -91,9 +121,24 @@ function MapLayout() {
     });
   }
 
+  // 뒤로가기 핸들러 추가
+  function handleBackToList() {
+    setSelectedHospital(null);
+  }
+
   return (
-  <div className="map-layout">
+  <div 
+    className={selectedHospital? "map-layout detail-mode" : "map-layout"}>
     <div className="map-content">
+      <button
+        type="button"
+        className="map-floating-back-button"
+        onClick={() => navigate(-1)}
+        aria-label="이전 화면으로 이동"
+      >
+        ←
+      </button>
+
       {showSearchButton && (
         <button
           type="button"
@@ -108,15 +153,17 @@ function MapLayout() {
         hospitals={hospitals}
         areaCongestions={areaCongestions}
         selectedHospital={selectedHospital}
+        initialHospital={initialHospital}
         onBoundsChange={handleBoundsChange}
         onSelectHospital={handleSelectHospital}
       />
     </div>
 
-    <MapListPanel
+    <MapSidePanel
       hospitals={hospitals}
       selectedHospital={selectedHospital}
       onSelectHospital={handleSelectHospital}
+      onBackToList={handleBackToList}
       loading={loading}
       error={error}
     />

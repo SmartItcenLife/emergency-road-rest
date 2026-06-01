@@ -24,6 +24,8 @@ import PostListPage from "./pages/community/PostListPage";
 import PostDetailPage from "./pages/community/PostDetailPage";
 import PostFormPage from "./pages/community/PostFormPage";
 
+
+
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuthContext();
   if (loading) return null;

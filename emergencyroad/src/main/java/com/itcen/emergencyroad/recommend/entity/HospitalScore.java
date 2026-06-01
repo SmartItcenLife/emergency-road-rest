@@ -1,14 +1,6 @@
 package com.itcen.emergencyroad.recommend.entity;
-
-import com.itcen.emergencyroad.general.entity.GeneralRealTimeAndStandard;
 import com.itcen.emergencyroad.global.entity.BaseEntity;
 import com.itcen.emergencyroad.hospital.entity.Hospital;
-import com.itcen.emergencyroad.hospital.entity.HospitalDetail;
-import com.itcen.emergencyroad.pediatric.entity.PediatricRealtime;
-import com.itcen.emergencyroad.pediatric.entity.PediatricStandard;
-import com.itcen.emergencyroad.pregnant.entity.Pregnant;
-import com.itcen.emergencyroad.pregnant.entity.PregnantRealtime;
-import com.itcen.emergencyroad.pregnant.entity.PregnantStandard;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -32,53 +24,40 @@ public class HospitalScore extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hpid", referencedColumnName = "hpid", unique = true, nullable = false)
     private Hospital hospital;
+    // 그룹화된 정보
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "nicuAvailable", column = @Column(name = "nicu_available")),
+            @AttributeOverride(name = "deliveryAvailable", column = @Column(name = "delivery_available")),
+            @AttributeOverride(name = "obstetricSurgeryAvailable", column = @Column(name = "obstetric_surgery_available")),
+            @AttributeOverride(name = "gynecologySurgeryAvailable", column = @Column(name = "gynecology_surgery_available")),
+            @AttributeOverride(name = "emergencyDialysisAvailable", column = @Column(name = "emergency_dialysis_available")),
+            @AttributeOverride(name = "isDeliveryRoomAvailable", column = @Column(name = "is_delivery_room_available")),
+            @AttributeOverride(name = "nicuBedCount", column = @Column(name = "nicu_bed_count")),
+            @AttributeOverride(name = "incubatorAvailableP", column = @Column(name = "incubator_available_p")),
+            @AttributeOverride(name = "prematureVentilatorAvailable", column = @Column(name = "premature_ventilator_available")),
+            @AttributeOverride(name = "deliveryRoomStandard", column = @Column(name = "delivery_room_standard")),
+            @AttributeOverride(name = "nicuStandard", column = @Column(name = "nicu_standard")),
+            @AttributeOverride(name = "ventilatorStandard", column = @Column(name = "ventilator_standard")),
+            @AttributeOverride(name = "incubatorStandard", column = @Column(name = "incubator_standard"))
+    })
+    private PregnantInfo pregnantInfo;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "pediatricBedCount", column = @Column(name = "pediatric_bed_count")),
+            @AttributeOverride(name = "pediatricBedStandard", column = @Column(name = "pediatric_bed_standard")),
+            @AttributeOverride(name = "incubatorAvailable", column = @Column(name = "incubator_available"))
+    })
+    private PediatricInfo pediatricInfo;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "availableBeds", column = @Column(name = "available_beds")),
+            @AttributeOverride(name = "totalBeds", column = @Column(name = "total_beds"))
+    })
+    private GeneralInfo generalInfo;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hpid", referencedColumnName = "hpid",
-            insertable = false, updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private HospitalDetail hospitalDetail;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hpid", referencedColumnName = "hpid",
-            insertable = false, updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private PediatricStandard pediatricStandard;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hpid", referencedColumnName = "hpid",
-            insertable = false, updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private PediatricRealtime pediatricRealtime;
-
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "hpid",
-            referencedColumnName = "hpid",
-            insertable = false,
-            updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
-    )
-    private Pregnant pregnant;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hpid", referencedColumnName = "hpid",
-            insertable = false, updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private PregnantStandard pregnantStandard;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hpid", referencedColumnName = "hpid",
-            insertable = false, updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private PregnantRealtime pregnantRealtime;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hpid", referencedColumnName = "hpid",
-            insertable = false, updatable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private GeneralRealTimeAndStandard generalRealTimeAndStandard;
+    @Column(name = "recorded_at")
+    private LocalDateTime recordedAt;
 
     // --- 카테고리별 추천 점수 (0.0 ~ 100.0) ---
     @Builder.Default
@@ -92,8 +71,6 @@ public class HospitalScore extends BaseEntity {
     @Builder.Default
     @Column(name = "general_score")
     private Double generalScore = 0.0;   // 일반 응급 점수 (가용 병상, 응급실 가동률 반영)
-
-    // --- 화면 노출용 상태 요약 정보 (반정규화) ---
 
     @Column(name = "pregnant_tag", length = 1000)
     private String pregnantTags; // 예: "분만 가능 | NICU 보유"
@@ -113,27 +90,32 @@ public class HospitalScore extends BaseEntity {
     /**
      * 임산부 점수 및 태그 업데이트 로직
      */
-    public void updatePregnantScore(Double score, String tag) {
+    public void updatePregnantScore(Double score, String tag, PregnantInfo info) {
         this.pregnantScore = score;
         this.pregnantTags = tag;
+        this.pregnantInfo = info;
         this.lastCalculatedAt = LocalDateTime.now();
     }
 
     /**
      * 소아 점수 및 태그 업데이트 로직
      */
-    public void updatePediatricScore(Double score, String tag) {
+    public void updatePediatricScore(Double score, String tag, PediatricInfo info, LocalDateTime recordedAt) {
         this.pediatricScore = score;
         this.pediatricTags = tag;
+        this.pediatricInfo = info;
+        this.recordedAt = recordedAt;
         this.lastCalculatedAt = LocalDateTime.now();
     }
 
     /**
      * 일반 응급 점수 및 태그 업데이트 로직
      */
-    public void updateGeneralScore(Double score, String tag) {
+    public void updateGeneralScore(Double score, String tag, GeneralInfo info, LocalDateTime recordedAt) {
         this.generalScore = score;
         this.generalTags = tag;
+        this.generalInfo = info;
+        this.recordedAt = recordedAt;
         this.lastCalculatedAt = LocalDateTime.now();
     }
 }

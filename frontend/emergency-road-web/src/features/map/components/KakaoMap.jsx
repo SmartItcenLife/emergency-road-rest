@@ -1,14 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getMapBoundsParams } from "../utils/mapBounds";
-import { getMarkerColorByGrade } from "../utils/mapMarkerStyle";
+import { getMapStatusToneByGrade } from "../utils/mapStatusStyle";
 import seoulDistrictPolygons from "../data/seoulDistrictPolygons.json";
 import { getPolygonColor } from "../utils/mapPolygonStyle";
+import locationIcon from "../../../assets/location.svg";
 
 const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 
 function KakaoMap({
   hospitals,
   selectedHospital,
+  initialHospital,
   onBoundsChange,
   onSelectHospital,
   areaCongestions,
@@ -19,7 +21,6 @@ function KakaoMap({
   const debounceTimeoutRef = useRef(null);
 
   // hover 상태 관리를 위한 ref
-  // const hoverHospitalIdRef = useRef(null);
   const infoOverlayRef = useRef([]);
 
   // 현재 활성화된 정보 오버레이를 추적하기 위한 ref
@@ -32,7 +33,23 @@ function KakaoMap({
   const activeAreaOverlayRef = useRef(null);
   const activeAreaCodeRef = useRef(null);
 
+  // 폴리곤 hover 상태 관리를 위한 ref
+  const hoverAreaOverlayRef = useRef(null);
 
+  // 사용자 위치를 관리하기 위한 Ref
+  const currentLocationOverlayRef = useRef(null);
+ 
+  const POLYGON_HIDE_LEVEL = 5;
+  const AREA_CLICK_ZOOM_LEVEL = 5;
+  
+  // 지도 맵 레벨을 관리하기 위한 상태
+  const AREA_MODE_LEVEL = 7; 
+  
+  const [mapLevel, setMapLevel] = useState(AREA_MODE_LEVEL);
+
+  const shouldRenderPolygons = !initialHospital && !selectedHospital && mapLevel > POLYGON_HIDE_LEVEL;
+
+  
   // 지도에 표시된 마커를 모두 제거하는 함수
   function clearMarkers() {
     closeActiveInfoOverlay();
@@ -63,13 +80,160 @@ function KakaoMap({
       }
 
     closeActiveAreaOverlay();
+    closeHoverAreaOverlay();
   }
+
+  function closeHoverAreaOverlay() {
+  if (hoverAreaOverlayRef.current) {
+    hoverAreaOverlayRef.current.setMap(null);
+    hoverAreaOverlayRef.current = null;
+    }
+  }
+  // 사용자 위치로 이동
+  function moveToCurrentLocation() {
+    const map = mapInstanceRef.current;
+
+    if (!map || !window.kakao?.maps) {
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      alert("현재 브라우저에서는 위치 정보를 사용할 수 없습니다.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        const currentPosition = new window.kakao.maps.LatLng(
+          latitude,
+          longitude
+        );
+
+        map.panTo(currentPosition);
+        map.setLevel(5);
+        setMapLevel(5);
+
+        showCurrentLocationMarker(currentPosition);
+      },
+      (error) => {
+        console.error("현재 위치를 가져오지 못했습니다:", error);
+        alert("현재 위치를 가져오지 못했습니다. 위치 권한을 확인해주세요.");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 30000,
+      }
+    );
+  }
+
+  function zoomIn() {
+    const map = mapInstanceRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const nextLevel = Math.max(map.getLevel() - 1, 1);
+    map.setLevel(nextLevel);
+    setMapLevel(nextLevel);
+  }
+
+  function zoomOut() {
+    const map = mapInstanceRef.current;
+
+    if (!map) {
+      return;
+    }
+
+    const nextLevel = map.getLevel() + 1;
+    map.setLevel(nextLevel);
+    setMapLevel(nextLevel);
+  }
+
+  // 사용자 위치 overlay 구성 함수
+  function showCurrentLocationMarker(position){
+    const map = mapInstanceRef.current;
+
+    if (!map || !window.kakao?.maps) {
+      return;
+    }
+
+    if (currentLocationOverlayRef.current) {
+      currentLocationOverlayRef.current.setMap(null);
+    }
+
+    const markerElement = document.createElement("div");
+    markerElement.className = "map-current-location-marker";
+    markerElement.setAttribute("aria-label", "현재 위치");
+
+    const markerDot = document.createElement("span");
+    markerDot.className = "map-current-location-dot";
+
+    markerElement.appendChild(markerDot);
+
+    const currentLocationOverlay = new window.kakao.maps.CustomOverlay({
+      map,
+      position,
+      content: markerElement,
+      xAnchor: 0.5,
+      yAnchor: 0.5,
+  });
+
+  currentLocationOverlayRef.current = currentLocationOverlay;
+  }
+
+
+  
+  // 줌 레벨에 따른 폴리곤 및 마커 색상 투명도 조절을 위한 상수 및 함수
+  const polygonOpacity = getPolygonOpacityByLevel(mapLevel);
+  const markerOpacity = getMarkerOpacityByLevel(mapLevel);
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function getPolygonOpacityByLevel(level) {
+    if (level <= 3) {
+      return {
+        fillOpacity: 0,
+        strokeOpacity: 0,
+      };
+    }
+
+    const normalized = clamp((level - 3) / 5, 0, 1);
+
+    return {
+      fillOpacity: 0.06 + normalized * 0.26,
+      strokeOpacity: 0.15 + normalized * 0.45,
+    };
+  }
+  
+  function getMarkerOpacityByLevel(level) {
+    if (level <= 3) {
+      return 1;
+    }
+
+    if (level <= 5) {
+      return 0.85;
+    }
+
+    if (level <= 7) {
+      return 0.6;
+    }
+
+    return 0.25;
+  }
+
 
   function closeActiveAreaOverlay() {
     if (activeAreaOverlayRef.current) {
       activeAreaOverlayRef.current.setMap(null);
       activeAreaOverlayRef.current = null;
     }
+    activeAreaCodeRef.current = null;
   }
 
   // GeoJson 좌표를 Kakao LatLng 배열로 변환하는 함수 ( 경도,위도 -> 위도,경도 )
@@ -85,8 +249,6 @@ function KakaoMap({
       activeInfoOverlayRef.current.setMap(null);
       activeInfoOverlayRef.current = null;
     }
-
-    activeAreaCodeRef.current = null;
   }
 
   // 
@@ -145,6 +307,44 @@ function KakaoMap({
     return content;
   }
 
+  // Marker overlay 생성함수
+  function createHospitalInfoContent(hospital) {
+    const content = document.createElement("div");
+    content.className = "map-marker-info map-marker-info-detail";
+
+    const statusLabel = hospital.status?.label ?? "정보없음";
+    const availableBeds = hospital.status?.availableCount;
+    const totalCount = hospital.status?.totalCount;
+    const rate = hospital.status?.rate;
+
+    content.innerHTML = `
+      <strong>${hospital.hospitalName ?? "선택한 병원"}</strong>
+      <span>${statusLabel}</span>
+      <dl>
+        <div>
+          <dt>병원 이름</dt>
+          <dd>${displayValue(hospital.hospitalName) ?? "정보없음"}</dd>
+        </div>
+        <div>
+          <dt>가용 병상</dt>
+          <dd>${displayValue(availableBeds)}개</dd>
+        </div>
+        <div>
+          <dt>전체 병상</dt>
+          <dd>${displayValue(totalCount)}개</dd>
+        </div>
+        <div>
+          <dt>가용률</dt>
+          <dd>${
+            rate !== null && rate !== undefined ? `${rate}%` : "정보없음"
+          }</dd>
+        </div>
+      </dl>
+    `;
+
+    return content;
+  }
+
   useEffect(() => {
     // Kakao SDK 로드
     // 지도 객체 생성
@@ -170,11 +370,16 @@ function KakaoMap({
       }
 
       window.kakao.maps.load(() => {
-        const center = new window.kakao.maps.LatLng(37.5665, 126.978);
+        // const center = new window.kakao.maps.LatLng(37.5665, 126.978);
+        const center = initialHospital?.latitude && initialHospital?.longitude ? 
+          new window.kakao.maps.LatLng(
+            initialHospital.latitude,
+            initialHospital.longitude
+          ) : new window.kakao.maps.LatLng(37.5665, 126.978);
 
         const options = {
           center,
-          level: 7,
+          level: initialHospital ? 4 : 7,
         };
 
         const map = new window.kakao.maps.Map(
@@ -183,6 +388,9 @@ function KakaoMap({
         );
 
         mapInstanceRef.current = map;
+
+        const initialLevel = map.getLevel();
+        setMapLevel(initialLevel);
 
         function emitBoundsChange() {
           const boundsParams = getMapBoundsParams(map);
@@ -206,12 +414,19 @@ function KakaoMap({
           "idle",
           emitBoundsChangeWithDebounce
         );
+
+        window.kakao.maps.event.addListener(map, "zoom_changed", () => {
+          const currentLevel = map.getLevel();
+          setMapLevel(currentLevel);
+        });
         
         window.kakao.maps.event.addListener(map, "click", () => {
           if (ignoreNextMapClickRef.current) {
               ignoreNextMapClickRef.current = false;
               return;
             }
+          closeHoverAreaOverlay();
+          closeActiveAreaOverlay();
           closeActiveInfoOverlay();
           onSelectHospital(null);
         });
@@ -250,29 +465,42 @@ function KakaoMap({
     }
 
     clearMarkers();
+    closeHoverAreaOverlay();
+    closeActiveAreaOverlay();
+    
+    const markerHospitals =
+        initialHospital && !hospitals.some((hospital) => hospital.hpid === initialHospital.hpid)
+          ? [initialHospital, ...hospitals]
+          : hospitals;
 
-    hospitals.forEach((hospital) => {
+    markerHospitals.forEach((hospital) => {
       const position = new window.kakao.maps.LatLng(
         hospital.latitude,
         hospital.longitude
       );
 
-      const markerColor = getMarkerColorByGrade(hospital.status?.grade);
       const isSelected = selectedHospital?.hpid === hospital.hpid;
+      // Marker 
+      const statusTone = getMapStatusToneByGrade(hospital.status?.grade);
+      const availableBeds = hospital.status?.availableCount
+      const availableBedsText = typeof availableBeds == 'number' ? availableBeds : "정보없음";
 
+      
+
+
+      
       const markerElement = document.createElement("div");
       markerElement.className = isSelected
-        ? "map-hospital-marker selected"
-        : "map-hospital-marker";
-      markerElement.style.backgroundColor = markerColor;
-      markerElement.title = hospital.hospitalName;
+        ? `map-hospital-marker ${statusTone} selected`
+        : `map-hospital-marker ${statusTone}`;
+      markerElement.style.opacity = isSelected ? 1 : markerOpacity; // 선택된 병원이 더 잘 보이게
+      markerElement.title = hospital.hospitalName ?? "선택한 병원";
+      markerElement.innerHTML = `
+        <span class="map-hospital-marker-shape"></span>
+        <strong class="map-hospital-marker-count">${availableBedsText}</strong>
+      `;
 
-      const infoContent = document.createElement("div");
-      infoContent.className = "map-marker-info";
-      infoContent.innerHTML = `
-        <strong>${hospital.hospitalName}</strong>
-        <span>${hospital.status?.label ?? "정보없음"}</span>
-        `;
+      const infoContent = createHospitalInfoContent(hospital);
 
       const infoOverlay = new window.kakao.maps.CustomOverlay({
         position,
@@ -285,7 +513,7 @@ function KakaoMap({
         map,
         position,
         content: markerElement,
-        yAnchor: 0.5,
+        yAnchor: 1,
         xAnchor: 0.5,
       });
 
@@ -317,7 +545,7 @@ function KakaoMap({
       }
 
     });
-  }, [hospitals, selectedHospital, onSelectHospital]);
+  }, [hospitals, selectedHospital, onSelectHospital, markerOpacity]);
 
   useEffect(() => {
     // selectedHospital 위치로 map.panTo
@@ -347,6 +575,10 @@ function KakaoMap({
 
   clearPolygons();
 
+  if (!shouldRenderPolygons) {
+    return;
+  }
+
   const congestionMap = new Map(
     areaCongestions.map((area) => [area.areaCode, area])
   );
@@ -364,9 +596,9 @@ function KakaoMap({
       path,
       strokeWeight: 2,
       strokeColor: polygonColor,
-      strokeOpacity: 0.9,
+      strokeOpacity: polygonOpacity.strokeOpacity,
       fillColor: polygonColor,
-      fillOpacity: 0.22,
+      fillOpacity: polygonOpacity.fillOpacity,
     });
 
     const infoOverlay = new window.kakao.maps.CustomOverlay({
@@ -378,11 +610,12 @@ function KakaoMap({
 
     window.kakao.maps.event.addListener(polygon, "mouseover", (mouseEvent) => {
       polygon.setOptions({
-        fillOpacity: 0.38,
+        fillOpacity: Math.min(polygonOpacity.fillOpacity + 0.16, 0.55),
       });
 
       infoOverlay.setPosition(mouseEvent.latLng);
       infoOverlay.setMap(map);
+      hoverAreaOverlayRef.current = infoOverlay;
     });
 
     window.kakao.maps.event.addListener(polygon, "mousemove", (mouseEvent) => {
@@ -390,17 +623,29 @@ function KakaoMap({
     });
 
     window.kakao.maps.event.addListener(polygon, "mouseout", () => {
-      polygon.setOptions({
-        fillOpacity: 0.22,
-      })
+        polygon.setOptions({
+          fillOpacity: polygonOpacity.fillOpacity
+        })
+      
+        infoOverlay.setMap(null);
+      
+        if ( activeAreaCodeRef.current === areaCode) {
+            activeAreaCodeRef.current = null;
+            activeAreaOverlayRef.current = null;
+          }
+        if (hoverAreaOverlayRef.current === infoOverlay) {
+          hoverAreaOverlayRef.current = null;
+        }
+      });
+    
+      window.kakao.maps.event.addListener(map, "zoom_changed", () => {
+        closeActiveAreaOverlay();
+        closeActiveInfoOverlay();
+        closeHoverAreaOverlay();
 
-      infoOverlay.setMap(null);
-
-      if ( activeAreaCodeRef.current === areaCode) {
-        activeAreaCodeRef.current = null;
-        activeAreaOverlayRef.current = null;
-      }
-    });
+        const currentLevel = map.getLevel();
+        setMapLevel(currentLevel);
+      });
 
     window.kakao.maps.event.addListener(polygon, "click", (mouseEvent) => {
       if ( activeAreaCodeRef.current === areaCode) {
@@ -415,19 +660,55 @@ function KakaoMap({
       
       activeAreaOverlayRef.current = infoOverlay;
       activeAreaCodeRef.current = areaCode;
+
+      map.panTo(mouseEvent.latLng);
+      map.setLevel(AREA_CLICK_ZOOM_LEVEL, {
+        anchor : mouseEvent.latLng
+      });
     });
 
     
     polygonsRef.current.push(polygon);
   });
-}, [areaCongestions]);
+}, [areaCongestions, mapLevel, shouldRenderPolygons]);
 
   return (
-    <div
-      ref={mapContainerRef}
-      className="kakao-map"
-      aria-label="응급 병원 지도"
-    />
+    <div className="kakao-map-wrapper">
+      <div
+        ref={mapContainerRef}
+        className="kakao-map"
+        aria-label="응급 병원 지도"
+      />
+      <div
+        className="map-control-stack"
+        aria-label="지도 조작 컨트롤"
+        >
+        <button
+          type="button"
+          className="map-control-button"
+          onClick={zoomIn}
+          aria-label="지도 확대"
+        >
+          +
+        </button>
+        <button
+          type="button"
+          className="map-control-button"
+          onClick={zoomOut}
+          aria-label="지도 축소"
+        >
+          -
+        </button>
+        <button
+          type="button"
+          className="map-control-button map-current-location-button"
+          onClick={moveToCurrentLocation}
+          aria-label="현재 위치로 이동"
+        >
+          <img src={locationIcon} alt="" />
+        </button>
+      </div>
+      </div>
   );
 }
 

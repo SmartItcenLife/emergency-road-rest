@@ -1,7 +1,6 @@
-import React from 'react';
 import './HospitalDetail.css';
 
-const HospitalDetail = ({ detailData, config }) => {
+const HospitalDetail = ({ detailData, config, actionContent }) => {
 
   const displayValue = (value) => {
     if (value === null || value === undefined || value === '') {
@@ -131,10 +130,15 @@ const HospitalDetail = ({ detailData, config }) => {
   return (
     <div className="hospital-detail-panel" style={{
             '--primary': theme.primary,
+            '--soft': theme.soft,
+            '--border': theme.border,
             }}>
-      {config.detailSections.map((section) =>
-        renderDetailSection(section)
-      )}
+      {config.detailSections.map((section, index) => (
+        <div key={section.title}>
+          {renderDetailSection(section)}
+          {index === 0 && actionContent}
+        </div>
+      ))}
     </div>
   );
 };

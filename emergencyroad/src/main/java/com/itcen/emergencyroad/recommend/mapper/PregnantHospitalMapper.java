@@ -2,6 +2,8 @@ package com.itcen.emergencyroad.recommend.mapper;
 
 import com.itcen.emergencyroad.recommend.dto.PregnantHospitalResponseDto;
 import com.itcen.emergencyroad.recommend.entity.HospitalScore;
+import com.itcen.emergencyroad.recommend.entity.PediatricInfo;
+import com.itcen.emergencyroad.recommend.entity.PregnantInfo;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,10 +17,7 @@ public class PregnantHospitalMapper {
     ) {
 
         var hospital = score.getHospital();
-
-        var pregnant = score.getPregnant();
-        var realtime = score.getPregnantRealtime();
-        var standard = score.getPregnantStandard();
+        PregnantInfo info = score.getPregnantInfo();
 
         return PregnantHospitalResponseDto.builder()
                 .hospitalName(hospital.getHospitalName())
@@ -30,23 +29,21 @@ public class PregnantHospitalMapper {
                 .tags(score.getPregnantTags())
 
                 // 가능 여부
-                .deliveryAvailable(pregnant.getDeliveryAvailable())
-                .nicuAvailable(pregnant.getNicuAvailable())
-                .obstetricSurgeryAvailable(pregnant.getObstetricSurgeryAvailable())
-                .gynecologySurgeryAvailable(pregnant.getGynecologySurgeryAvailable())
-                .emergencyDialysisAvailable(pregnant.getEmergencyDialysisAvailable())
-
+                .deliveryAvailable(info.getDeliveryAvailable())
+                .nicuAvailable(info.getNicuAvailable())
+                .obstetricSurgeryAvailable(info.getObstetricSurgeryAvailable())
+                .gynecologySurgeryAvailable(info.getGynecologySurgeryAvailable())
+                .emergencyDialysisAvailable(info.getEmergencyDialysisAvailable())
                 // realtime
-                .nicuBedCount(realtime.getNicuBedCount())
-                .incubatorAvailable(realtime.getIncubatorAvailable())
-                .prematureVentilatorAvailable(realtime.getPrematureVentilatorAvailable())
-                .isDeliveryRoomAvailable(realtime.getIsDeliveryRoomAvailable())
-
+                .nicuBedCount(info.getNicuBedCount())
+                .incubatorAvailable(info.getIncubatorAvailableP())
+                .prematureVentilatorAvailable(info.getPrematureVentilatorAvailable())
+                .isDeliveryRoomAvailable(info.getIsDeliveryRoomAvailable())
                 // standard
-                .deliveryRoomStandard(standard.getDeliveryRoomStandard())
-                .nicuStandard(standard.getNicuStandard())
-                .ventilatorStandard(standard.getVentilatorStandard())
-                .incubatorStandard(standard.getIncubatorStandard())
+                .deliveryRoomStandard(info.getDeliveryRoomStandard())
+                .nicuStandard(info.getNicuStandard())
+                .ventilatorStandard(info.getVentilatorStandard())
+                .incubatorStandard(info.getIncubatorStandard())
 
                 .emergencyPhone(hospital.getEmergencyPhone())
                 .hospitalLatitude(hospital.getLatitude())

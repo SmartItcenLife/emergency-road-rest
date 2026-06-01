@@ -11,8 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -58,10 +61,21 @@ public class GeneralRecommendationStrategy implements RecommendationStrategy {
             WeightGeneralConfiguration config
     ) {
         GeneralRealTimeAndStandard realtime = row.getGeneralRealTimeAndStandard();
+        GeneralInfo info = GeneralInfo.builder()
+                .availableBeds(Optional.ofNullable(realtime)
+                        .map(GeneralRealTimeAndStandard::getEmergencyAvailableBeds)
+                        .orElse(0))
+                .totalBeds(Optional.ofNullable(realtime)
+                        .map(GeneralRealTimeAndStandard::getEmergencyTotalBeds)
+                        .orElse(0))
+                .build();
+        LocalDateTime recordedAt = (realtime != null && realtime.getRecordedAt() != null)
+                ? realtime.getRecordedAt()
+                : LocalDateTime.now();
 
         // 필터링: 가용 병상 없음
         if (realtime == null || realtime.getEmergencyAvailableBeds() == null || realtime.getEmergencyAvailableBeds() <= 0) {
-            scoreEntity.updateGeneralScore(0.0, "응급실 만석");
+            scoreEntity.updateGeneralScore(0.0, "응급실 만석",info, recordedAt);
             return;
         }
 
@@ -83,7 +97,8 @@ public class GeneralRecommendationStrategy implements RecommendationStrategy {
         double availabilityScore = calculateAvailabilityScore(realtime, config);
 
         double finalScore = Math.min(medicalScore + availabilityScore, 100);
-        scoreEntity.updateGeneralScore(finalScore, String.join(" | ", tags));
+        scoreEntity.updateGeneralScore(finalScore, String.join(" | ", tags),info, recordedAt);
+
     }
 
     private double calculateSevereScore(GeneralSrsIll severe, WeightGeneralConfiguration config, Set<String> tags) {
