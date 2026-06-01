@@ -1,4 +1,4 @@
-package com.itcen.emergencyroad.community.dto.post;
+package com.itcen.emergencyroad.community.dto.report;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
