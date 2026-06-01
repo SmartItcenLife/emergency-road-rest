@@ -3,16 +3,9 @@ import HospitalCard from './HospitalCard';
 import './HospitalList.css';
 import HospitalListFooter from './HospitalListFooter.jsx';
 import SortSelect from "../../../features/hospitals/components/SortSelect.jsx";
+
 const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, showRanking, showDistance, compact }) => {
-  // 병원이 없는 경우를 위한 처리
-  if (!hospitals || hospitals.length === 0) {
-    return (
-      <div className="empty">
-        10km 반경 내에 추천 가능한 병원이 없습니다.<br />
-        아래 버튼을 눌러 전체 병원 목록을 확인해보세요.
-      </div>
-    );
-  }
+
   let type = "";
   if(category === "PEDIATRIC"){
     type="소아 응급";
