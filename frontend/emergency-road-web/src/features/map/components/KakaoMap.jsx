@@ -10,6 +10,7 @@ const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 function KakaoMap({
   hospitals,
   selectedHospital,
+  initialHospital,
   onBoundsChange,
   onSelectHospital,
   areaCongestions,
@@ -46,7 +47,7 @@ function KakaoMap({
   
   const [mapLevel, setMapLevel] = useState(AREA_MODE_LEVEL);
 
-  const shouldRenderPolygons = mapLevel > POLYGON_HIDE_LEVEL;
+  const shouldRenderPolygons = !initialHospital && !selectedHospital && mapLevel > POLYGON_HIDE_LEVEL;
 
   
   // 지도에 표시된 마커를 모두 제거하는 함수
@@ -79,6 +80,7 @@ function KakaoMap({
       }
 
     closeActiveAreaOverlay();
+    closeHoverAreaOverlay();
   }
 
   function closeHoverAreaOverlay() {
@@ -305,6 +307,44 @@ function KakaoMap({
     return content;
   }
 
+  // Marker overlay 생성함수
+  function createHospitalInfoContent(hospital) {
+    const content = document.createElement("div");
+    content.className = "map-marker-info map-marker-info-detail";
+
+    const statusLabel = hospital.status?.label ?? "정보없음";
+    const availableBeds = hospital.status?.availableCount;
+    const totalCount = hospital.status?.totalCount;
+    const rate = hospital.status?.rate;
+
+    content.innerHTML = `
+      <strong>${hospital.hospitalName ?? "선택한 병원"}</strong>
+      <span>${statusLabel}</span>
+      <dl>
+        <div>
+          <dt>병원 이름</dt>
+          <dd>${displayValue(hospital.hospitalName) ?? "정보없음"}</dd>
+        </div>
+        <div>
+          <dt>가용 병상</dt>
+          <dd>${displayValue(availableBeds)}개</dd>
+        </div>
+        <div>
+          <dt>전체 병상</dt>
+          <dd>${displayValue(totalCount)}개</dd>
+        </div>
+        <div>
+          <dt>가용률</dt>
+          <dd>${
+            rate !== null && rate !== undefined ? `${rate}%` : "정보없음"
+          }</dd>
+        </div>
+      </dl>
+    `;
+
+    return content;
+  }
+
   useEffect(() => {
     // Kakao SDK 로드
     // 지도 객체 생성
@@ -330,11 +370,16 @@ function KakaoMap({
       }
 
       window.kakao.maps.load(() => {
-        const center = new window.kakao.maps.LatLng(37.5665, 126.978);
+        // const center = new window.kakao.maps.LatLng(37.5665, 126.978);
+        const center = initialHospital?.latitude && initialHospital?.longitude ? 
+          new window.kakao.maps.LatLng(
+            initialHospital.latitude,
+            initialHospital.longitude
+          ) : new window.kakao.maps.LatLng(37.5665, 126.978);
 
         const options = {
           center,
-          level: 7,
+          level: initialHospital ? 4 : 7,
         };
 
         const map = new window.kakao.maps.Map(
@@ -420,9 +465,15 @@ function KakaoMap({
     }
 
     clearMarkers();
+    closeHoverAreaOverlay();
+    closeActiveAreaOverlay();
+    
+    const markerHospitals =
+        initialHospital && !hospitals.some((hospital) => hospital.hpid === initialHospital.hpid)
+          ? [initialHospital, ...hospitals]
+          : hospitals;
 
-
-    hospitals.forEach((hospital) => {
+    markerHospitals.forEach((hospital) => {
       const position = new window.kakao.maps.LatLng(
         hospital.latitude,
         hospital.longitude
@@ -435,22 +486,21 @@ function KakaoMap({
       const availableBedsText = typeof availableBeds == 'number' ? availableBeds : "정보없음";
 
       
+
+
+      
       const markerElement = document.createElement("div");
       markerElement.className = isSelected
         ? `map-hospital-marker ${statusTone} selected`
         : `map-hospital-marker ${statusTone}`;
       markerElement.style.opacity = isSelected ? 1 : markerOpacity; // 선택된 병원이 더 잘 보이게
-      markerElement.title = hospital.hospitalName
+      markerElement.title = hospital.hospitalName ?? "선택한 병원";
       markerElement.innerHTML = `
         <span class="map-hospital-marker-shape"></span>
         <strong class="map-hospital-marker-count">${availableBedsText}</strong>
       `;
 
-      const infoContent = document.createElement("div");
-      infoContent.className = "map-marker-info";
-      infoContent.innerHTML = `
-        <strong>${hospital.hospitalName}</strong>
-        `;
+      const infoContent = createHospitalInfoContent(hospital);
 
       const infoOverlay = new window.kakao.maps.CustomOverlay({
         position,

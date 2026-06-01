@@ -1,8 +1,8 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export async function getMapHospitals(boundsParams) {
+export async function getMapHospitals(category = "GENERAL", boundsParams = {}) {
     const params = new URLSearchParams({
-        category: "GENERAL",
+        category: category.toUpperCase(),
         ...boundsParams,
     });
 
@@ -15,9 +15,9 @@ export async function getMapHospitals(boundsParams) {
     return result.data;
 }
 
-export async function getAreaCongestion() {
+export async function getAreaCongestion(category = "GENERAL") {
     const params = new URLSearchParams({
-        category: "GENERAL",
+        category: category.toUpperCase(),
     });
 
     const response = await fetch(`${API_BASE_URL}/api/map/areas/congestion?${params.toString()}`);
