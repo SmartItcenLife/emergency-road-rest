@@ -11,8 +11,12 @@ import com.itcen.emergencyroad.community.repository.PostRepository;
 import com.itcen.emergencyroad.community.repository.UserRepository;
 import com.itcen.emergencyroad.global.exception.CustomException;
 import com.itcen.emergencyroad.global.exception.ExceptionStatus;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,14 +34,28 @@ public class CommentService {
 
   @Transactional(readOnly = true)
   public List<CommentResponseDto> getComments(Long postId, Long loginUserId) {
-    return commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId)
-        .stream()
-        .map(comment -> {
-          long likeCount = commentLikeRepository.countByComment_Id(comment.getId());
-          boolean isLiked = (loginUserId != null) &&
-              commentLikeRepository.existsByComment_IdAndUser_Id(comment.getId(), loginUserId);
-          return CommentResponseDto.from(comment, likeCount, isLiked);
-        }).toList();
+
+    List<Comment> comments = commentRepository
+        .findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
+
+    List<Long> commentIds = comments.stream()
+        .map(Comment::getId)
+        .toList();
+
+    Map<Long, Long> likeCountMap = toCountMap(
+        commentLikeRepository.countByCommentIds(commentIds));
+
+    Set<Long> likedCommentIds = (loginUserId != null)
+        ? new HashSet<>(commentLikeRepository.findLikedCommentIds(commentIds, loginUserId))
+        : Set.of();
+
+    return comments.stream()
+        .map(comment -> CommentResponseDto.from(
+            comment,
+            likeCountMap.getOrDefault(comment.getId(), 0L),
+            likedCommentIds.contains(comment.getId())
+        ))
+        .toList();
   }
 
   @Transactional
@@ -81,4 +99,12 @@ public class CommentService {
     }
     comment.delete();
   }
-}
+
+  private Map<Long, Long> toCountMap(List<Object[]> rows) {
+    return rows.stream()
+        .collect(Collectors.toMap(
+            row -> (Long) row[0],
+            row -> (Long) row[1]
+        ));
+
+}}
