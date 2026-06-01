@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthContext } from "../../app/providers/AuthProvider";
 import { usePostDetail } from "../../features/community/hooks/usePostDetail";
 import { PostBody } from "../../features/community/components/PostBody";
@@ -47,6 +47,9 @@ export default function PostDetailPage() {
     reportTarget,
     setReportTarget,
   } = usePostDetail(hpid, postId, user);
+
+  const [searchParams] = useSearchParams();
+  const commentId = searchParams.get("commentId");
 
   if (loading)
     return (
@@ -234,6 +237,7 @@ export default function PostDetailPage() {
       ) : (
         comments.map((c) => (
           <CommentItem
+            isReportedComment={String(c.id) == commentId}
             key={c.id}
             c={c}
             onLike={handleCommentLike}

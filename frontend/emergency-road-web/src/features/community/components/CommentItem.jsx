@@ -1,6 +1,7 @@
 import { Avatar, Icon } from "../../../shared/components/ui/Primitives";
 import { MoreMenu } from "./MoreMenu";
 import { formatDateShort } from "../utils/dateFormat";
+import "./CommentItem.css";
 
 const BORDER1 = "#E2E6EE";
 const INK1 = "#0F1422";
@@ -11,14 +12,20 @@ const ACCENT = "#2563EB";
  * CommentItem — 댓글 아이템
  */
 // 91번 줄에 신고 버튼 추가했습니다
-export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId, isAdmin }) {
+export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId, isAdmin, isReportedComment }) {
   return (
     <div
+      className={isReportedComment ? "reported-comment" : ""}
       style={{
         display: "flex",
         gap: 10,
         padding: "14px 20px",
         borderBottom: `1px solid ${BORDER1}`,
+        backgroundColor: isReportedComment ? "#FEE2E2" : "transparent",
+        borderLeft: isReportedComment
+          ? "4px solid #DC2626"
+          : "4px solid transparent",
+        borderRadius: "20px",
       }}
     >
       <Avatar name={c.nickname} src={c.profileImageUrl} size={32} />
@@ -116,7 +123,7 @@ export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId, isAdm
           )}
         </div>
       </div>
-    </div>
+      </div>
   );
 }
 

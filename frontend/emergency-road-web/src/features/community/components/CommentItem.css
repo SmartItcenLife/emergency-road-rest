@@ -1,0 +1,20 @@
+.reported-comment {
+  animation: reported-comment-pulse 0.8s ease-in-out 3;
+}
+
+@keyframes reported-comment-pulse {
+  0%,
+  100% {
+    background-color: #fee2e2;
+  }
+
+  50% {
+    background-color: #fecaca;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reported-comment {
+    animation: none;
+  }
+}

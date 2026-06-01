@@ -1,15 +1,19 @@
 
 function ReportTableRow({ report, index, type, onDeleteReport }) {
   const deleted = report.isTargetDeleted ?? report.targetDeleted;
-  const postId = type === "post" ? report.targetId : report.postId;
+  const postId = type === "post" ? report.targetId : report.postId; // targetId가 댓글 번호임
+  const commentId = type === "comment" ? report.targetId : null;
 
   return (
     <tr>
       <td>{index + 1}</td>
       <td>{report.reporterNickname}</td>
       <td>
-        <a className="post-title" href={`/community/${report.hpid}/posts/${postId}`}>
-          {type === "post" ? `게시글 #${report.targetId}` : `댓글 #${report.targetId}`}
+        <a className="post-title" href={
+          type === "comment"
+          ? `/community/${report.hpid}/posts/${postId}?commentId=${commentId}`
+          : `/community/${report.hpid}/posts/${postId}`}>
+          {type === "post" ? `게시글 #${report.postId}` : `댓글 #${report.targetId}`}
         </a>
       </td>
       <td>{report.reason}</td>
