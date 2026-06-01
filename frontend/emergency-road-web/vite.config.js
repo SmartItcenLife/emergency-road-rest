@@ -8,9 +8,9 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 5713,
     proxy: {
-      // '/api'로 시작하는 요청을 백엔드 서버(8089)로 전달
+      // '/api'로 시작하는 요청을 백엔드 서버(8088)로 전달
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:8088',
         // target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
