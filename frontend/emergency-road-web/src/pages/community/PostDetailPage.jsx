@@ -62,6 +62,7 @@ export default function PostDetailPage() {
     );
 
   const isMyPost = user?.userId === post.userId;
+  const isAdmin = user?.role === "ADMIN";
 
   function handleComposerSubmit(text) {
     if (editing) {
@@ -101,7 +102,7 @@ export default function PostDetailPage() {
           </button>
         }
         rightAction={
-          isMyPost && (
+          (isMyPost || isAdmin) && (
             <MoreMenu
               onEdit={() => navigate(`/community/${hpid}/posts/${postId}/edit`)}
               onDelete={handleAskDeletePost}
@@ -171,6 +172,7 @@ export default function PostDetailPage() {
         onLike={handleLike}
       />
 
+      {/* 게시글 신고하기 버튼 */}
       {user && user.userId !== post.userId && (
         <div>
           <button
@@ -239,6 +241,7 @@ export default function PostDetailPage() {
             onDelete={handleAskDeleteComment}
             onReport={handleAskReportComment}
             myId={user?.userId}
+            isAdmin={isAdmin}
           />
         ))
       )}
@@ -267,6 +270,7 @@ export default function PostDetailPage() {
         onClose={() => setConfirmTarget(null)}
       />
 
+      {/* 게시글 신고 모달 창(사유) 띄우기 */}
       <ReportModal
         open={!!reportTarget}
         type={reportTarget?.kind}

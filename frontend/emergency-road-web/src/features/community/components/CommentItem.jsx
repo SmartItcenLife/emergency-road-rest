@@ -11,7 +11,7 @@ const ACCENT = "#2563EB";
  * CommentItem — 댓글 아이템
  */
 // 91번 줄에 신고 버튼 추가했습니다
-export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId }) {
+export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId, isAdmin }) {
   return (
     <div
       style={{
@@ -43,12 +43,12 @@ export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId }) {
           >
             · {formatDateShort(c.createdAt)}
           </span>
-          {c.userId === myId && (
+          {(c.userId === myId || isAdmin) && (
             <div style={{ marginLeft: "auto" }}>
               <MoreMenu
                 size={16}
                 topOffset={24}
-                onEdit={() => onEdit(c)}
+                onEdit={c.userId === myId ? () => onEdit(c) : undefined}
                 onDelete={() => onDelete(c.id)}
               />
             </div>
