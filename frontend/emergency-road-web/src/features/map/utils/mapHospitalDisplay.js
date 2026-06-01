@@ -11,10 +11,10 @@ export function getMapHospitalLabels(category) {
             };
         case "PREGNANT" :
             return {
-                title : "NICU 병상 현황",
+                title : "분만 가능 여부",
                 availableLabel : "가용 NICU 병상",
                 totalLabel : "전체 NICU 병상",
-                ratioLabel : "가용률",
+                ratioLabel : "분만 상태",
                 countSuffix: "개"
             };
         case "PEDIATRIC" : 

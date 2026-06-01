@@ -78,9 +78,23 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
     ["resources", "capabilities"].includes(section.type));
 
   // 도넛 차트를 위한 변수 선언
-  const donutRate = getMapStatusRateForDisplay(rate);
-  const donutRateText = rate !== null && rate !== undefined ? `${rate}%` : "-";
+  const isPregnantCategory = category === "PREGNANT"; 
+
+  const donutRate = isPregnantCategory ? 100 : getMapStatusRateForDisplay(rate);
+  const donutRateText = isPregnantCategory ? getDeliveryDisplayLabel(statusLabel) : (rate !== null && rate !== undefined ? `${rate}%` : "-");
   const donutColor = getMapStatusColorByTone(statusTone);
+
+  function getDeliveryDisplayLabel(label) {
+  if (label === "분만 가능") {
+    return "가능";
+  }
+
+  if (label === "분만 불가") {
+    return "불가능";
+  }
+
+  return label ?? "정보없음";
+}
     
   // hpid 가 바뀔 때 값 마다 잘가져오는지 확인
   useEffect(() => {
@@ -96,6 +110,7 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
         
         const hospitalCategory = hospital.category ?? "GENERAL";
         const data = await getHospitalDetail(hospitalCategory, hospital.hpid);
+
 
         console.log("지도 상세 패널 병원 상세 데이터:", data);
 
@@ -202,9 +217,13 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
           <div className="map-detail-bed-status">
             <div className="map-detail-bed-count-card">
               <strong>
-                {displayValue(availableBeds)} / {displayValue(totalBeds)}
+                {isPregnantCategory ? statusLabel : `${displayValue(availableBeds)} / ${displayValue(totalBeds)}`}
               </strong>
-              <span>{metricLabels.availableLabel} / {metricLabels.totalLabel}</span>
+              <span>
+                {isPregnantCategory
+                  ? "분만 가능 여부"
+                  : `${metricLabels.availableLabel} / ${metricLabels.totalLabel}`}
+              </span>
             </div>
 
             <div
