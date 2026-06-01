@@ -3,7 +3,7 @@ package com.itcen.emergencyroad.findpath.service;
 import com.itcen.emergencyroad.findpath.api.KakaoMobilityApiClient;
 import com.itcen.emergencyroad.findpath.dto.LocationRequestDto;
 import com.itcen.emergencyroad.findpath.dto.PathResponseDto;
-import com.itcen.emergencyroad.hospital.entity.Hospital;
+import com.itcen.emergencyroad.hospital.dto.HospitalApiDto;
 import com.itcen.emergencyroad.hospital.repository.HospitalRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
@@ -22,7 +22,7 @@ public class KakaoMobilityService {
     private final KakaoMobilityApiClient kakaoApiClient;
 
     // 사용자 위치(매개변수) 받기 → DB에서 병원 찾기 → 카카오에게 보낼 주문서(JSON) 조립하기 → 카카오에 통신 지시하기 → 받아온 결과를 parseResponse에 넘기기
-    public List<PathResponseDto> findHospitalsWithDistance(LocationRequestDto requestDto,  List<Hospital> hospitals) {
+    public List<PathResponseDto> findHospitalsWithDistance(LocationRequestDto requestDto,  List<HospitalApiDto> hospitals) {
 
 
         // 2. JSON 바디에 사용자의 위도, 경도 값 넣기
@@ -35,13 +35,13 @@ public class KakaoMobilityService {
         // 3. 목적지 리스트
         JSONArray destinations = new JSONArray(); // 배열
         // 여기를 for 문 말고 parallelStream()으로 구현하면 병렬로 요청하기 때문에 빠르게 취합 가능
-        for (Hospital hospital : hospitals) {
+        for (HospitalApiDto hospital : hospitals) {
             // 좌표가 있는 것만 담기
-            if (hospital.getLongitude() == null || hospital.getLatitude() == null) continue;
+            if (hospital.lon() == null || hospital.lat() == null) continue;
             JSONObject dest = new JSONObject();
-            dest.put("x", hospital.getLongitude());
-            dest.put("y", hospital.getLatitude());
-            dest.put("key", hospital.getHpid());
+            dest.put("x", hospital.lon());
+            dest.put("y", hospital.lat());
+            dest.put("key", hospital.hpid());
             // ❌ 여기에 radius 안 들어감 !!!!
             destinations.put(dest); // 목적지 배열에 dest를 여러 개 넣음(다중 목적지니까)
 
@@ -66,7 +66,7 @@ public class KakaoMobilityService {
 
     // 카카오가 던져준 긴 원본 텍스트(String)를 분석하기
     // 매개변수에는 카카오에서 응답 해 온 값, 목적지 병원 리스트 들어감
-    private List<PathResponseDto> parseResponse(String jsonResponse, List<Hospital> targetHospitals) {
+    private List<PathResponseDto> parseResponse(String jsonResponse, List<HospitalApiDto> targetHospitals) {
         List<PathResponseDto> resultList = new ArrayList<>();
         JSONObject responseObj = new JSONObject(jsonResponse);
 
@@ -91,16 +91,16 @@ public class KakaoMobilityService {
                 JSONObject summary = route.getJSONObject("summary");
 
                 // DB 병원 hpid와 카카오가 준 hpid가 일치하는 병원을 반환
-                Hospital matched = targetHospitals.stream()
-                        .filter(h -> h.getHpid().equals(hpid))
+                HospitalApiDto matched = targetHospitals.stream()
+                        .filter(h -> h.hpid().equals(hpid))
                         .findFirst().orElse(null);
 
-                System.out.println("병원 HPID = " + matched.getHpid());
+                System.out.println("병원 HPID = " + matched.hpid());
 
                 //병원 이름, hpid, 거리, 소요 시간을 직관적으로 넣을 수 있음.
                 if (matched != null) {
                     resultList.add(PathResponseDto.builder()
-                            .hospitalName(matched.getHospitalName())
+                            .hospitalName(matched.name())
                             .hpid(hpid)
                             .distance(Math.round((summary.getInt("distance") / 1000.0) * 10) / 10.0)
                             .duration(summary.getInt("duration") / 60)
