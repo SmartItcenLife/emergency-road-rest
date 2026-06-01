@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getHospitalDetail } from "../../hospitals/api/hospitalDetail";
+import { getMapHospitalLabels} from "../utils/mapHospitalDisplay"
+import { categoryConfig } from "../../hospitals/constants/categoryConfig";
 import {
   getMapStatusColorByTone,
   getMapStatusRateForDisplay,
@@ -69,94 +71,15 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
   const rate = hospital.status?.rate;
   const recordedAt = hospital.recordedAt;
 
+  const category = hospital.category ?? "GENERAL";
+  const detailSections = categoryConfig[category]?.detailSections ?? [];
+  const metricLabels = getMapHospitalLabels(category);
+  const mapDetailSections = detailSections.filter((section) => 
+    ["resources", "capabilities"].includes(section.type));
+
   // 도넛 차트를 위한 변수 선언
   const donutRate = getMapStatusRateForDisplay(rate);
   const donutRateText = rate !== null && rate !== undefined ? `${rate}%` : "-";
-  
-  // DetailAPI 에서 가져온 항목 - 자원 가능 항목
-  const availableResources = [
-    {
-      label: "CT",
-      status: normalizeAvailableStatus(hospitalDetail?.ctAvailable),
-    },
-    {
-      label: "MRI",
-      status: normalizeAvailableStatus(hospitalDetail?.mriAvailable),
-    },
-    {
-      label: "인공호흡기",
-      status: normalizeAvailableStatus(hospitalDetail?.ventilatorAvailable),
-    },
-    {
-      label: "CRRT",
-      status: normalizeAvailableStatus(hospitalDetail?.crrtAvailable),
-    },
-    {
-      label: "ECMO",
-      status: normalizeAvailableStatus(hospitalDetail?.ecmoAvailable),
-    },
-    {
-      label: "혈관조영",
-      status: normalizeAvailableStatus(hospitalDetail?.angioAvailable),
-    },
-  ];
-
-
-  // DetailAPI - 중증질환 수용가능 항목
-  const severeDiseaseResources = [
-    {
-      label: "심근경색",
-      status: normalizeAvailableStatus(
-        hospitalDetail?.myocardialInfarctionAvailable
-      ),
-    },
-    {
-      label: "뇌경색",
-      status: normalizeAvailableStatus(hospitalDetail?.cerebralInfarctionAvailable),
-    },
-    {
-      label: "거미막하 출혈",
-      status: normalizeAvailableStatus(
-        hospitalDetail?.subarachnoidHemorrhageAvailable
-      ),
-    },
-    {
-      label: "기타 출혈",
-      status: normalizeAvailableStatus(hospitalDetail?.otherHemorrhageAvailable),
-    },
-    {
-      label: "대동맥 응급 흉부",
-      status: normalizeAvailableStatus(hospitalDetail?.aorticChestAvailable),
-    },
-    {
-      label: "대동맥 응급 복부",
-      status: normalizeAvailableStatus(hospitalDetail?.aorticAbdomenAvailable),
-    },
-    {
-      label: "응급투석",
-      status: normalizeAvailableStatus(hospitalDetail?.dialysisAvailable),
-    },
-    {
-      label: "폐쇄병동 입원",
-      status: normalizeAvailableStatus(hospitalDetail?.closedWardAvailable),
-    },
-    {
-      label: "응급내시경 위장관",
-      status: normalizeAvailableStatus(hospitalDetail?.endoscopyGiAvailable),
-    },
-    {
-      label: "응급내시경 기관지",
-      status: normalizeAvailableStatus(hospitalDetail?.endoscopyBronchialAvailable),
-    },
-    {
-      label: "중증화상",
-      status: normalizeAvailableStatus(hospitalDetail?.severeBurnsAvailable),
-    },
-    {
-      label: "성인 혈관중재",
-      status: normalizeAvailableStatus(hospitalDetail?.angioAdultAvailable),
-    },
-  ];
   const donutColor = getMapStatusColorByTone(statusTone);
     
   // hpid 가 바뀔 때 값 마다 잘가져오는지 확인
@@ -170,7 +93,9 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
         setDetailLoading(true);
         setDetailError(null);
 
-        const data = await getHospitalDetail("GENERAL", hospital.hpid);
+        
+        const hospitalCategory = hospital.category ?? "GENERAL";
+        const data = await getHospitalDetail(hospitalCategory, hospital.hpid);
 
         console.log("지도 상세 패널 병원 상세 데이터:", data);
 
@@ -184,7 +109,7 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
     }
 
     fetchHospitalDetail();
-  }, [hospital?.hpid]);
+  }, [hospital?.hpid, hospital?.category]);
 
   return (
     <div className="map-detail-panel">
@@ -270,7 +195,7 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
 
         <section className="map-detail-section">
           <div className="map-detail-section-header">
-            <h3 className="map-detail-title">응급실 병상 현황</h3>
+            <h3 className="map-detail-title">{metricLabels.title}</h3>
             <span>{formatDateTime(recordedAt)} 기준</span>
           </div>
 
@@ -279,7 +204,7 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
               <strong>
                 {displayValue(availableBeds)} / {displayValue(totalBeds)}
               </strong>
-              <span>가용 병상 / 전체 병상</span>
+              <span>{metricLabels.availableLabel} / {metricLabels.totalLabel}</span>
             </div>
 
             <div
@@ -290,53 +215,54 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
             >
               <div className="map-detail-donut-inner">
                 <strong>{donutRateText}</strong>
-                <span>{statusLabel}</span>
+                <span>{metricLabels.ratioLabel}</span>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="map-detail-section">
-          <h3 className="map-detail-title">자원 가능 항목</h3>
-
-          {detailLoading ? (
-            <p className="map-detail-message">자원 정보를 불러오는 중입니다.</p>
-          ) : detailError ? (
+        {detailLoading ? (
+          <section className="map-detail-section">
+            <p className="map-detail-message">상세 정보를 불러오는 중입니다.</p>
+          </section>
+        ) : detailError ? (
+          <section className="map-detail-section">
             <p className="map-detail-message error">{detailError}</p>
-          ) : (
-            <div className="map-detail-chip-list">
-              {availableResources.map((resource) => (
-                <span
-                  key={resource.label}
-                  className={`map-detail-chip ${resource.status}`}
-                >
-                  {resource.label}
-                </span>
-              ))}
-            </div>
-          )}
-        </section>
+          </section>
+        ) : (
+          mapDetailSections.map((section) =>(
+            <section key={section.title} className="map-detail-section">
+              <h3 className="map-detail-title">{section.title}</h3>
+              {section.type === "resources" && (
+                <div className="map-detail-chip-list">
+                  {section.items.map((item) => (
+                    <span key={item.label} className="map-detail-chip available">
+                      {item.label} {displayValue(hospitalDetail?.[item.currentKey])}
+                      /
+                      {displayValue(hospitalDetail?.[item.totalKey])}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {section.type === "capabilities" && (
+                <div className="map-detail-chip-list">
+                  {section.items.map((item) => {
+                    const status = normalizeAvailableStatus(hospitalDetail?.[item.key]);
 
-        <section className="map-detail-section">
-          <h3 className="map-detail-title">중증질환 수용 가능</h3>
-
-          {detailLoading ? (
-            <p className="map-detail-message">수용 가능 정보를 불러오는 중입니다.</p>
-          ) : detailError ? (
-            <p className="map-detail-message error">{detailError}</p>
-          ) : (
-            <div className="map-detail-chip-list">
-              {severeDiseaseResources.map((resource) => (
-                <span
-                  key={resource.label}
-                  className={`map-detail-chip ${resource.status}`}
-                >
-                  {resource.label}
-                </span>
-              ))}
-            </div>
-          )}
-        </section>
+                    return (
+                      <span
+                        key={item.lable}
+                        className={`map-detail-chip ${status}`}
+                        >
+                          {item.label}
+                        </span>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          ))
+        )}
       </div>
     </div>
   );
