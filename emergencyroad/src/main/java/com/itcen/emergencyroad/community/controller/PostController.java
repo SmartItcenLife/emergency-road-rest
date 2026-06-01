@@ -1,13 +1,16 @@
 package com.itcen.emergencyroad.community.controller;
 
+import com.itcen.emergencyroad.community.dto.post.ReportRequestDTO;
 import com.itcen.emergencyroad.community.dto.post.PostRequestDto;
 import com.itcen.emergencyroad.community.dto.post.PostResponseDto;
+import com.itcen.emergencyroad.community.enums.ReportTargetType;
 import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.service.PostService;
+import com.itcen.emergencyroad.community.service.ReportService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,16 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -37,6 +31,7 @@ public class PostController {
   private static final String ROLE_PREFIX = "ROLE_";
 
   private final PostService postService;
+  private final ReportService reportService;
 
   // 게시글 목록 조회 (비로그인 허용)
   @GetMapping
@@ -115,5 +110,29 @@ public class PostController {
         .findFirst()
         .map(a -> a.getAuthority().replace(ROLE_PREFIX, ""))
         .orElse(USER);
+  }
+
+  // 게시글 신고 접수
+  @PostMapping("/{postId}/report")
+  public ResponseEntity<ApiResponseDto<Void>> reportPost(
+          @PathVariable String hpid,
+          @PathVariable Long postId,
+          @Valid @RequestBody ReportRequestDTO requestDto,
+          @AuthenticationPrincipal Long userId) {
+
+    if (userId == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+              .body(ApiResponseDto.fail(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
+    }
+
+    reportService.createReport(
+            userId,
+            ReportTargetType.POST,
+            postId,
+            requestDto.getReason(),
+            hpid
+    );
+
+    return ResponseEntity.ok(ApiResponseDto.success("게시글 신고가 접수되었습니다."));
   }
 }
