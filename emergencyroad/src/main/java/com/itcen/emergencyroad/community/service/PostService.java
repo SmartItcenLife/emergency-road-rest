@@ -13,7 +13,9 @@ import com.itcen.emergencyroad.global.exception.ExceptionStatus;
 import com.itcen.emergencyroad.hospital.entity.Hospital;
 import com.itcen.emergencyroad.hospital.repository.HospitalRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,34 +43,50 @@ public class PostService {
   public Page<PostResponseDto> getPosts(String hpid, int page, String keyword) {
     Pageable pageable = PageRequest.of(page, 10, Sort.by(Direction.DESC, "createdAt"));
 
-    Page<Post> posts;
+    Page<Post> posts = (keyword != null && !keyword.isBlank())
+        ? postRepository.searchByHospitalId(hpid, keyword, pageable)
+        : postRepository.findByHospitalHpidAndIsDeletedFalse(hpid, pageable);
 
-    if (keyword != null && !keyword.isBlank()) {
-      posts = postRepository.searchByHospitalId(hpid, keyword, pageable);
-    } else {
-      posts = postRepository.findByHospitalHpidAndIsDeletedFalse(hpid, pageable);
-    }
+    List<Long> postIds = posts.stream()
+        .map(Post::getId)
+        .toList();
 
-    return posts.map(post -> {
-      List<String> imageUrls = postImageService.getImageUrls(post.getId());
-      long postLikeCount = postLikeRepository.countByPost_Id(post.getId());
-      long commentCount = commentRepository.countByPostIdAndIsDeletedFalse(post.getId());
-      return PostResponseDto.from(post, imageUrls, postLikeCount, commentCount, false);
-    });
+    Map<Long, List<String>> imageUrlMap = postImageService.getImageUrlMap(postIds);
+    Map<Long, Long> likeCountMap = toCountMap(postLikeRepository.countByPostIds(postIds));
+    Map<Long, Long> commentCountMap = toCountMap(commentRepository.countByPostIds(postIds));
+
+    return  posts.map(post -> PostResponseDto.from(
+        post,
+        imageUrlMap.getOrDefault(post.getId(), List.of()),
+        likeCountMap.getOrDefault(post.getId(), 0L),
+        commentCountMap.getOrDefault(post.getId(), 0L),
+        false
+    ));
   }
 
   @Transactional(readOnly = true)
   public PostResponseDto getPost(Long postId, Long userId) {
     Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ExceptionStatus.POST_NOT_FOUND));
 
-    List<String> imageUrls = postImageService.getImageUrls(postId);
+    if(post.isDeleted()){
+      throw new CustomException(ExceptionStatus.POST_NOT_FOUND);
+    }
 
-    long postLikeCount = postLikeRepository.countByPost_Id(postId);
-    long commentLikeCount = commentRepository.countByPostIdAndIsDeletedFalse(postId);
+    List<Long> postIds = List.of(postId);
+
+    List<String> imageUrls = postImageService.getImageUrlMap(postIds)
+        .getOrDefault(postId, List.of());
+
+    long postLikeCount = toCountMap(postLikeRepository.countByPostIds(postIds))
+        .getOrDefault(postId, 0L);
+
+    long commentCount = toCountMap(commentRepository.countByPostIds(postIds))
+        .getOrDefault(postId, 0L);
+
     boolean isLiked = (userId != null) &&
         postLikeRepository.existsByPost_IdAndUser_Id(postId, userId);
 
-    return PostResponseDto.from(post, imageUrls, postLikeCount, commentLikeCount, isLiked);
+    return PostResponseDto.from(post, imageUrls, postLikeCount, commentCount, isLiked);
   }
 
   @Transactional
@@ -121,5 +139,13 @@ public class PostService {
 
     postImageService.deleteImages(postId);
     post.delete();
+  }
+
+  private Map<Long, Long> toCountMap(List<Object[]> rows) {
+    return rows.stream()
+        .collect(Collectors.toMap(
+            row -> (Long) row[0],
+            row -> (Long) row[1]
+        ));
   }
 }

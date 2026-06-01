@@ -8,8 +8,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-  @Query("SELECT COUNT(c) FROM Comment c WHERE c.post.id = :postId AND c.isDeleted = false")
-  long countByPostIdAndIsDeletedFalse(@Param("postId") Long postId);
-
   List<Comment> findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(Long postId);
+
+  @Query("select c.post.id, count(c) from Comment c " +
+      "where c.post.id in :postIds and c.isDeleted = false group by c.post.id")
+  List<Object[]> countByPostIds(@Param("postIds") List<Long> postIds);
+
 }
