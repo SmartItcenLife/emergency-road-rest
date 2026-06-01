@@ -1,7 +1,19 @@
 import React from 'react';
 import './AdminHeader.css';
 import logo from '../../assets/logo.png'
+import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../app/providers/AuthProvider';
+
 const AdminHeader = () => {
+
+  const navigate = useNavigate();
+  const {logout} = useAuthContext();
+
+  const handleLogout = async() =>{
+    await logout();
+    navigate("/login", {replace: true});
+  };
+
   return (
     <header className="admin-header">
 
@@ -18,7 +30,7 @@ const AdminHeader = () => {
         <a href="/admin/posts">커뮤니티 관리</a>
       </nav>
 
-      <button>로그아웃</button>
+      <button onClick={handleLogout}>로그아웃</button>
 
     </header>
   );

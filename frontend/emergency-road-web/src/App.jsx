@@ -35,6 +35,9 @@ const GuestRoute = ({ children }) => {
   const location = useLocation();
   if (loading) return null;
   if (user) {
+    if(user.role === "ADMIN"){
+      return <Navigate to="/admin" replace/>;
+    }
     const from = (location.state?.from || "/").replace(/\/$/, "");
     const safeTo = from === "/login" ? "/" : from;
     return <Navigate to={safeTo} replace />;
