@@ -18,4 +18,5 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
       @Param("userId") Long userId);
   void deleteByComment_IdAndUser_Id(Long commentId, Long userId);
 
+  boolean existsByComment_IdAndUser_Id(Long commentId, Long userId);
 }
