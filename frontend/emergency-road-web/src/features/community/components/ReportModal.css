@@ -1,0 +1,72 @@
+/* 신고 모달 창 띄우기 스타일 */
+
+.report-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  background: rgba(15, 20, 34, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+
+.report-modal {
+  width: 100%;
+  max-width: 340px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 26px 24px 22px;
+  box-shadow: 0 24px 48px -12px rgba(15, 20, 34, 0.28);
+  text-align: center;
+}
+
+.report-modal h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f1422;
+}
+
+.report-modal p {
+  margin: 0 0 18px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.report-reason-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.report-reason-button {
+  width: 100%;
+  border: 1px solid #e2e6ee;
+  background: #ffffff;
+  color: #404757;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.report-reason-button:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.report-cancel-button {
+  margin-top: 14px;
+  width: 100%;
+  border: none;
+  background: #f2f4f6;
+  color: #505866;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

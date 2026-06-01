@@ -9,6 +9,8 @@ import {
   toggleCommentLike,
   deletePost,
   deleteComment,
+  reportPost,
+  reportComment,
 } from "../api/api";
 
 /**
@@ -117,6 +119,49 @@ export function usePostDetail(hpid, postId, user) {
     setConfirmTarget(null);
   }
 
+  const [reportTarget, setReportTarget] = useState(null);
+// 신고 메서드(1.게시글, 2.댓글)
+  function handleAskReportPost(){
+    if(!user){
+      return navigate("/login",{
+        state: {from:location.pathname.replace(/\/$/, "")},
+      });
+    }
+
+    console.log("게시글 신고 버튼 클릭");
+
+    setReportTarget({
+      kind: "post",
+      target: postId
+    });
+  }
+
+  function handleAskReportComment(commentId){
+    if(!user){
+      return navigate("/login",{
+        state: {from:location.pathname.replace(/\/$/, "")},
+      })
+    }
+
+    setReportTarget({
+      kind: "comment",
+      target: commentId
+    });
+  }
+// 신고 처리 메서드(type 별로 나눔)
+  async function handleSubmitReport(reason){
+    if(!reportTarget) return;
+
+    if(reportTarget.kind==="post"){
+      await reportPost(hpid, postId, reason);
+    } else {
+      await reportComment(hpid, postId, reportTarget.target, reason);
+    }
+
+    setReportTarget(null);
+    alert("신고가 접수되었습니다.");
+  }
+
   return {
     post,
     comments,
@@ -133,6 +178,11 @@ export function usePostDetail(hpid, postId, user) {
     handleAskDeleteComment,
     handleAskDeletePost,
     handleConfirmDelete,
+    handleAskReportPost,
+    handleAskReportComment,
+    handleSubmitReport,
+    reportTarget,
+    setReportTarget,
   };
 }
 

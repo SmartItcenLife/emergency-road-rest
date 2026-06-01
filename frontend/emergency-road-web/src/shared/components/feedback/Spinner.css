@@ -1,0 +1,10 @@
+.spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner-mascot {
+  width: 180px;
+  height: auto;
+}
