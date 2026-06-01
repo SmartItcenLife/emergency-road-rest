@@ -25,6 +25,33 @@ function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
     loadAreaCongestions();
   }, []);
 
+  useEffect(() => {
+    if ( !selectedHospital?.hpid || hospitals.length == 0) {
+      return;
+    }
+
+    const matchedHospital = hospitals.find(
+      (hospital) => hospital.hpid === selectedHospital.hpid
+    );
+
+    if(!matchedHospital) {
+      return;
+    }
+
+    setSelectedHospital((prev) => {
+      if (!prev?.hpid || prev.hpid !== matchedHospital.hpid) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        ...matchedHospital,
+        latitude: matchedHospital.latitude ?? prev.latitude,
+        longitude: matchedHospital.longitude ?? prev.longitude,
+      };
+    });
+  }, [hospitals, selectedHospital?.hpid]);
+
   // 지도 bounds 변경 시 호출되는 함수
   function handleBoundsChange(boundsParams) {
     setPendingBounds(boundsParams);
