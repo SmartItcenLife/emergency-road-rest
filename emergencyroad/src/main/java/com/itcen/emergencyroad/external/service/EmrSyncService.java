@@ -121,7 +121,7 @@ public class EmrSyncService {
 
                 // 응급실 특수 장비 여부
                 .hvctayn(getText(item, "hvctayn"))     // CT
-                .hvmariayn(getText(item, "hvmariayn"))   // MRI
+                .hvmriayn(getText(item, "hvmriayn"))   // MRI
                 .hvventiayn(getText(item, "hvventiayn")) // 인공호흡기
                 .hvcrrtayn(getText(item, "hvcrrtayn"))   // CRRT
                 .hvecmoayn(getText(item, "hvecmoayn"))   // ECMO

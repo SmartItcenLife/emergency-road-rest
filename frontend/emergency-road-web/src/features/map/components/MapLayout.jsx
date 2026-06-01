@@ -1,7 +1,7 @@
 import { useState,useRef } from "react";
 import KakaoMap from "./KakaoMap";
 import { getAreaCongestion, getMapHospitals } from "../api/mapApi";
-import MapListPanel from "./MapListPanel";
+import MapSidePanel from "./MapSidePanel";
 import { useEffect } from "react";
 
 function MapLayout() {
@@ -91,8 +91,14 @@ function MapLayout() {
     });
   }
 
+  // 뒤로가기 핸들러 추가
+  function handleBackToList() {
+    setSelectedHospital(null);
+  }
+
   return (
-  <div className="map-layout">
+  <div 
+    className={selectedHospital? "map-layout detail-mode" : "map-layout"}>
     <div className="map-content">
       {showSearchButton && (
         <button
@@ -113,10 +119,11 @@ function MapLayout() {
       />
     </div>
 
-    <MapListPanel
+    <MapSidePanel
       hospitals={hospitals}
       selectedHospital={selectedHospital}
       onSelectHospital={handleSelectHospital}
+      onBackToList={handleBackToList}
       loading={loading}
       error={error}
     />
