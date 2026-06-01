@@ -15,11 +15,23 @@
     font-size: 25px;
     margin: 0;
 }
+.hospital-list-toolbar {
+  margin-top: 24px;
+}
+
 .community-guide{
-    color: gray; 
+    color: gray;
     text-shadow: 0 8px 9px rgba(27, 23, 255, 0.15);
     font-size: 15px;
-    margin-top: 30px;
+    margin: 0 0 14px;
+}
+
+.hospital-list-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 .hospital-map-view-button {
   width: 100%;
@@ -35,29 +47,35 @@
 }
 
 .hospital-view-switch {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
-  margin: 12px 0;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  min-width: 148px;
+  margin: 0;
   padding: 4px;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  background: #f8fafc;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
 }
 
 .hospital-view-switch__button {
-  min-height: 36px;
+  min-width: 68px;
+  height: 38px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 9px;
   background: transparent;
   color: #64748b;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   cursor: pointer;
 }
 
 .hospital-view-switch__button.active {
-  background: #ffffff;
-  color: #111827;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.22);
 }
