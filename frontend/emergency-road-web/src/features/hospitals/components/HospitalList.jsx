@@ -38,20 +38,6 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, sho
             현재 위치로부터 10km 이내,<br />
             <span className="highlight">진료 가능 여부와 실시간 상황</span>을 종합 분석한 추천 결과입니다.
           </p>
-          <button
-            type = "button"
-            className = "hospital-map-view-button"
-            onClick={() => {
-              const params = new URLSearchParams();
-
-              if (normalizedCategory) {
-                params.set("category",normalizedCategory);
-              }
-
-              navigate(`/map?${params.toString()}`);
-            }
-          }>지도보기
-          </button>
         </div>
       )}
       {!showRanking && (
