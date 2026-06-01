@@ -47,7 +47,7 @@ function KakaoMap({
   
   const [mapLevel, setMapLevel] = useState(AREA_MODE_LEVEL);
 
-  const shouldRenderPolygons = mapLevel > POLYGON_HIDE_LEVEL;
+  const shouldRenderPolygons = !initialHospital && !selectedHospital && mapLevel > POLYGON_HIDE_LEVEL;
 
   
   // 지도에 표시된 마커를 모두 제거하는 함수
@@ -80,6 +80,7 @@ function KakaoMap({
       }
 
     closeActiveAreaOverlay();
+    closeHoverAreaOverlay();
   }
 
   function closeHoverAreaOverlay() {
@@ -426,6 +427,8 @@ function KakaoMap({
     }
 
     clearMarkers();
+    closeHoverAreaOverlay();
+    closeActiveAreaOverlay();
     
     const markerHospitals =
         initialHospital && !hospitals.some((hospital) => hospital.hpid === initialHospital.hpid)
