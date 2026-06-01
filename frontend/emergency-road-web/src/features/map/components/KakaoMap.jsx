@@ -10,6 +10,7 @@ const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 function KakaoMap({
   hospitals,
   selectedHospital,
+  initialHospital,
   onBoundsChange,
   onSelectHospital,
   areaCongestions,
@@ -330,11 +331,16 @@ function KakaoMap({
       }
 
       window.kakao.maps.load(() => {
-        const center = new window.kakao.maps.LatLng(37.5665, 126.978);
+        // const center = new window.kakao.maps.LatLng(37.5665, 126.978);
+        const center = initialHospital?.latitude && initialHospital?.longitude ? 
+          new window.kakao.maps.LatLng(
+            initialHospital.latitude,
+            initialHospital.longitude
+          ) : new window.kakao.maps.LatLng(37.5665, 126.978);
 
         const options = {
           center,
-          level: 7,
+          level: initialHospital ? 4 : 7,
         };
 
         const map = new window.kakao.maps.Map(
@@ -420,9 +426,13 @@ function KakaoMap({
     }
 
     clearMarkers();
+    
+    const markerHospitals =
+        initialHospital && !hospitals.some((hospital) => hospital.hpid === initialHospital.hpid)
+          ? [initialHospital, ...hospitals]
+          : hospitals;
 
-
-    hospitals.forEach((hospital) => {
+    markerHospitals.forEach((hospital) => {
       const position = new window.kakao.maps.LatLng(
         hospital.latitude,
         hospital.longitude
@@ -435,12 +445,15 @@ function KakaoMap({
       const availableBedsText = typeof availableBeds == 'number' ? availableBeds : "정보없음";
 
       
+
+
+      
       const markerElement = document.createElement("div");
       markerElement.className = isSelected
         ? `map-hospital-marker ${statusTone} selected`
         : `map-hospital-marker ${statusTone}`;
       markerElement.style.opacity = isSelected ? 1 : markerOpacity; // 선택된 병원이 더 잘 보이게
-      markerElement.title = hospital.hospitalName
+      markerElement.title = hospital.hospitalName ?? "선택한 병원";
       markerElement.innerHTML = `
         <span class="map-hospital-marker-shape"></span>
         <strong class="map-hospital-marker-count">${availableBedsText}</strong>
@@ -449,7 +462,7 @@ function KakaoMap({
       const infoContent = document.createElement("div");
       infoContent.className = "map-marker-info";
       infoContent.innerHTML = `
-        <strong>${hospital.hospitalName}</strong>
+        <strong>${hospital.hospitalName ?? "선택한 병원"}</strong>
         `;
 
       const infoOverlay = new window.kakao.maps.CustomOverlay({

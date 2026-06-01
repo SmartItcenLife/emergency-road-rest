@@ -4,9 +4,9 @@ import { getAreaCongestion, getMapHospitals } from "../api/mapApi";
 import MapSidePanel from "./MapSidePanel";
 import { useEffect } from "react";
 
-function MapLayout() {
+function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
   const [hospitals, setHospitals] = useState([]);
-  const [selectedHospital, setSelectedHospital] = useState(null);
+  const [selectedHospital, setSelectedHospital] = useState(initialHospital);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -44,7 +44,7 @@ function MapLayout() {
       setLoading(true);
       setError(null);
 
-      const data = await getMapHospitals(boundsParams);
+      const data = await getMapHospitals(initialCategory, boundsParams);
       setHospitals(data);
       setShowSearchButton(false);
     } catch (err) {
@@ -61,7 +61,7 @@ function MapLayout() {
       setAreaCongestionLoading(true);
       setAreaCongestionError(null);
 
-      const data = await getAreaCongestion();
+      const data = await getAreaCongestion(initialCategory);
       setAreaCongestions(data);
     } catch (err) {
       console.error("구별 혼잡도 정보를 불러오는 중 오류가 발생했습니다:", err);
@@ -114,6 +114,7 @@ function MapLayout() {
         hospitals={hospitals}
         areaCongestions={areaCongestions}
         selectedHospital={selectedHospital}
+        initialHospital={initialHospital}
         onBoundsChange={handleBoundsChange}
         onSelectHospital={handleSelectHospital}
       />

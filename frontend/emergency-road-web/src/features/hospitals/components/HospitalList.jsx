@@ -5,6 +5,9 @@ import HospitalListFooter from './HospitalListFooter.jsx';
 import SortSelect from "../../../features/hospitals/components/SortSelect.jsx";
 import { useNavigate } from 'react-router-dom';
 const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, showRanking, showDistance, compact }) => {
+  const navigate = useNavigate();
+  const normalizedCategory = category?.toUpperCase();
+  
   // 병원이 없는 경우를 위한 처리
   if (!hospitals || hospitals.length === 0) {
     return (
@@ -23,8 +26,6 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, sho
     type="임산부 응급";
   }
 
-  const navigate = useNavigate();
-  const normalizedCategory = category?.toUpperCase();
 
   return (
     <section className="hospital-list-section">
@@ -41,11 +42,13 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, sho
             type = "button"
             className = "hospital-map-view-button"
             onClick={() => {
-              const param = new URLSearchParams();
+              const params = new URLSearchParams();
 
               if (normalizedCategory) {
-                param.set("category",normalizedCategory);
+                params.set("category",normalizedCategory);
               }
+
+              navigate(`/map?${params.toString()}`);
             }
           }>지도보기
           </button>
