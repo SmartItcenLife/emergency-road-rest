@@ -307,6 +307,44 @@ function KakaoMap({
     return content;
   }
 
+  // Marker overlay 생성함수
+  function createHospitalInfoContent(hospital) {
+    const content = document.createElement("div");
+    content.className = "map-marker-info map-marker-info-detail";
+
+    const statusLabel = hospital.status?.label ?? "정보없음";
+    const availableBeds = hospital.status?.availableCount;
+    const totalCount = hospital.status?.totalCount;
+    const rate = hospital.status?.rate;
+
+    content.innerHTML = `
+      <strong>${hospital.hospitalName ?? "선택한 병원"}</strong>
+      <span>${statusLabel}</span>
+      <dl>
+        <div>
+          <dt>병원 이름</dt>
+          <dd>${displayValue(hospital.hospitalName) ?? "정보없음"}</dd>
+        </div>
+        <div>
+          <dt>가용 병상</dt>
+          <dd>${displayValue(availableBeds)}개</dd>
+        </div>
+        <div>
+          <dt>전체 병상</dt>
+          <dd>${displayValue(totalCount)}개</dd>
+        </div>
+        <div>
+          <dt>가용률</dt>
+          <dd>${
+            rate !== null && rate !== undefined ? `${rate}%` : "정보없음"
+          }</dd>
+        </div>
+      </dl>
+    `;
+
+    return content;
+  }
+
   useEffect(() => {
     // Kakao SDK 로드
     // 지도 객체 생성
@@ -462,11 +500,7 @@ function KakaoMap({
         <strong class="map-hospital-marker-count">${availableBedsText}</strong>
       `;
 
-      const infoContent = document.createElement("div");
-      infoContent.className = "map-marker-info";
-      infoContent.innerHTML = `
-        <strong>${hospital.hospitalName ?? "선택한 병원"}</strong>
-        `;
+      const infoContent = createHospitalInfoContent(hospital);
 
       const infoOverlay = new window.kakao.maps.CustomOverlay({
         position,
