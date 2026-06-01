@@ -14,6 +14,8 @@ import mascotBlue from '../../../assets/mascot_blue.png';
 // 지도로 보기
 import { useNavigate } from "react-router-dom";
 import { buildHospitalMapUrl, canNavigateToHospitalMap } from "../../../shared/utils/mapNavigation";
+import HospitalEmpty from "../../../shared/components/feedback/HospitalEmpty.jsx";
+
 
 const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, showRanking, showDistance, compact }) => {
   const { detailData, loading, isExpanded, toggleDetail} = useHospitalDetail(category, hospital.hpid);
@@ -178,7 +180,7 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, show
 
       {isExpanded && (
         <div className="hospital-detail-wrapper">
-          {loading && <div className="detail-loading">상세 정보를 불러오는 중입니다...</div>}
+          {/* {loading && <div className="detail-loading">상세 정보를 불러오는 중입니다...</div>} */}
           {error && <div className="detail-error">{error}</div>}
           {detailData && (
             <HospitalDetail

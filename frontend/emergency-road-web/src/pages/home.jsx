@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import "./Home.css";
 import location from "../assets/home/location.png"
 import general from "../assets/home/general.png"
@@ -6,16 +6,22 @@ import pediatric from "../assets/home/pediatric.png"
 import pregnant from "../assets/home/pregnant.png"
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "../features/hospitals/hooks/recommend/useLocation"; // 훅 import
+import Loading from "../shared/components/feedback/Loading";
 
 function Home() {
   const navigate = useNavigate(); // Hook 호출
   const { getLocation } = useLocation();
   const [message, setMessage] = useState("버튼을 눌러 내 주변 응급 병원을 확인하세요.");
+  const [loading, setLoading] = useState(false);
+  console.log("현재 loading:", loading);
+  useEffect(() => {
+    setLoading(false);
+  }, []);
 
   const handleCategoryClick = async (category) => {
-    setMessage("위치 정보를 가져오는 중입니다...");
-
     try {
+      setLoading(true);
+      setMessage("위치 정보를 가져오는 중입니다...");
       // 훅이 위치 가져오는 복잡한 과정을 처리함
       const { lat, lon } = await getLocation();
 
@@ -26,6 +32,13 @@ function Home() {
       console.error(err);
     }
   };
+
+  if (loading) {
+    console.log("Loading 컴포넌트 렌더링");
+    return (
+      <Loading text="가장 적합한 응급실을 찾고 있습니다..." />
+    );
+  }
 
   return (
     <div className="mainpage">
@@ -65,11 +78,11 @@ function Home() {
               className="recommend-button pregnant"
               onClick={() => handleCategoryClick("PREGNANT")}
             >
-              <div id ="btnDetail_wrap">
-              <div className="btn-detail">
-                <img src={pregnant} alt="pregnant icon" className="pregnant-img" />
-                임산부 응급
-              </div>
+              <div id="btnDetail_wrap">
+                <div className="btn-detail">
+                  <img src={pregnant} alt="pregnant icon" className="pregnant-img" />
+                  임산부 응급
+                </div>
               </div>
             </button>
           </div>

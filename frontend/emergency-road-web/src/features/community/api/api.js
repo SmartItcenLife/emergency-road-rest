@@ -182,3 +182,36 @@ export async function deleteComment(hpid, postId, commentId) {
   if (!res.ok) throw new Error(data.message || "댓글 삭제에 실패했어요.");
   return data;
 }
+
+// 게시글 신고
+export async function reportPost(hpid, postId, reason){
+  const response = await fetch(`${base(hpid)}/${postId}/report`, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+      ...authHeaders(),
+    },
+    body: JSON.stringify({reason}),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || "게시글 신고에 실패했어요.");
+  return data;
+}
+
+// 댓글 신고
+export async function reportComment(hpid, postId, commentId, reason){
+  const response = await fetch(`${base(hpid)}/${postId}/comments/${commentId}/report`, {
+    method: "POST",
+    headers:{
+      "Content-type": "application/json",
+      ...authHeaders(),
+    },
+    body: JSON.stringify({reason})
+  });
+  const data = await response.json();
+
+  if (!response.ok) throw new Error(data.message || "댓글 신고에 실패했어요.");
+  return data;
+}

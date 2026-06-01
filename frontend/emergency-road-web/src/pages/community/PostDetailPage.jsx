@@ -13,6 +13,7 @@ import {
   ConfirmModal,
 } from "../../shared/components/ui/Primitives";
 import { formatDate } from "../../features/community/utils/dateFormat";
+import ReportModal from "../../features/community/components/ReportModal";
 
 const BORDER1 = "#E2E6EE";
 const INK1 = "#0F1422";
@@ -40,6 +41,11 @@ export default function PostDetailPage() {
     handleAskDeleteComment,
     handleAskDeletePost,
     handleConfirmDelete,
+    handleAskReportPost,
+    handleAskReportComment,
+    handleSubmitReport,
+    reportTarget,
+    setReportTarget,
   } = usePostDetail(hpid, postId, user);
 
   if (loading)
@@ -165,6 +171,30 @@ export default function PostDetailPage() {
         onLike={handleLike}
       />
 
+      {user && user.userId !== post.userId && (
+        <div>
+          <button
+          type="button"
+          onClick={handleAskReportPost}
+          style={{
+              cursor: "pointer",
+              border: "1px solid #ebeef2",
+              background: "#ffffff",
+              color: "#505866",
+              minWidth: 36,
+              height: 36,
+              padding: "0 12px",
+              borderRadius: 8,
+              fontWeight: 700,
+              transition: "all 0.2s ease",
+              margin: "15px"
+                }}
+          >
+            게시글 신고하기
+          </button>
+        </div>
+      )}
+
       {/* 댓글 헤더 */}
       <div
         style={{
@@ -207,6 +237,7 @@ export default function PostDetailPage() {
             onLike={handleCommentLike}
             onEdit={handleStartEdit}
             onDelete={handleAskDeleteComment}
+            onReport={handleAskReportComment}
             myId={user?.userId}
           />
         ))
@@ -234,6 +265,13 @@ export default function PostDetailPage() {
         danger
         onConfirm={handleConfirmDelete}
         onClose={() => setConfirmTarget(null)}
+      />
+
+      <ReportModal
+        open={!!reportTarget}
+        type={reportTarget?.kind}
+        onSubmit={handleSubmitReport}
+        onClose={()=>setReportTarget(null)}
       />
     </div>
   );

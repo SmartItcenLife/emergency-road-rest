@@ -1,0 +1,14 @@
+.loading {
+  min-height: calc(100vh - 80px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading p {
+  text-align: center;
+  color: #6b7280;
+  font-size: 18px;
+}
