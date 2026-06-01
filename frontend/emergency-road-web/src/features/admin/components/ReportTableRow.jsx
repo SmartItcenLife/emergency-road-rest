@@ -8,7 +8,7 @@ function ReportTableRow({ report, index, type, onDeleteReport }) {
       <td>{index + 1}</td>
       <td>{report.reporterNickname}</td>
       <td>
-        <a className="post-title" href={`/hospitals/${report.hpid}/posts/${postId}`}>
+        <a className="post-title" href={`/community/${report.hpid}/posts/${postId}`}>
           {type === "post" ? `게시글 #${report.targetId}` : `댓글 #${report.targetId}`}
         </a>
       </td>

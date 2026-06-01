@@ -7,7 +7,7 @@ function PostTableRow({post, index, onDeletePost}){
             <td>{index+1}</td>
             <td>{post.hospitalName}</td>
             <td>
-                <a className="post-title" href={`/hospitals/${post.hpid}/posts/${post.id}`}>
+                <a className="post-title" href={`/community/${post.hpid}/posts/${post.id}`}>
                    {post.title}
                 </a>
             </td>
