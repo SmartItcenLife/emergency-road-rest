@@ -355,25 +355,57 @@ body {
     border-radius: 8px;
     border: 1px solid #e5e7eb;
 }
-.map-button {
-  min-width: 42px;
-  height: 33px;
-  padding: 0 8px;
-  border: 1px solid var(--primary);
-  border-radius: 999px;
-  background: #ffffff;
-  color: var(--primary);
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
+
+.hospital-detail-action-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    margin: 14px 0 4px;
+    padding-top: 12px;
+    border-top: 1px solid #eef2f7;
 }
 
-.map-button:hover {
-  background: var(--soft);
+.hospital-detail-action-button {
+    min-width: 0;
+    min-height: 34px;
+    padding: 6px 5px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--soft);
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.2;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: none;
 }
 
-.map-button-disabled,
-.map-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+.hospital-detail-action-button:hover {
+    background: var(--soft);
+    border-color: var(--primary);
+}
+
+.hospital-detail-action-button img {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 auto;
+}
+
+.hospital-detail-action-button.disabled,
+.hospital-detail-action-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f8fafc;
+}
+
+@media (max-width: 430px) {
+    .hospital-detail-action-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }

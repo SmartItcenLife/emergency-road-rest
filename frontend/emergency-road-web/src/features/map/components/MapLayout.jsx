@@ -3,8 +3,10 @@ import KakaoMap from "./KakaoMap";
 import { getAreaCongestion, getMapHospitals } from "../api/mapApi";
 import MapSidePanel from "./MapSidePanel";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
+  const navigate = useNavigate();
   const [hospitals, setHospitals] = useState([]);
   const [selectedHospital, setSelectedHospital] = useState(initialHospital);
   const [loading, setLoading] = useState(false);
@@ -15,6 +17,7 @@ function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
   const [showSearchButton, setShowSearchButton] = useState(false);
   
   const hasSearchedOnceRef = useRef(false);
+  const normalizedCategory = initialCategory?.toUpperCase() || "GENERAL";
 
   // Polygon 데이터 및 구별 혼잡도 정보 상태
   const [areaCongestions, setAreaCongestions] = useState([]);
@@ -71,7 +74,7 @@ function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
       setLoading(true);
       setError(null);
 
-      const data = await getMapHospitals(initialCategory, boundsParams);
+      const data = await getMapHospitals(normalizedCategory, boundsParams);
       setHospitals(data);
       setShowSearchButton(false);
     } catch (err) {
@@ -88,7 +91,7 @@ function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
       setAreaCongestionLoading(true);
       setAreaCongestionError(null);
 
-      const data = await getAreaCongestion(initialCategory);
+      const data = await getAreaCongestion(normalizedCategory);
       setAreaCongestions(data);
     } catch (err) {
       console.error("구별 혼잡도 정보를 불러오는 중 오류가 발생했습니다:", err);
@@ -127,6 +130,15 @@ function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
   <div 
     className={selectedHospital? "map-layout detail-mode" : "map-layout"}>
     <div className="map-content">
+      <button
+        type="button"
+        className="map-floating-back-button"
+        onClick={() => navigate(-1)}
+        aria-label="이전 화면으로 이동"
+      >
+        ←
+      </button>
+
       {showSearchButton && (
         <button
           type="button"

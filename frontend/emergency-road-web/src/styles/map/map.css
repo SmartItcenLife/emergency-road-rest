@@ -497,6 +497,29 @@
   height: calc(100svh - 80px);
 }
 
+.map-floating-back-button {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 35;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(6px);
+}
+
+.map-floating-back-button:hover {
+  background: #ffffff;
+}
+
 .map-search-current-button {
   position: absolute;
   top: 16px;
@@ -714,6 +737,14 @@
     top: 12px;
     max-width: calc(100% - 120px);
     white-space: nowrap;
+  }
+
+  .map-floating-back-button {
+    top: 12px;
+    left: 12px;
+    width: 38px;
+    height: 38px;
+    font-size: 21px;
   }
 
   .map-control-stack {

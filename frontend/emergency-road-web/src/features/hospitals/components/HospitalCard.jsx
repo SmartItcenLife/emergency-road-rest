@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
 import './HospitalCard.css';
 import HospitalDonutChart from './HospitalDonutChart';
-import { getHospitalDetail } from '../api/hospitalDetail';
 import HospitalDetail from './HospitalDetail';
 // 아이콘
 import phoneIcon from '../../../assets/hospital/phone.svg';
 import finderIcon from '../../../assets/hospital/finder.svg';
 import communityIcon from '../../../assets/hospital/community.svg';
 import angleIcon from '../../../assets/hospital/angle-brackets.png';
+import locationIcon from '../../../assets/location2.svg';
 import { useHospitalDetail } from '../hooks/recommend/useHospitalDetail';
 import mascotGreen from '../../../assets/mascot_green.png';
 import mascotPink from '../../../assets/mascot_pink.png';
@@ -18,7 +17,7 @@ import { buildHospitalMapUrl, canNavigateToHospitalMap } from "../../../shared/u
 
 const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, showRanking, showDistance, compact }) => {
   const { detailData, loading, isExpanded, toggleDetail} = useHospitalDetail(category, hospital.hpid);
-  const [error, setError] = useState(null);
+  const error = null;
   const theme = config.theme;
   
 
@@ -40,6 +39,55 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, show
   const canOpenHospitalMap = canNavigateToHospitalMap(hospital);
   const hospitalMapUrl = buildHospitalMapUrl( {hospital, category} );
 
+  const detailActions = (
+    <div className="hospital-detail-action-row">
+      {hospital.emergencyPhone ? (
+        <a
+          href={`tel:${hospital.emergencyPhone}`}
+          className="hospital-detail-action-button"
+        >
+          <img src={phoneIcon} alt="" />
+          <span>전화</span>
+        </a>
+      ) : (
+        <button
+          type="button"
+          className="hospital-detail-action-button disabled"
+          disabled
+        >
+          <img src={phoneIcon} alt="" />
+          <span>전화</span>
+        </button>
+      )}
+
+      <button
+        type="button"
+        className="hospital-detail-action-button"
+        onClick={moveRoute}
+      >
+        <img src={finderIcon} alt="" />
+        <span>길찾기</span>
+      </button>
+
+      <a
+        href={`/community/${hospital.hpid}`}
+        className="hospital-detail-action-button"
+      >
+        <img src={communityIcon} alt="" />
+        <span>커뮤니티</span>
+      </a>
+
+      <button
+        type="button"
+        className="hospital-detail-action-button hospital-detail-map-button"
+        onClick={() => navigate(hospitalMapUrl)}
+        disabled={!canOpenHospitalMap}
+      >
+        <img src={locationIcon} alt="" />
+        <span>지도에서 보기</span>
+      </button>
+    </div>
+  );
 
  
   return (
@@ -119,15 +167,6 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, show
               <a href={`/community/${hospital.hpid}`} className="community-button">
                 <img src={communityIcon} className="community-icon-img" alt="커뮤니티" />
               </a>
-              <button
-                type="button"
-                onClick={() => navigate(hospitalMapUrl)}
-                className={`map-button ${!canOpenHospitalMap ? "map-button-disabled" : ""}`}
-                disabled={!canOpenHospitalMap}
-                aria-label="지도에서 보기"
-              >
-                지도
-            </button>
             </div>
           </div>
 
@@ -142,10 +181,11 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, show
           {loading && <div className="detail-loading">상세 정보를 불러오는 중입니다...</div>}
           {error && <div className="detail-error">{error}</div>}
           {detailData && (
-                  <HospitalDetail
-                    detailData={detailData}
-                    config={config}
-                  />
+            <HospitalDetail
+              detailData={detailData}
+              config={config}
+              actionContent={detailActions}
+            />
            )}
         </div>
       )}
