@@ -1,6 +1,6 @@
 // fetch를 직접 쓰지 말고 API 파일을 하나 만들기
 
-const ADMIN_API_BASE_URL = "http://localhost:8080/api/admin";
+const ADMIN_API_BASE_URL = "/api/admin";
 
 function authHeaders(){
   const token = localStorage.getItem("accessToken");

@@ -117,7 +117,8 @@ public class SecurityConfig {
         // React package.json 의 설정값에 따라 설정.
         "http://localhost:5713",
             // 모바일 확인용
-            "http://192.168.2.180:5713"
+            "http://192.168.2.180:5713",
+            "http://localhost:9016"
     ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
