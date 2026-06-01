@@ -12,6 +12,9 @@ import { useHospitalDetail } from '../hooks/recommend/useHospitalDetail';
 import mascotGreen from '../../../assets/mascot_green.png';
 import mascotPink from '../../../assets/mascot_pink.png';
 import mascotBlue from '../../../assets/mascot_blue.png';
+// 지도로 보기
+import { useNavigate } from "react-router-dom";
+import { buildHospitalMapUrl, canNavigateToHospitalMap } from "../../../shared/utils/mapNavigation";
 
 const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, showRanking, showDistance, compact }) => {
   const { detailData, loading, isExpanded, toggleDetail} = useHospitalDetail(category, hospital.hpid);
@@ -30,6 +33,12 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, show
     if (label === '혼잡' || label === '주의') return 'badge-busy';
     return 'badge-unknown';
   };
+
+  // 지도보기 기능을 위한 변수 추가
+  const navigate = useNavigate();
+
+  const canOpenHospitalMap = canNavigateToHospitalMap(hospital);
+  const hospitalMapUrl = buildHospitalMapUrl( {hospital, category} );
 
 
  
@@ -110,6 +119,15 @@ const HospitalCard = ({ hospital, rank, userLat, userLon, config, category, show
               <a href={`/community/${hospital.hpid}`} className="community-button">
                 <img src={communityIcon} className="community-icon-img" alt="커뮤니티" />
               </a>
+              <button
+                type="button"
+                onClick={() => navigate(hospitalMapUrl)}
+                className={`map-button ${!canOpenHospitalMap ? "map-button-disabled" : ""}`}
+                disabled={!canOpenHospitalMap}
+                aria-label="지도에서 보기"
+              >
+                지도
+            </button>
             </div>
           </div>
 

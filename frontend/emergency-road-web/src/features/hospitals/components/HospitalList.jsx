@@ -3,6 +3,7 @@ import HospitalCard from './HospitalCard';
 import './HospitalList.css';
 import HospitalListFooter from './HospitalListFooter.jsx';
 import SortSelect from "../../../features/hospitals/components/SortSelect.jsx";
+import { useNavigate } from 'react-router-dom';
 const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, showRanking, showDistance, compact }) => {
   // 병원이 없는 경우를 위한 처리
   if (!hospitals || hospitals.length === 0) {
@@ -22,6 +23,9 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, sho
     type="임산부 응급";
   }
 
+  const navigate = useNavigate();
+  const normalizedCategory = category?.toUpperCase();
+
   return (
     <section className="hospital-list-section">
 
@@ -33,10 +37,40 @@ const HospitalList = ({ hospitals, userLat, userLon, config, category, sort, sho
             현재 위치로부터 10km 이내,<br />
             <span className="highlight">진료 가능 여부와 실시간 상황</span>을 종합 분석한 추천 결과입니다.
           </p>
+          <button
+            type = "button"
+            className = "hospital-map-view-button"
+            onClick={() => {
+              const param = new URLSearchParams();
+
+              if (normalizedCategory) {
+                param.set("category",normalizedCategory);
+              }
+            }
+          }>지도보기
+          </button>
         </div>
       )}
       {!showRanking && (<div>   
                         <div className="community-guide">병원 커뮤니티에 공유된 응급실 현장 상황을 확인해보세요.</div>
+                        <div className="hospital-view-switch">
+                          <button type="button" className='hospital-view-switch-button active'> 
+                            목록
+                          </button>
+
+                          <button type="button" className="hospital-view-switch__button" onClick={()=> {
+                            const params = new URLSearchParams();
+
+                            if (normalizedCategory) {
+                              params.set("category", normalizedCategory);
+                            }
+
+                            navigate(`/map?${params.toString()}`);
+                            }
+                          }>
+                            지도
+                          </button>
+                        </div>
                           <SortSelect sort={sort} />
                         </div>)}
 
