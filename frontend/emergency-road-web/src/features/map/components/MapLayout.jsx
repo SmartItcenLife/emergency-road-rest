@@ -25,8 +25,23 @@ function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
   const [areaCongestionError, setAreaCongestionError] = useState(null);
 
   useEffect(() => {
+    async function loadAreaCongestions() {
+      try {
+        setAreaCongestionLoading(true);
+        setAreaCongestionError(null);
+
+        const data = await getAreaCongestion(normalizedCategory);
+        setAreaCongestions(data);
+      } catch (err) {
+        console.error("구별 혼잡도 정보를 불러오는 중 오류가 발생했습니다:", err);
+        setAreaCongestionError("구별 혼잡도 정보를 불러오지 못했습니다.");
+      } finally {
+        setAreaCongestionLoading(false);
+      }
+    }
+
     loadAreaCongestions();
-  }, []);
+  }, [normalizedCategory]);
 
   useEffect(() => {
     if ( !selectedHospital?.hpid || hospitals.length == 0) {
@@ -82,22 +97,6 @@ function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
       setError("병원 정보를 불러오지 못했습니다.");
     } finally {
       setLoading(false);
-    }
-  }
-
-  // 구별 혼잡도 조회
-  async function loadAreaCongestions() {
-    try {
-      setAreaCongestionLoading(true);
-      setAreaCongestionError(null);
-
-      const data = await getAreaCongestion(normalizedCategory);
-      setAreaCongestions(data);
-    } catch (err) {
-      console.error("구별 혼잡도 정보를 불러오는 중 오류가 발생했습니다:", err);
-      setAreaCongestionError("구별 혼잡도 정보를 불러오지 못했습니다.");
-    } finally {
-      setAreaCongestionLoading(false);
     }
   }
 

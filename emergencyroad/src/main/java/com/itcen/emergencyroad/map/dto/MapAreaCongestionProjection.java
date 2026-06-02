@@ -6,9 +6,9 @@ public interface MapAreaCongestionProjection {
 
     String getAddress();
 
-    Integer getEmergencyAvailableBeds();
+    Integer getAvailableCount();
 
-    Integer getEmergencyTotalBeds();
+    Integer getTotalCount();
 
     LocalDateTime getRecordedAt();
 }

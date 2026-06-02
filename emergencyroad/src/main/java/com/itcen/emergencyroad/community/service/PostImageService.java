@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,12 +69,13 @@ public class PostImageService {
     postImageRepository.deleteByPost_Id(postId);
   }
 
-  @Transactional(readOnly = true)
-  public List<String> getImageUrls(Long postId) {
-    return postImageRepository.findByPost_IdOrderByCreatedAtAsc(postId)
+  public Map<Long, List<String>> getImageUrlMap(List<Long> postIds) {
+    return postImageRepository.findByPost_IdInOrderByCreatedAtAsc(postIds)
         .stream()
-        .map(PostImage::getImageUrl)
-        .toList();
+        .collect(Collectors.groupingBy(
+            image -> image.getPost().getId(),
+            Collectors.mapping(PostImage::getImageUrl, Collectors.toList())
+        ));
   }
 
   private String saveFile(MultipartFile file) {

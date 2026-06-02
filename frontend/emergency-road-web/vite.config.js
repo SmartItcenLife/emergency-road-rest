@@ -10,8 +10,7 @@ export default defineConfig({
     proxy: {
       // '/api'로 시작하는 요청을 백엔드 서버(8088)로 전달
       '/api': {
-        target: 'http://localhost:8081',
-        // target: 'http://localhost:8080',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       }
