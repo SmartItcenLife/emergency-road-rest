@@ -4,6 +4,7 @@ import com.itcen.emergencyroad.community.dto.post.PostRequestDto;
 import com.itcen.emergencyroad.community.dto.post.PostResponseDto;
 import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.User;
+import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.repository.CommentRepository;
 import com.itcen.emergencyroad.community.repository.PostLikeRepository;
 import com.itcen.emergencyroad.community.repository.PostRepository;
@@ -29,8 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class PostService {
-
-  static final String ADMIN_ROLE = "ADMIN";
 
   private final PostRepository postRepository;
   private final UserRepository userRepository;
@@ -131,7 +130,7 @@ public class PostService {
     Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ExceptionStatus.POST_NOT_FOUND));
 
     boolean isAuthor = Objects.equals(post.getUser().getId(), userId);
-    boolean isAdmin = ADMIN_ROLE.equals(role);
+    boolean isAdmin = Role.ADMIN.name().equals(role);
 
     if (!isAdmin && !isAuthor) {
       throw new CustomException(ExceptionStatus.DELETE_FORBIDDEN);

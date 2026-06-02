@@ -5,6 +5,7 @@ import com.itcen.emergencyroad.community.dto.comment.CommentResponseDto;
 import com.itcen.emergencyroad.community.entity.Comment;
 import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.User;
+import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.repository.CommentLikeRepository;
 import com.itcen.emergencyroad.community.repository.CommentRepository;
 import com.itcen.emergencyroad.community.repository.PostRepository;
@@ -24,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-
-  static final String ADMIN_ROLE = "ADMIN";
 
   private final CommentRepository commentRepository;
   private final PostRepository postRepository;
@@ -92,7 +91,7 @@ public class CommentService {
         .orElseThrow(() -> new CustomException(ExceptionStatus.NOT_FOUND));
 
     boolean isAuthor = Objects.equals(comment.getUser().getId(), userId);
-    boolean isAdmin = ADMIN_ROLE.equals(role);
+    boolean isAdmin = Role.ADMIN.name().equals(role);
 
     if (!isAuthor && !isAdmin) {
       throw new CustomException(ExceptionStatus.DELETE_FORBIDDEN);
