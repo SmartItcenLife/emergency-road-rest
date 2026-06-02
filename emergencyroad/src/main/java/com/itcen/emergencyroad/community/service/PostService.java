@@ -39,8 +39,8 @@ public class PostService {
   private final CommentRepository commentRepository;
 
   @Transactional(readOnly = true)
-  public Page<PostResponseDto> getPosts(String hpid, int page, String keyword) {
-    Pageable pageable = PageRequest.of(page, 10, Sort.by(Direction.DESC, "createdAt"));
+  public Page<PostResponseDto> getPosts(String hpid, int page, int size, String keyword) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "createdAt"));
 
     Page<Post> posts = (keyword != null && !keyword.isBlank())
         ? postRepository.searchByHospitalId(hpid, keyword, pageable)

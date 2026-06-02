@@ -34,8 +34,8 @@ const base = (hpid) => `/api/hospitals/${hpid}/posts`;
 // ── 게시글 ────────────────────────────────────────────────────────────────────
 
 /** GET /api/hospitals/{hpid}/posts?page=&keyword= → Page<PostResponseDto> */
-export async function getPosts(hpid, { page = 0, keyword } = {}) {
-  const params = new URLSearchParams({ page });
+export async function getPosts(hpid, { page = 0, keyword, size = 5 } = {}) {
+  const params = new URLSearchParams({ page, size });
   if (keyword) params.set("keyword", keyword);
   const res = await fetch(`${base(hpid)}?${params}`, {
     headers: authHeaders(),
@@ -184,32 +184,36 @@ export async function deleteComment(hpid, postId, commentId) {
 }
 
 // 게시글 신고
-export async function reportPost(hpid, postId, reason){
+export async function reportPost(hpid, postId, reason) {
   const response = await fetch(`${base(hpid)}/${postId}/report`, {
     method: "POST",
     headers: {
       "Content-type": "application/json",
       ...authHeaders(),
     },
-    body: JSON.stringify({reason}),
+    body: JSON.stringify({ reason }),
   });
 
   const data = await response.json();
 
-  if (!response.ok) throw new Error(data.message || "게시글 신고에 실패했어요.");
+  if (!response.ok)
+    throw new Error(data.message || "게시글 신고에 실패했어요.");
   return data;
 }
 
 // 댓글 신고
-export async function reportComment(hpid, postId, commentId, reason){
-  const response = await fetch(`${base(hpid)}/${postId}/comments/${commentId}/report`, {
-    method: "POST",
-    headers:{
-      "Content-type": "application/json",
-      ...authHeaders(),
+export async function reportComment(hpid, postId, commentId, reason) {
+  const response = await fetch(
+    `${base(hpid)}/${postId}/comments/${commentId}/report`,
+    {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+        ...authHeaders(),
+      },
+      body: JSON.stringify({ reason }),
     },
-    body: JSON.stringify({reason})
-  });
+  );
   const data = await response.json();
 
   if (!response.ok) throw new Error(data.message || "댓글 신고에 실패했어요.");

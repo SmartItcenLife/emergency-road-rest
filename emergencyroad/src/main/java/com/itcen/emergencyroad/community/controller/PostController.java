@@ -43,11 +43,12 @@ public class PostController {
   public ResponseEntity<ApiResponseDto<Page<PostResponseDto>>> getPosts(
       @PathVariable String hpid,
       @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue =  "5") int size,
       @RequestParam(required = false) String keyword) {
 
     return ResponseEntity.ok(
         ApiResponseDto.success("게시글 목록 조회 성공",
-            postService.getPosts(hpid, page, keyword))
+            postService.getPosts(hpid, page,size,keyword))
     );
   }
 

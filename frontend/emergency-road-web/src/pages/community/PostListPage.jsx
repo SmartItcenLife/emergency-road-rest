@@ -18,6 +18,32 @@ const INK2 = "#404757";
 const INK3 = "#7B8392";
 const ACCENT = "#2563EB";
 
+function getPageNumbers(current, total) {
+  if (total <= 5) {
+    return Array.from({ length: total }, (_, i) => i);
+  }
+
+  const pages = [];
+
+  pages.push(0);
+
+  if (current > 2) pages.push("...");
+
+  for (
+    let i = Math.max(1, current - 1);
+    i <= Math.min(total - 2, current + 1);
+    i++
+  ) {
+    pages.push(i);
+  }
+
+  if (current < total - 3) pages.push("...");
+
+  pages.push(total - 1);
+
+  return pages;
+}
+
 export default function PostListPage() {
   const { hpid } = useParams();
   const navigate = useNavigate();
@@ -27,12 +53,13 @@ export default function PostListPage() {
     posts,
     hospitalName,
     page,
-    hasMore,
+    totalPages,
     loading,
     keyword,
     onKeywordChange,
     onSearch,
-    onLoadMore,
+    onPageChange,
+    totalElements,
   } = usePostList(hpid);
 
   return (
@@ -121,9 +148,9 @@ export default function PostListPage() {
         }}
       >
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: INK1 }}>
-          최신 후기{" "}
+          후기 갯수 :{" "}
           <span style={{ color: ACCENT, fontVariantNumeric: "tabular-nums" }}>
-            {posts.length}
+            {totalElements}
           </span>
         </h3>
         <span style={{ fontSize: 12, color: INK3 }}>최신순</span>
@@ -158,22 +185,93 @@ export default function PostListPage() {
             />
           ))
         )}
-        {hasMore && (
-          <div style={{ padding: 16, textAlign: "center" }}>
+        {totalPages > 1 && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              padding: "20px 0 28px",
+            }}
+          >
+            {/* 이전 버튼 */}
             <button
-              onClick={onLoadMore}
-              disabled={loading}
+              onClick={() => onPageChange(page - 1)}
+              disabled={page === 0}
               style={{
-                font: "500 14px inherit",
-                color: ACCENT,
-                background: "transparent",
-                border: `1px solid ${BORDER1}`,
+                width: 36,
+                height: 36,
                 borderRadius: 8,
-                padding: "10px 24px",
-                cursor: "pointer",
+                border: `1px solid ${BORDER1}`,
+                background: "transparent",
+                color: page === 0 ? INK3 : INK1,
+                cursor: page === 0 ? "default" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: page === 0 ? 0.4 : 1,
               }}
             >
-              {loading ? "불러오는 중..." : "더 보기"}
+              <Icon name="arrowLeft" size={16} />
+            </button>
+
+            {/* 페이지 번호 버튼 */}
+            {getPageNumbers(page, totalPages).map((p, i) =>
+              p === "..." ? (
+                <span
+                  key={`dots-${i}`}
+                  style={{ color: INK3, fontSize: 14, padding: "0 4px" }}
+                >
+                  ···
+                </span>
+              ) : (
+                <button
+                  key={p}
+                  onClick={() => onPageChange(p)}
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 8,
+                    border: `1px solid ${p === page ? ACCENT : BORDER1}`,
+                    background: p === page ? ACCENT : "transparent",
+                    color: p === page ? "#fff" : INK1,
+                    fontWeight: p === page ? 600 : 400,
+                    fontSize: 14,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {p + 1} {/* ← 0-based → 1-based 표시 */}
+                </button>
+              ),
+            )}
+
+            {/* 다음 버튼 */}
+            <button
+              onClick={() => onPageChange(page + 1)}
+              disabled={page === totalPages - 1}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 8,
+                border: `1px solid ${BORDER1}`,
+                background: "transparent",
+                color: page === totalPages - 1 ? INK3 : INK1,
+                cursor: page === totalPages - 1 ? "default" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                opacity: page === totalPages - 1 ? 0.4 : 1,
+              }}
+            >
+              <Icon
+                name="arrowLeft"
+                size={16}
+                style={{ transform: "rotate(180deg)" }}
+              />
             </button>
           </div>
         )}
