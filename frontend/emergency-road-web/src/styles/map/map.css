@@ -880,6 +880,30 @@
   border-color: #bbf7d0;
 }
 
+.map-detail-chip.relaxed {
+  color: #16a34a;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.map-detail-chip.normal {
+  color: #2563eb;
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.map-detail-chip.crowded {
+  color: #f97316;
+  background-color: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.map-detail-chip.very-crowded {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
 .map-detail-chip.unavailable {
   color: #ef4444;
   background-color: #fef2f2;

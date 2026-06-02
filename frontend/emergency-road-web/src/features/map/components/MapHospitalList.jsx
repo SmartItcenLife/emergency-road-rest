@@ -3,6 +3,7 @@ import {
   getMapStatusRateForDisplay,
   getMapStatusToneByGrade,
 } from "../utils/mapStatusStyle";
+import { getPregnantNicuStatusByCounts } from "../utils/mapPregnantNicuStatus";
 
 function displayValue(value) {
   if (value === null || value === undefined || value === "") {
@@ -47,28 +48,37 @@ function MapHospitalList({
         {hospitals.map((hospital) => {
           const statusGrade = hospital.status?.grade ?? "UNKNOWN";
           const statusTone = getMapStatusToneByGrade(statusGrade);
-          const statusColor = getMapStatusColorByTone(statusTone);
           const statusLabel = hospital.status?.label ?? "정보없음";
           const availableBeds = hospital.status?.availableCount;
           const totalBeds = hospital.status?.totalCount;
-          const rate = getMapStatusRateForDisplay(hospital.status?.rate);
+          const isPregnantCategory = hospital.category === "PREGNANT";
+          const nicuStatus = getPregnantNicuStatusByCounts(
+            availableBeds,
+            totalBeds
+          );
+          const displayTone = isPregnantCategory ? nicuStatus.tone : statusTone;
+          const displayLabel = isPregnantCategory ? nicuStatus.label : statusLabel;
+          const displayRate = getMapStatusRateForDisplay(
+            isPregnantCategory ? nicuStatus.rate : hospital.status?.rate
+          );
+          const displayColor = getMapStatusColorByTone(displayTone);
 
           return (
             <button
               key={hospital.hpid}
               type="button"
-              className={`map-list-item-summary ${statusTone}`}
+              className={`map-list-item-summary ${displayTone}`}
               onClick={() => onSelectHospital(hospital)}
             >
-              <div className={`map-list-hospital-icon ${statusTone}`}>
+              <div className={`map-list-hospital-icon ${displayTone}`}>
                 <span className="map-list-hospital-symbol" aria-hidden="true" />
               </div>
 
               <div className="map-list-hospital-content">
                 <div className="map-list-hospital-title-row">
                   <strong>{hospital.hospitalName}</strong>
-                  <span className={`map-status-badge ${statusTone}`}>
-                    {statusLabel}
+                  <span className={`map-status-badge ${displayTone}`}>
+                    {displayLabel}
                   </span>
                 </div>
 
@@ -78,13 +88,13 @@ function MapHospitalList({
               <div
                 className="map-list-status-donut"
                 style={{
-                  background: `conic-gradient(${statusColor} ${rate}%, #edf2f7 0)`,
+                  background: `conic-gradient(${displayColor} ${displayRate}%, #edf2f7 0)`,
                 }}
               >
                 <div className="map-list-status-donut-inner">
-                  <strong>{statusLabel}</strong>
+                  <strong>{isPregnantCategory ? "NICU" :displayLabel}</strong>
                   <span>
-                    {displayValue(availableBeds)}/{displayValue(totalBeds)}
+                    {displayValue(availableBeds)} / {displayValue(totalBeds)}
                   </span>
                 </div>
               </div>
