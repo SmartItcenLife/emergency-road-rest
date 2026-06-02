@@ -70,7 +70,7 @@ public class PostController {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(ApiResponseDto.fail(HttpStatus.NOT_FOUND, "삭제된 게시글입니다."));
     }
-    return ResponseEntity.ok(ApiResponseDto.success("게시글 조회 성공", postService.getPost(postId, userId)));
+    return ResponseEntity.ok(ApiResponseDto.success("게시글 조회 성공", post));
   }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

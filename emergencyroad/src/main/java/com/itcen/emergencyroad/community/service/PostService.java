@@ -67,9 +67,12 @@ public class PostService {
   public PostResponseDto getPost(Long postId, Long userId) {
     Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ExceptionStatus.POST_NOT_FOUND));
 
-    if(post.isDeleted()){
-      throw new CustomException(ExceptionStatus.POST_NOT_FOUND);
-    }
+    // 해당 조건문이 존재하면, 삭제된 게시글은 관리자인지 확인하기 전에 예외가 발생함
+    // -> 관리자가 삭제된 게시글 확인 못하게 됨
+    // 그래서 주석 처리 했습니다_정연
+//    if(post.isDeleted()){
+//      throw new CustomException(ExceptionStatus.POST_NOT_FOUND);
+//    }
 
     List<Long> postIds = List.of(postId);
 
