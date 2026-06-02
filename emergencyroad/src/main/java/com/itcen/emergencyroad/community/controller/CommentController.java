@@ -8,6 +8,7 @@ import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.service.CommentService;
 import com.itcen.emergencyroad.community.service.ReportService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
+import com.itcen.emergencyroad.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,6 @@ public class CommentController {
   private final CommentService commentService;
   private final ReportService reportService;
 
-  // 댓글 목록 조회
   @GetMapping
   public ResponseEntity<ApiResponseDto<List<CommentResponseDto>>> getComments(
       @PathVariable Long postId,
@@ -41,7 +41,6 @@ public class CommentController {
     );
   }
 
-  // 댓글 작성
   @PostMapping
   public ResponseEntity<ApiResponseDto<Void>> createComment(
       @PathVariable Long postId,
@@ -53,7 +52,6 @@ public class CommentController {
         .body(ApiResponseDto.success("댓글이 작성되었습니다."));
   }
 
-  // 댓글 수정
   @PutMapping("/{commentId}")
   public ResponseEntity<ApiResponseDto<Void>> updateComment(
       @PathVariable Long commentId,
@@ -64,13 +62,12 @@ public class CommentController {
     return ResponseEntity.ok(ApiResponseDto.success("댓글이 수정되었습니다."));
   }
 
-  // 댓글 삭제
   @DeleteMapping("/{commentId}")
   public ResponseEntity<ApiResponseDto<Void>> deleteComment(
       @PathVariable Long commentId,
       @AuthenticationPrincipal Long userId) {
 
-    commentService.deleteComment(commentId, userId, getCurrentUserRole());
+    commentService.deleteComment(commentId, userId, SecurityUtil.getCurrentUserRole());
     return ResponseEntity.ok(ApiResponseDto.success("댓글이 삭제되었습니다."));
   }
 

@@ -9,10 +9,22 @@ import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-  Page<Post> findByHospitalHpidAndIsDeletedFalse(String hpid, Pageable pageable);
+  @Query(value = "select p from Post p " +
+      "join fetch p.user " +
+      "join fetch p.hospital " +
+      "where p.hospital.hpid = :hpid and p.isDeleted = false",
+      countQuery = "select count(p) from Post p " +
+          "where p.hospital.hpid = :hpid and p.isDeleted = false")
+  Page<Post> findByHospitalHpidAndIsDeletedFalse(@Param("hpid") String hpid, Pageable pageable);
 
-  @Query("select p from Post p where p.hospital.hpid = :hpid and p.isDeleted = false " +
-      "and (p.title like %:keyword% or p.content like %:keyword%)")
+  @Query(value = "select p from Post p " +
+      "join fetch p.user " +
+      "join fetch p.hospital " +
+      "where p.hospital.hpid = :hpid and p.isDeleted = false " +
+      "and (p.title like %:keyword% or p.content like %:keyword%)",
+      countQuery = "select count(p) from Post p " +
+          "where p.hospital.hpid = :hpid and p.isDeleted = false " +
+          "and (p.title like %:keyword% or p.content like %:keyword%)")
   Page<Post> searchByHospitalId(@Param("hpid") String hpid, @Param("keyword") String keyword, Pageable pageable);
 
 
