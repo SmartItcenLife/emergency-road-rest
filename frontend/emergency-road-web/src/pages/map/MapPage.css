@@ -1,0 +1,11 @@
+.map-page {
+  width: 100%;
+  min-height: calc(100svh - 80px);
+  background: #f5f7fb;
+}
+
+@media (max-width: 768px) {
+  .map-page {
+    min-height: calc(100svh - 120px);
+  }
+}

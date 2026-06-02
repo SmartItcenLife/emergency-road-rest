@@ -6,6 +6,7 @@ import { getPolygonColor } from "../utils/mapPolygonStyle";
 import locationIcon from "../../../assets/location.svg";
 import { getMapHospitalLabels } from "../utils/mapHospitalDisplay";
 import { getPregnantNicuStatusByCounts } from "../utils/mapPregnantNicuStatus";
+import "./KakaoMap.css";
 
 const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 

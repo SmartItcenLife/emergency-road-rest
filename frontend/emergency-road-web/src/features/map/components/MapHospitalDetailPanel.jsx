@@ -7,6 +7,7 @@ import {
   getMapStatusRateForDisplay,
   getMapStatusToneByGrade,
 } from "../utils/mapStatusStyle";
+import "./MapHospitalDetailPanel.css";
 
 
 function displayValue(value) {

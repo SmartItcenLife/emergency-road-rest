@@ -1,0 +1,406 @@
+.map-detail-panel {
+  min-height: 100%;
+  background: #ffffff;
+}
+
+.map-detail-panel-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.map-detail-panel-header strong {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.map-detail-back-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.map-detail-info-card {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.map-detail-section {
+  padding: 16px;
+}
+
+.map-detail-section + .map-detail-section {
+  margin-top: 0;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.map-detail-hospital-summary {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  padding: 18px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.map-detail-hospital-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor;
+  background: #ffffff;
+}
+
+.map-detail-hospital-icon .map-list-hospital-symbol {
+  width: 24px;
+  height: 24px;
+}
+
+.map-list-hospital-symbol {
+  display: block;
+  color: inherit;
+  background-color: currentColor;
+  mask-image: url("../../../assets/hospital/hospital.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url("../../../assets/hospital/hospital.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.map-detail-hospital-icon.relaxed {
+  color: #16a34a;
+}
+
+.map-detail-hospital-icon.normal {
+  color: #2563eb;
+}
+
+.map-detail-hospital-icon.crowded {
+  color: #f97316;
+}
+
+.map-detail-hospital-icon.very-crowded {
+  color: #dc2626;
+}
+
+.map-detail-hospital-icon.unknown {
+  color: #6b7280;
+}
+
+.map-detail-hospital-content {
+  min-width: 0;
+}
+
+.map-detail-hospital-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.map-detail-hospital-title-row h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.map-detail-hospital-title-row .map-status-badge {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.map-detail-hospital-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.map-detail-hospital-phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #2563eb;
+  font-size: 13px;
+}
+
+.map-detail-hospital-phone strong {
+  color: #374151;
+  font-weight: 800;
+}
+
+.map-detail-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 14px 16px 18px;
+}
+
+.map-detail-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.map-detail-action-button:hover {
+  background: #eff6ff;
+}
+
+.map-detail-action-button.disabled,
+.map-detail-action-button:disabled {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.map-detail-title {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.map-detail-message {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.map-detail-message.error {
+  color: #ef4444;
+}
+
+.map-detail-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.map-detail-section-header span {
+  font-size: 12px;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.map-detail-bed-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  align-items: center;
+  gap: 18px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #f9fafb;
+}
+
+.map-detail-bed-count-card {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.map-detail-bed-count-card strong {
+  font-size: 18px;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: 0;
+}
+
+.map-detail-bed-count-card span {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
+.map-detail-donut {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  padding: 9px;
+  box-shadow: inset 0 0 0 1px rgba(229, 231, 235, 0.65);
+}
+
+.map-detail-donut-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-detail-donut-inner strong {
+  font-size: 16px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.map-detail-donut-inner span {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.map-detail-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.map-detail-chip {
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+  border: 1px solid #dbeafe;
+}
+
+.map-detail-chip.available,
+.map-detail-chip.relaxed {
+  color: #16a34a;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.map-detail-chip.normal {
+  color: #2563eb;
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.map-detail-chip.crowded {
+  color: #f97316;
+  background-color: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.map-detail-chip.very-crowded,
+.map-detail-chip.unavailable {
+  color: #ef4444;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.map-detail-chip.very-crowded {
+  color: #dc2626;
+}
+
+.map-detail-chip.unknown {
+  color: #6b7280;
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.map-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.map-status-badge.relaxed {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.map-status-badge.normal {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.map-status-badge.crowded {
+  color: #f97316;
+  background-color: #ffedd5;
+}
+
+.map-status-badge.very-crowded {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+.map-status-badge.unknown {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .map-detail-hospital-title-row h2 {
+    font-size: 18px;
+  }
+
+  .map-detail-bed-status {
+    grid-template-columns: 1fr 84px;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .map-detail-bed-count-card strong {
+    font-size: 18px;
+  }
+
+  .map-detail-donut {
+    width: 84px;
+    height: 84px;
+    padding: 8px;
+  }
+
+  .map-detail-chip-list {
+    gap: 5px;
+  }
+
+  .map-detail-chip {
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+}

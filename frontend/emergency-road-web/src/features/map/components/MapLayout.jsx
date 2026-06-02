@@ -4,6 +4,7 @@ import { getAreaCongestion, getMapHospitals } from "../api/mapApi";
 import MapSidePanel from "./MapSidePanel";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "./MapLayout.css";
 
 function MapLayout({initialCategory = "GENERAL", initialHospital = null }) {
   const navigate = useNavigate();

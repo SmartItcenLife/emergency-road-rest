@@ -4,6 +4,7 @@ import {
   getMapStatusToneByGrade,
 } from "../utils/mapStatusStyle";
 import { getPregnantNicuStatusByCounts } from "../utils/mapPregnantNicuStatus";
+import "./MapHospitalList.css";
 
 function displayValue(value) {
   if (value === null || value === undefined || value === "") {
