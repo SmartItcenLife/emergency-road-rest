@@ -1,4 +1,4 @@
-import { Icon } from "../../../../shared/components/ui/Primitives";
+import { Icon } from "../../../../shared/components/ui";
 
 const SUCCESS = "#1F8A5B";
 const INK3 = "#7B8392";

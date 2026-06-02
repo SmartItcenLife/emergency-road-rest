@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Icon } from "../../../../shared/components/ui/Primitives";
+import { Icon } from "../../../../shared/components/ui";
 
 const ACCENT = "#2563EB";
 const SURFACE_SUNK = "#EEF1F6";

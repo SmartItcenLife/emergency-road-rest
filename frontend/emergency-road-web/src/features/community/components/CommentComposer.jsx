@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Icon } from "../../../shared/components/ui/Primitives";
+import { Icon } from "../../../shared/components/ui";
 
 const SURFACE_SUNK = "#EEF1F6";
 const BORDER1 = "#E2E6EE";

@@ -4,12 +4,7 @@ import { usePostList } from "../../features/community/hooks/usePostList";
 import { HospitalHeader } from "../../features/community/components/HospitalHeader";
 import { PostCard } from "../../features/community/components/PostCard";
 import { PostSearchBar } from "../../features/community/components/PostSearchBar";
-import {
-  AppBar,
-  Avatar,
-  Icon,
-  Wordmark,
-} from "../../shared/components/ui/Primitives";
+import { AppBar, Avatar, Icon, Wordmark } from "../../shared/components/ui";
 
 const SURFACE = "#FFFFFF";
 const BORDER1 = "#E2E6EE";

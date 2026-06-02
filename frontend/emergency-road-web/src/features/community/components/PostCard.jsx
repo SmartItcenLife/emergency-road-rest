@@ -1,4 +1,4 @@
-import { Avatar, Icon } from "../../../shared/components/ui/Primitives";
+import { Avatar, Icon } from "../../../shared/components/ui";
 import { formatDateShort } from "../utils/dateFormat";
 
 const BORDER1 = "#E2E6EE";

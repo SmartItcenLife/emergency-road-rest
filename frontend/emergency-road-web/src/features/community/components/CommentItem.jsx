@@ -1,4 +1,4 @@
-import { Avatar, Icon } from "../../../shared/components/ui/Primitives";
+import { Avatar, Icon } from "../../../shared/components/ui";
 import { MoreMenu } from "./MoreMenu";
 import { formatDateShort } from "../utils/dateFormat";
 import "./CommentItem.css";
@@ -12,7 +12,16 @@ const ACCENT = "#2563EB";
  * CommentItem — 댓글 아이템
  */
 // 91번 줄에 신고 버튼 추가했습니다
-export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId, isAdmin, isReportedComment }) {
+export function CommentItem({
+  c,
+  onLike,
+  onEdit,
+  onDelete,
+  onReport,
+  myId,
+  isAdmin,
+  isReportedComment,
+}) {
   return (
     <div
       className={isReportedComment ? "reported-comment" : ""}
@@ -96,14 +105,13 @@ export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId, isAdm
             />{" "}
             {c.likeCount}
           </button>
-          
+
           {/* 신고 버튼 추가 */}
           {myId && myId !== c.userId && (
             <button
-            type="button"
-            onClick={() => onReport(c.id)}
-            style={
-              {
+              type="button"
+              onClick={() => onReport(c.id)}
+              style={{
                 background: "transparent",
                 border: "none",
                 cursor: "pointer",
@@ -114,16 +122,15 @@ export function CommentItem({ c, onLike, onEdit, onDelete, onReport, myId, isAdm
                 fontSize: 12,
                 color: "#DC2626",
                 fontWeight: 600,
-                margin: "0 0 0 10px"
-              }
-            }
+                margin: "0 0 0 10px",
+              }}
             >
-              <Icon name="flag" size={13}/>
+              <Icon name="flag" size={13} />
             </button>
           )}
         </div>
       </div>
-      </div>
+    </div>
   );
 }
 

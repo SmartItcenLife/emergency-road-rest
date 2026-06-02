@@ -1,4 +1,4 @@
-import { Wordmark } from "../../shared/components/ui/Primitives";
+import { Wordmark } from "../../shared/components/ui";
 import { useLogin } from "../../features/auth/hooks/useLogin";
 import { LoginForm } from "../../features/auth/components/login/LoginForm";
 

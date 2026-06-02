@@ -1,4 +1,4 @@
-import { Icon } from "../../../shared/components/ui/Primitives";
+import { Icon } from "../../../shared/components/ui";
 
 const SURFACE = "#FFFFFF";
 const SURFACE_SUNK = "#EEF1F6";
