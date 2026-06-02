@@ -1,18 +1,23 @@
 package com.itcen.emergencyroad.community.service;
 
+import static com.itcen.emergencyroad.global.util.QueryResultUtil.toCountMap;
 import com.itcen.emergencyroad.community.dto.comment.CommentRequestDto;
 import com.itcen.emergencyroad.community.dto.comment.CommentResponseDto;
 import com.itcen.emergencyroad.community.entity.Comment;
 import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.User;
+import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.repository.CommentLikeRepository;
 import com.itcen.emergencyroad.community.repository.CommentRepository;
 import com.itcen.emergencyroad.community.repository.PostRepository;
 import com.itcen.emergencyroad.community.repository.UserRepository;
 import com.itcen.emergencyroad.global.exception.CustomException;
 import com.itcen.emergencyroad.global.exception.ExceptionStatus;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CommentService {
 
-  static final String ADMIN_ROLE = "ADMIN";
-
   private final CommentRepository commentRepository;
   private final PostRepository postRepository;
   private final UserRepository userRepository;
@@ -30,14 +33,28 @@ public class CommentService {
 
   @Transactional(readOnly = true)
   public List<CommentResponseDto> getComments(Long postId, Long loginUserId) {
-    return commentRepository.findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId)
-        .stream()
-        .map(comment -> {
-          long likeCount = commentLikeRepository.countByComment_Id(comment.getId());
-          boolean isLiked = (loginUserId != null) &&
-              commentLikeRepository.existsByComment_IdAndUser_Id(comment.getId(), loginUserId);
-          return CommentResponseDto.from(comment, likeCount, isLiked);
-        }).toList();
+
+    List<Comment> comments = commentRepository
+        .findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(postId);
+
+    List<Long> commentIds = comments.stream()
+        .map(Comment::getId)
+        .toList();
+
+    Map<Long, Long> likeCountMap = toCountMap(
+        commentLikeRepository.countByCommentIds(commentIds));
+
+    Set<Long> likedCommentIds = (loginUserId != null)
+        ? new HashSet<>(commentLikeRepository.findLikedCommentIds(commentIds, loginUserId))
+        : Set.of();
+
+    return comments.stream()
+        .map(comment -> CommentResponseDto.from(
+            comment,
+            likeCountMap.getOrDefault(comment.getId(), 0L),
+            likedCommentIds.contains(comment.getId())
+        ))
+        .toList();
   }
 
   @Transactional
@@ -74,7 +91,7 @@ public class CommentService {
         .orElseThrow(() -> new CustomException(ExceptionStatus.NOT_FOUND));
 
     boolean isAuthor = Objects.equals(comment.getUser().getId(), userId);
-    boolean isAdmin = ADMIN_ROLE.equals(role);
+    boolean isAdmin = Role.ADMIN.name().equals(role);
 
     if (!isAuthor && !isAdmin) {
       throw new CustomException(ExceptionStatus.DELETE_FORBIDDEN);

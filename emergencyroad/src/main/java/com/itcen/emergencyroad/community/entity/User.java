@@ -60,8 +60,12 @@ public class User extends BaseEntity {
   private String kakaoId;
 
   public void updateKakaoProfile(String nickname, String profileImageUrl) {
-    this.nickname = nickname;
-    this.profileImageUrl = profileImageUrl;
+    if(nickname != null && !nickname.isBlank()){
+      this.nickname = nickname;
+    }
+    if(profileImageUrl != null){
+      this.profileImageUrl = profileImageUrl;
+    }
   }
 
   public void updateProfileImage(String imageUrl) {
