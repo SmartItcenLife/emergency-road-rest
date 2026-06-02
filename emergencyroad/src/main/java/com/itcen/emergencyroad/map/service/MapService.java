@@ -14,11 +14,58 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 @RequiredArgsConstructor
 public class MapService {
     private final MapHospitalRepository mapHospitalRepository;
     private final MapAreaRepository mapAreaRepository;
+
+    private static final long AREA_CONGESTION_CACHE_TTL_MILLIS = 60_000L;
+    private static final long HOSPITAL_MARKER_CACHE_TTL_MILLIS = 10_000L;
+
+    private final Map<MapCategory, CachedAreaCongestion> areaCongestionCache =
+            new ConcurrentHashMap<>();
+    private final Map<String, CachedHospitalMarkers> hospitalMarkerCache =
+            new ConcurrentHashMap<>();
+
+    private record CachedAreaCongestion(
+            List<MapAreaCongestionResponseDto> data,
+            long cachedAt
+    ){
+
+    }
+
+    private record CachedHospitalMarkers(
+            List<MapHospitalMarkerResponseDto> data,
+            long cachedAt
+    ) {
+    }
+
+
+    private String buildHospitalMarkerCacheKey(
+            MapCategory category,
+            Double swLat,
+            Double swLon,
+            Double neLat,
+            Double neLon
+    ) {
+        if (!hasBounds(swLat, swLon, neLat, neLon)) {
+            return category + ":ALL";
+        }
+
+        Bounds bounds = normalizeBounds(swLat, swLon, neLat, neLon);
+
+        return String.format(
+                "%s:%.3f:%.3f:%.3f:%.3f",
+                category,
+                bounds.minLat(),
+                bounds.minLon(),
+                bounds.maxLat(),
+                bounds.maxLon()
+        );
+    }
 
     public List<MapHospitalMarkerResponseDto> getHospitals(
             MapCategory category,
@@ -27,11 +74,45 @@ public class MapService {
             Double neLat,
             Double neLon
     ) {
-        return switch (category) {
+
+        long startTime = System.nanoTime();
+        long now = System.currentTimeMillis();
+        String cacheKey = buildHospitalMarkerCacheKey(category, swLat, swLon, neLat, neLon);
+
+        CachedHospitalMarkers cached = hospitalMarkerCache.get(cacheKey);
+
+        if (cached != null && now - cached.cachedAt() < HOSPITAL_MARKER_CACHE_TTL_MILLIS) {
+            double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
+            System.out.printf(
+                    "[MAP HOSPITAL MARKERS][AFTER][CACHE] %s key=%s count=%d: %.2fms%n",
+                    category,
+                    cacheKey,
+                    cached.data().size(),
+                    elapsedMs
+            );
+
+            return cached.data();
+        }
+
+        List<MapHospitalMarkerResponseDto> result = switch (category) {
             case GENERAL -> getGeneralHospitals(swLat, swLon, neLat, neLon);
             case PEDIATRIC -> getPediatricHospitals(swLat, swLon, neLat, neLon);
             case PREGNANT -> getPregnantHospitals(swLat, swLon, neLat, neLon);
         };
+
+        hospitalMarkerCache.put(cacheKey, new CachedHospitalMarkers(result, now));
+
+        double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
+        System.out.printf(
+                "[MAP HOSPITAL MARKERS][AFTER][DB] %s key=%s bounds=%s count=%d: %.2fms%n",
+                category,
+                cacheKey,
+                hasBounds(swLat, swLon, neLat, neLon),
+                result.size(),
+                elapsedMs
+        );
+
+        return result;
     }
 
     private List<MapHospitalMarkerResponseDto> getGeneralHospitals(
@@ -519,6 +600,23 @@ public class MapService {
     }
     // 구 별 혼잡도 조회 메인 메소드
     public List<MapAreaCongestionResponseDto> getAreaCongestion(MapCategory category) {
+        // 캐싱 적용 후 속도 측정
+        long startTime = System.nanoTime();
+        long now = System.currentTimeMillis();
+
+        CachedAreaCongestion cached = areaCongestionCache.get(category);
+
+        if (cached != null && now - cached.cachedAt() < AREA_CONGESTION_CACHE_TTL_MILLIS) {
+            double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
+            System.out.printf(
+                    "[MAP AREA CONGESTION][AFTER][CACHE] %s: %.2fms%n",
+                    category,
+                    elapsedMs
+            );
+
+            return cached.data();
+        }
+
         List<MapArea> areas = mapAreaRepository.findActiveAreasBySidoAndLevel(
                 "11",
                 MapAreaLevel.DISTRICT
@@ -532,13 +630,25 @@ public class MapService {
                         .collect(Collectors.groupingBy(
                                 source -> extractDistrictName(source.getAddress())
                         ));
-        return areas.stream()
+
+        List<MapAreaCongestionResponseDto> result = areas.stream()
                 .map(area -> toAreaCongestionResponse(
                         category,
                         area,
                         hospitalsByDistrict.getOrDefault(area.getAreaName(), List.of())
                 ))
                 .toList();
+
+        areaCongestionCache.put(category, new CachedAreaCongestion(result, now));
+
+        double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
+        System.out.printf(
+                "[MAP AREA CONGESTION][AFTER][DB] %s: %.2fms%n",
+                category,
+                elapsedMs
+        );
+
+        return result;
     }
 
     private List<MapAreaCongestionProjection> getAreaCongestionSources(MapCategory category) {
