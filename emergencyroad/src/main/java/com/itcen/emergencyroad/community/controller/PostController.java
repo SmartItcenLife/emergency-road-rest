@@ -1,6 +1,6 @@
 package com.itcen.emergencyroad.community.controller;
 
-import com.itcen.emergencyroad.community.dto.post.ReportRequestDTO;
+import com.itcen.emergencyroad.community.dto.report.ReportRequestDTO;
 import com.itcen.emergencyroad.community.dto.post.PostRequestDto;
 import com.itcen.emergencyroad.community.dto.post.PostResponseDto;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
@@ -35,6 +35,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class PostController {
 
+  private static final String USER = "USER";
+  private static final String ROLE_PREFIX = "ROLE_";
+  private static final String ADMIN = "ADMIN";
+
   private final PostService postService;
   private final ReportService reportService;
 
@@ -56,7 +60,15 @@ public class PostController {
       @PathVariable Long postId,
       @AuthenticationPrincipal Long userId) {
 
-    return ResponseEntity.ok(ApiResponseDto.success("게시글 조회 성공", postService.getPost(postId, userId)));
+    PostResponseDto post = postService.getPost(postId, userId);
+
+    // 관리자가 아닐 때에는 '삭제된 게시글입니다' 띄우기_정연 수정
+    if (post.isDeleted() && !ADMIN.equals(getCurrentUserRole())) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(ApiResponseDto.fail(HttpStatus.NOT_FOUND, "삭제된 게시글입니다."));
+    }
+
+    return ResponseEntity.ok(ApiResponseDto.success("게시글 조회 성공", post));
   }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthContext } from "../../app/providers/AuthProvider";
 import { usePostDetail } from "../../features/community/hooks/usePostDetail";
 import { PostBody } from "../../features/community/components/PostBody";
@@ -48,6 +48,9 @@ export default function PostDetailPage() {
     setReportTarget,
   } = usePostDetail(hpid, postId, user);
 
+  const [searchParams] = useSearchParams();
+  const commentId = searchParams.get("commentId");
+
   if (loading)
     return (
       <div style={{ padding: "60px 24px", textAlign: "center", color: INK3 }}>
@@ -62,6 +65,7 @@ export default function PostDetailPage() {
     );
 
   const isMyPost = user?.userId === post.userId;
+  const isAdmin = user?.role === "ADMIN";
 
   function handleComposerSubmit(text) {
     if (editing) {
@@ -101,7 +105,7 @@ export default function PostDetailPage() {
           </button>
         }
         rightAction={
-          isMyPost && (
+          (isMyPost || isAdmin) && (
             <MoreMenu
               onEdit={() => navigate(`/community/${hpid}/posts/${postId}/edit`)}
               onDelete={handleAskDeletePost}
@@ -171,6 +175,7 @@ export default function PostDetailPage() {
         onLike={handleLike}
       />
 
+      {/* 게시글 신고하기 버튼 */}
       {user && user.userId !== post.userId && (
         <div>
           <button
@@ -232,6 +237,7 @@ export default function PostDetailPage() {
       ) : (
         comments.map((c) => (
           <CommentItem
+            isReportedComment={String(c.id) == commentId}
             key={c.id}
             c={c}
             onLike={handleCommentLike}
@@ -239,6 +245,7 @@ export default function PostDetailPage() {
             onDelete={handleAskDeleteComment}
             onReport={handleAskReportComment}
             myId={user?.userId}
+            isAdmin={isAdmin}
           />
         ))
       )}
@@ -267,6 +274,7 @@ export default function PostDetailPage() {
         onClose={() => setConfirmTarget(null)}
       />
 
+      {/* 게시글 신고 모달 창(사유) 띄우기 */}
       <ReportModal
         open={!!reportTarget}
         type={reportTarget?.kind}

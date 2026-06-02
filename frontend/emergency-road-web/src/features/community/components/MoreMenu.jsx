@@ -49,6 +49,7 @@ export function MoreMenu({ onEdit, onDelete, size = 20, topOffset = 36 }) {
               overflow: "hidden",
             }}
           >
+            {onEdit && (
             <button
               onClick={() => {
                 setOpen(false);
@@ -68,6 +69,7 @@ export function MoreMenu({ onEdit, onDelete, size = 20, topOffset = 36 }) {
             >
               수정
             </button>
+            )}
             <button
               onClick={() => {
                 setOpen(false);

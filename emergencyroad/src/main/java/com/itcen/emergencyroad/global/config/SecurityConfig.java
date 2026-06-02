@@ -79,8 +79,8 @@ public class SecurityConfig {
                 "/api/hospitals/*/posts/*/comments/*").authenticated()
 
             // 어드민(ADMIN 경로는 ROLE을 ADMIN 가진 경우에만 진입할 수 있도록 설정해두었습니다.)
-            //.requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/admin/**").permitAll() // 임시로 허용했습니다(테스트)_정연
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            //    .requestMatchers("/api/admin/**").permitAll() // 임시로 허용했습니다(테스트)_정연
 
 
                 // 나머지
@@ -117,7 +117,8 @@ public class SecurityConfig {
         // React package.json 의 설정값에 따라 설정.
         "http://localhost:5713",
             // 모바일 확인용
-            "http://192.168.2.180:5713"
+            "http://192.168.2.180:5713",
+            "http://localhost:9016"
     ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));

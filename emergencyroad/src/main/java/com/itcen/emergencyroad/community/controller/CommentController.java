@@ -2,7 +2,7 @@ package com.itcen.emergencyroad.community.controller;
 
 import com.itcen.emergencyroad.community.dto.comment.CommentRequestDto;
 import com.itcen.emergencyroad.community.dto.comment.CommentResponseDto;
-import com.itcen.emergencyroad.community.dto.post.ReportRequestDTO;
+import com.itcen.emergencyroad.community.dto.report.ReportRequestDTO;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
 import com.itcen.emergencyroad.community.service.CommentService;
 import com.itcen.emergencyroad.community.service.ReportService;
