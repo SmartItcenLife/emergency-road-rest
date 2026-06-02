@@ -1,19 +1,5 @@
 import "./MapListPanel.css";
-
-function displayValue(value) {
-    if ( value == null || value == "" || value == undefined ) {
-        return "-";
-    }
-    return value;
-}
-
-function formatDateTime(dateTimeString) {
-    if (!dateTimeString) {
-        return "-";
-    }
-
-    return dateTimeString.replace("T", " ").substring(0, 16);
-}
+import { displayValue, formatDateTime } from "../utils/mapFormat";
 
 function MapHospitalDetail({ hospital }) {
     return (
