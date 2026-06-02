@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: "0.0.0.0",
-    port: 5713,
+    port: 5173,
     proxy: {
       // '/api'로 시작하는 요청을 백엔드 서버(8088)로 전달
       "/api": {
