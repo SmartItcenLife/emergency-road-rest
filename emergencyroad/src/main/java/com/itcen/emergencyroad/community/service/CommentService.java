@@ -1,5 +1,6 @@
 package com.itcen.emergencyroad.community.service;
 
+import static com.itcen.emergencyroad.global.util.QueryResultUtil.toCountMap;
 import com.itcen.emergencyroad.community.dto.comment.CommentRequestDto;
 import com.itcen.emergencyroad.community.dto.comment.CommentResponseDto;
 import com.itcen.emergencyroad.community.entity.Comment;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,12 +98,4 @@ public class CommentService {
     }
     comment.delete();
   }
-
-  private Map<Long, Long> toCountMap(List<Object[]> rows) {
-    return rows.stream()
-        .collect(Collectors.toMap(
-            row -> (Long) row[0],
-            row -> (Long) row[1]
-        ));
-
-}}
+}

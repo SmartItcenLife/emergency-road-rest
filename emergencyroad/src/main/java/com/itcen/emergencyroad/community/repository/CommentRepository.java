@@ -14,4 +14,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
       "where c.post.id in :postIds and c.isDeleted = false group by c.post.id")
   List<Object[]> countByPostIds(@Param("postIds") List<Long> postIds);
 
+  long countByPost_IdAndIsDeletedFalse(Long postId);
 }
