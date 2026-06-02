@@ -522,6 +522,7 @@ function KakaoMap({
         content: infoContent,
         yAnchor: 1.6,
         xAnchor: 0.5,
+        zIndex: 10000,
       });
 
       const marker = new window.kakao.maps.CustomOverlay({
@@ -530,9 +531,11 @@ function KakaoMap({
         content: markerElement,
         yAnchor: 1,
         xAnchor: 0.5,
+        zIndex : isSelected ? 5000 : 1000.
       });
 
         markerElement.addEventListener("mouseover", () => {
+          infoOverlay.setZIndex(10000); // 호버 시 항상 위에 표시
           infoOverlay.setMap(map);
         });
 
@@ -555,6 +558,7 @@ function KakaoMap({
 
       // 선택된 마커를 처리하는 함수
       if (isSelected){
+        infoOverlay.setZIndex(10000);
         infoOverlay.setMap(map);
         activeInfoOverlayRef.current = infoOverlay;
       }
