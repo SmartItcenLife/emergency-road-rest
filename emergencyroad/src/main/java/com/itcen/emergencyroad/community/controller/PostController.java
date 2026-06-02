@@ -1,5 +1,6 @@
 package com.itcen.emergencyroad.community.controller;
 
+import static com.itcen.emergencyroad.global.util.SecurityUtil.getCurrentUserRole;
 import com.itcen.emergencyroad.community.dto.report.ReportRequestDTO;
 import com.itcen.emergencyroad.community.dto.post.PostRequestDto;
 import com.itcen.emergencyroad.community.dto.post.PostResponseDto;
@@ -7,10 +8,8 @@ import com.itcen.emergencyroad.community.enums.ReportTargetType;
 import com.itcen.emergencyroad.community.service.PostService;
 import com.itcen.emergencyroad.community.service.ReportService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
-import com.itcen.emergencyroad.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -35,8 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class PostController {
 
-  private static final String USER = "USER";
-  private static final String ROLE_PREFIX = "ROLE_";
   private static final String ADMIN = "ADMIN";
 
   private final PostService postService;
@@ -101,7 +98,7 @@ public class PostController {
       @PathVariable Long postId,
       @AuthenticationPrincipal Long userId) {
 
-    postService.deletePost(postId, userId, SecurityUtil.getCurrentUserRole());
+    postService.deletePost(postId, userId, getCurrentUserRole());
     return ResponseEntity.ok(ApiResponseDto.success("게시글이 삭제되었습니다."));
   }
 

@@ -9,14 +9,8 @@ export default defineConfig({
     port: 5713,
     proxy: {
       // '/api'로 시작하는 요청을 백엔드 서버(8088)로 전달
-<<<<<<< Updated upstream
-      '/api': {
-        target: 'http://localhost:8080',
-=======
       "/api": {
         target: "http://localhost:8080",
-        // target: 'http://localhost:8080',
->>>>>>> Stashed changes
         changeOrigin: true,
         secure: false,
       },
