@@ -1,5 +1,6 @@
 package com.itcen.emergencyroad.community.service;
 
+import static com.itcen.emergencyroad.global.util.QueryResultUtil.toCountMap;
 import com.itcen.emergencyroad.community.dto.post.PostRequestDto;
 import com.itcen.emergencyroad.community.dto.post.PostResponseDto;
 import com.itcen.emergencyroad.community.entity.Post;
@@ -16,7 +17,6 @@ import com.itcen.emergencyroad.hospital.repository.HospitalRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -76,11 +76,8 @@ public class PostService {
     List<String> imageUrls = postImageService.getImageUrlMap(postIds)
         .getOrDefault(postId, List.of());
 
-    long postLikeCount = toCountMap(postLikeRepository.countByPostIds(postIds))
-        .getOrDefault(postId, 0L);
-
-    long commentCount = toCountMap(commentRepository.countByPostIds(postIds))
-        .getOrDefault(postId, 0L);
+    long postLikeCount = postLikeRepository.countByPost_Id(postId);
+    long commentCount = commentRepository.countByPost_IdAndIsDeletedFalse(postId);
 
     boolean isLiked = (userId != null) &&
         postLikeRepository.existsByPost_IdAndUser_Id(postId, userId);
@@ -138,13 +135,5 @@ public class PostService {
 
     postImageService.deleteImages(postId);
     post.delete();
-  }
-
-  private Map<Long, Long> toCountMap(List<Object[]> rows) {
-    return rows.stream()
-        .collect(Collectors.toMap(
-            row -> (Long) row[0],
-            row -> (Long) row[1]
-        ));
   }
 }
