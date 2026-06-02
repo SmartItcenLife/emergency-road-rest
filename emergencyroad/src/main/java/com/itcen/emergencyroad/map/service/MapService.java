@@ -27,22 +27,30 @@ public class MapService {
             Double neLat,
             Double neLon
     ) {
-        validateGeneralCategory(category); // 유효한 유형인지 검사
+        return switch (category) {
+            case GENERAL -> getGeneralHospitals(swLat, swLon, neLat, neLon);
+            case PEDIATRIC -> getPediatricHospitals(swLat, swLon, neLat, neLon);
+            case PREGNANT -> getPregnantHospitals(swLat, swLon, neLat, neLon);
+        };
+    }
 
+    private List<MapHospitalMarkerResponseDto> getGeneralHospitals(
+            Double swLat,
+            Double swLon,
+            Double neLat,
+            Double neLon
+    ) {
         List<MapGeneralHospitalMarkerProjection> hospitals; // 필요한 데이터만 끌고 오기위해 projection 사용
 
         // 영역 설정
         if ( hasBounds(swLat, swLon, neLat, neLon)) {
-            double minLat = Math.min(swLat, neLat);
-            double maxLat = Math.max(swLat, neLat);
-            double minLon = Math.min(swLon, neLon);
-            double maxLon = Math.max(swLon, neLon);
+            Bounds bounds = normalizeBounds(swLat, swLon, neLat, neLon);
 
             hospitals = mapHospitalRepository.findGeneralHospitalMarkersInBounds(
-                    minLat,
-                    minLon,
-                    maxLat,
-                    maxLon
+                    bounds.minLat(),
+                    bounds.minLon(),
+                    bounds.maxLat(),
+                    bounds.maxLon()
             );
         } else { // 사용자 영역이 없는 경우 현재는 기본적으로 좌표가 있는 모든 병원 목록을 조회한다.
             hospitals = mapHospitalRepository.findGeneralHospitalMarkers();
@@ -53,25 +61,108 @@ public class MapService {
                 .toList();
     }
 
+    private List<MapHospitalMarkerResponseDto> getPediatricHospitals(
+            Double swLat,
+            Double swLon,
+            Double neLat,
+            Double neLon
+    ) {
+        List<MapPediatricHospitalMarkerProjection> hospitals;
+
+        if (hasBounds(swLat, swLon, neLat, neLon)) {
+            Bounds bounds = normalizeBounds(swLat, swLon, neLat, neLon);
+
+            hospitals = mapHospitalRepository.findPediatricHospitalMarkersInBounds(
+                    bounds.minLat(),
+                    bounds.minLon(),
+                    bounds.maxLat(),
+                    bounds.maxLon()
+            );
+        } else {
+            hospitals = mapHospitalRepository.findPediatricHospitalMarkers();
+        }
+
+        return hospitals.stream()
+                .map(this::toMarkerResponse)
+                .toList();
+    }
+
+    private List<MapHospitalMarkerResponseDto> getPregnantHospitals(
+            Double swLat,
+            Double swLon,
+            Double neLat,
+            Double neLon
+    ) {
+        List<MapPregnantHospitalMarkerProjection> hospitals;
+
+        if (hasBounds(swLat, swLon, neLat, neLon)) {
+            Bounds bounds = normalizeBounds(swLat, swLon, neLat, neLon);
+
+            hospitals = mapHospitalRepository.findPregnantHospitalMarkersInBounds(
+                    bounds.minLat(),
+                    bounds.minLon(),
+                    bounds.maxLat(),
+                    bounds.maxLon()
+            );
+        } else {
+            hospitals = mapHospitalRepository.findPregnantHospitalMarkers();
+        }
+
+        return hospitals.stream()
+                .map(this::toMarkerResponse)
+                .toList();
+    }
+
     private MapHospitalMarkerResponseDto toMarkerResponse(
             MapGeneralHospitalMarkerProjection hospital
+    ) {
+        return baseMarkerBuilder(hospital, MapCategory.GENERAL)
+                .status(createEmergencyBedStatus(
+                        hospital.getEmergencyAvailableBeds(),
+                        hospital.getEmergencyTotalBeds()
+                ))
+                .build();
+    }
+
+    private MapHospitalMarkerResponseDto toMarkerResponse(
+            MapPediatricHospitalMarkerProjection hospital
+    ) {
+        return baseMarkerBuilder(hospital, MapCategory.PEDIATRIC)
+                .status(createResourceRateStatus(
+                        MapMetricType.PEDIATRIC_BED,
+                        hospital.getPediatricAvailableBeds(),
+                        hospital.getPediatricTotalBeds()
+                ))
+                .build();
+    }
+
+    private MapHospitalMarkerResponseDto toMarkerResponse(
+            MapPregnantHospitalMarkerProjection hospital
+    ) {
+        return baseMarkerBuilder(hospital, MapCategory.PREGNANT)
+                .status(createPregnantStatus(
+                        hospital.getNicuBedCount(),
+                        hospital.getNicuStandard(),
+                        hospital.getDeliveryAvailable()
+                ))
+                .build();
+    }
+
+    private MapHospitalMarkerResponseDto.MapHospitalMarkerResponseDtoBuilder baseMarkerBuilder(
+            MapHospitalMarkerBaseProjection hospital,
+            MapCategory category
     ) {
         return MapHospitalMarkerResponseDto.builder()
                 .hpid(hospital.getHpid())
                 .hospitalName(hospital.getHospitalName())
-                .category(MapCategory.GENERAL)
+                .category(category)
                 .latitude(hospital.getLatitude())
                 .longitude(hospital.getLongitude())
                 .address(hospital.getAddress())
                 .emergencyPhone(hospital.getEmergencyPhone())
                 .areaCode(null)
                 .areaName(extractDistrictName(hospital.getAddress()))
-                .status(createEmergencyBedStatus(
-                        hospital.getEmergencyAvailableBeds(),
-                        hospital.getEmergencyTotalBeds()
-                ))
-                .recordedAt(hospital.getRecordedAt())
-                .build();
+                .recordedAt(hospital.getRecordedAt());
     }
 
     private boolean hasBounds(
@@ -86,10 +177,26 @@ public class MapService {
                 && neLon != null;
     }
 
-    private void validateGeneralCategory(MapCategory category) {
-        if (category != MapCategory.GENERAL) {
-            throw new IllegalArgumentException("현재 지도 병원 마커 API는 GENERAL만 지원합니다. category=" + category);
-        }
+    private Bounds normalizeBounds(
+            Double swLat,
+            Double swLon,
+            Double neLat,
+            Double neLon
+    ) {
+        return new Bounds(
+                Math.min(swLat, neLat),
+                Math.min(swLon, neLon),
+                Math.max(swLat, neLat),
+                Math.max(swLon, neLon)
+        );
+    }
+
+    private record Bounds(
+            double minLat,
+            double minLon,
+            double maxLat,
+            double maxLon
+    ) {
     }
 
     private MapDisplayStatusDto createEmergencyBedStatus(
@@ -152,15 +259,15 @@ public class MapService {
                 .build();
     }
 
-    // 구 별 혼잡도 계산 : 구 별 혼잡도를 확인하기 위해서 병원별 혼잡도를 기준으로 계산
-    private MapDisplayStatusDto createAreaEmergencyBedStatus(
+    private MapDisplayStatusDto createResourceRateStatus(
+            MapMetricType metricType,
             Integer availableCount,
             Integer totalCount
     ) {
         if (availableCount == null || totalCount == null || totalCount == 0) {
             return MapDisplayStatusDto.builder()
                     .type(MapStatusType.SCORE)
-                    .metricType(MapMetricType.EMERGENCY_BED)
+                    .metricType(metricType)
                     .grade(MapCongestionGrade.UNKNOWN)
                     .label("정보없음")
                     .colorLevel(0)
@@ -177,15 +284,138 @@ public class MapService {
         String label;
         int colorLevel;
 
-        if (rate >= 30) {
+        if (rate >= 50) {
             grade = MapCongestionGrade.RELAXED;
             label = "여유";
             colorLevel = 4;
-        } else if (rate >= 15) {
+        } else if (rate >= 20) {
             grade = MapCongestionGrade.NORMAL;
             label = "보통";
             colorLevel = 3;
-        } else if (rate >= 5) {
+        } else {
+            grade = MapCongestionGrade.CROWDED;
+            label = "혼잡";
+            colorLevel = 2;
+        }
+
+        return MapDisplayStatusDto.builder()
+                .type(MapStatusType.SCORE)
+                .metricType(metricType)
+                .grade(grade)
+                .label(label)
+                .colorLevel(colorLevel)
+                .score(rate)
+                .availableCount(availableCount)
+                .totalCount(totalCount)
+                .rate(rate)
+                .build();
+    }
+
+    private MapDisplayStatusDto createPregnantStatus(
+            Integer nicuBedCount,
+            Integer nicuStandard,
+            String deliveryAvailable
+    ) {
+        String deliveryLabel = toAvailabilityLabel(deliveryAvailable);
+
+        if ("가능".equals(deliveryLabel)) {
+            return MapDisplayStatusDto.builder()
+                    .type(MapStatusType.STATUS)
+                    .metricType(MapMetricType.DELIVERY_ROOM)
+                    .grade(MapCongestionGrade.RELAXED)
+                    .label("분만 가능")
+                    .colorLevel(4)
+                    .score(null)
+                    .availableCount(nicuBedCount)
+                    .totalCount(nicuStandard)
+                    .rate(null)
+                    .build();
+        }
+
+        if ("불가".equals(deliveryLabel)) {
+            return MapDisplayStatusDto.builder()
+                    .type(MapStatusType.STATUS)
+                    .metricType(MapMetricType.DELIVERY_ROOM)
+                    .grade(MapCongestionGrade.CROWDED)
+                    .label("분만 불가")
+                    .colorLevel(2)
+                    .score(null)
+                    .availableCount(nicuBedCount)
+                    .totalCount(nicuStandard)
+                    .rate(null)
+                    .build();
+        }
+
+        return createResourceRateStatus(
+                MapMetricType.NICU,
+                nicuBedCount,
+                nicuStandard
+        );
+    }
+
+
+    private String toAvailabilityLabel(String value) {
+        if (value == null || value.isBlank()) {
+            return "정보없음";
+        }
+
+        String normalized = value.trim();
+
+        if ("Y".equalsIgnoreCase(normalized) || "Y1".equalsIgnoreCase(normalized)) {
+            return "가능";
+        }
+
+        if ("N".equalsIgnoreCase(normalized) || "N1".equalsIgnoreCase(normalized)) {
+            return "불가";
+        }
+
+        return normalized;
+    }
+
+    // 구 별 혼잡도 계산 : 구 별 혼잡도를 확인하기 위해서 병원별 혼잡도를 기준으로 계산
+    private MapDisplayStatusDto createAreaResourceStatus(
+            MapMetricType metricType,
+            Integer availableCount,
+            Integer totalCount,
+            Integer hospitalCount
+    ) {
+        if (availableCount == null || totalCount == null || totalCount == 0) {
+            return MapDisplayStatusDto.builder()
+                    .type(MapStatusType.SCORE)
+                    .metricType(metricType)
+                    .grade(MapCongestionGrade.UNKNOWN)
+                    .label("정보없음")
+                    .colorLevel(0)
+                    .score(null)
+                    .availableCount(availableCount)
+                    .totalCount(totalCount)
+                    .rate(null)
+                    .build();
+        }
+
+        int rate = (int) Math.round(availableCount * 100.0 / totalCount);
+        int validHospitalCount = hospitalCount == null || hospitalCount <= 0 ? 1 : hospitalCount;
+        double averageAvailable = availableCount / (double) validHospitalCount;
+        int averageAvailableScore = (int) Math.round(
+                Math.min(averageAvailable, getAreaAverageAvailableCap(metricType))
+                        / getAreaAverageAvailableCap(metricType)
+                        * 100
+        );
+        int finalScore = (int) Math.round(rate * 0.7 + averageAvailableScore * 0.3);
+
+        MapCongestionGrade grade;
+        String label;
+        int colorLevel;
+
+        if (finalScore >= 70) {
+            grade = MapCongestionGrade.RELAXED;
+            label = "여유";
+            colorLevel = 4;
+        } else if (finalScore >= 40) {
+            grade = MapCongestionGrade.NORMAL;
+            label = "보통";
+            colorLevel = 3;
+        } else if (finalScore >= 15) {
             grade = MapCongestionGrade.CROWDED;
             label = "혼잡";
             colorLevel = 2;
@@ -197,15 +427,24 @@ public class MapService {
 
         return MapDisplayStatusDto.builder()
                 .type(MapStatusType.SCORE)
-                .metricType(MapMetricType.EMERGENCY_BED)
+                .metricType(metricType)
                 .grade(grade)
                 .label(label)
                 .colorLevel(colorLevel)
-                .score(rate)
+                .score(finalScore)
                 .availableCount(availableCount)
                 .totalCount(totalCount)
                 .rate(rate)
                 .build();
+    }
+
+    private int getAreaAverageAvailableCap(MapMetricType metricType) {
+        return switch (metricType) {
+            case EMERGENCY_BED -> 20;
+            case PEDIATRIC_BED -> 5;
+            case NICU -> 3;
+            case DELIVERY_ROOM -> 1;
+        };
     }
 
     // TODO : 나중에는 master table 의 컬럼값을 조절하던, hospital district mapping 테이블을 만들던하자.
@@ -226,15 +465,12 @@ public class MapService {
     }
     // 구 별 혼잡도 조회 메인 메소드
     public List<MapAreaCongestionResponseDto> getAreaCongestion(MapCategory category) {
-        validateGeneralCategory(category);
-
         List<MapArea> areas = mapAreaRepository.findActiveAreasBySidoAndLevel(
                 "11",
                 MapAreaLevel.DISTRICT
         );
 
-        List<MapAreaCongestionProjection> sources =
-                mapHospitalRepository.findGeneralAreaCongestionSources();
+        List<MapAreaCongestionProjection> sources = getAreaCongestionSources(category);
 
         Map< String, List<MapAreaCongestionProjection> > hospitalsByDistrict =
                 sources.stream()
@@ -244,27 +480,37 @@ public class MapService {
                         ));
         return areas.stream()
                 .map(area -> toAreaCongestionResponse(
+                        category,
                         area,
                         hospitalsByDistrict.getOrDefault(area.getAreaName(), List.of())
                 ))
                 .toList();
     }
 
+    private List<MapAreaCongestionProjection> getAreaCongestionSources(MapCategory category) {
+        return switch (category) {
+            case GENERAL -> mapHospitalRepository.findGeneralAreaCongestionSources();
+            case PEDIATRIC -> mapHospitalRepository.findPediatricAreaCongestionSources();
+            case PREGNANT -> mapHospitalRepository.findPregnantAreaCongestionSources();
+        };
+    }
+
     // 구별 응답 DTO 변환 메소드
     private MapAreaCongestionResponseDto toAreaCongestionResponse(
+            MapCategory category,
             MapArea area,
             List<MapAreaCongestionProjection> hospitals
     ) {
         int hospitalCount = hospitals.size();
 
         int totalAvailableBeds = hospitals.stream()
-                .map(MapAreaCongestionProjection::getEmergencyAvailableBeds)
+                .map(MapAreaCongestionProjection::getAvailableCount)
                 .filter(Objects::nonNull)
                 .mapToInt(Integer::intValue)
                 .sum();
 
         int totalBeds = hospitals.stream()
-                .map(MapAreaCongestionProjection::getEmergencyTotalBeds)
+                .map(MapAreaCongestionProjection::getTotalCount)
                 .filter(Objects::nonNull)
                 .mapToInt(Integer::intValue)
                 .sum();
@@ -279,11 +525,24 @@ public class MapService {
                 .areaCode(area.getAreaCode())
                 .areaName(area.getAreaName())
                 .areaLevel(area.getAreaLevel())
-                .category(MapCategory.GENERAL)
+                .category(category)
 //                .status(createEmergencyBedStatus(totalAvailableBeds, totalBeds)) -> 각 병원에서 혼잡도를 표현하기엔 적합하나 구 전체의 혼잡도를 표현하기엔 부적절
-                .status(createAreaEmergencyBedStatus(totalAvailableBeds,totalBeds))
+                .status(createAreaResourceStatus(
+                        getAreaMetricType(category),
+                        totalAvailableBeds,
+                        totalBeds,
+                        hospitalCount
+                ))
                 .hospitalCount(hospitalCount)
                 .recordedAt(recordedAt)
                 .build();
+    }
+
+    private MapMetricType getAreaMetricType(MapCategory category) {
+        return switch (category) {
+            case GENERAL -> MapMetricType.EMERGENCY_BED;
+            case PEDIATRIC -> MapMetricType.PEDIATRIC_BED;
+            case PREGNANT -> MapMetricType.NICU;
+        };
     }
 }

@@ -4,6 +4,7 @@ import { getMapStatusToneByGrade } from "../utils/mapStatusStyle";
 import seoulDistrictPolygons from "../data/seoulDistrictPolygons.json";
 import { getPolygonColor } from "../utils/mapPolygonStyle";
 import locationIcon from "../../../assets/location.svg";
+import { getMapHospitalLabels } from "../utils/mapHospitalDisplay";
 
 const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 
@@ -48,6 +49,7 @@ function KakaoMap({
   const [mapLevel, setMapLevel] = useState(AREA_MODE_LEVEL);
 
   const shouldRenderPolygons = !initialHospital && !selectedHospital && mapLevel > POLYGON_HIDE_LEVEL;
+
 
   
   // 지도에 표시된 마커를 모두 제거하는 함수
@@ -271,6 +273,7 @@ function KakaoMap({
   function createAreaInfoContent(areaName, congestion) {
     const content = document.createElement("div");
     content.className = "map-area-info";
+    const metricLabels = getMapHospitalLabels(congestion?.category ?? "GENERAL");
 
     content.innerHTML = `
       <strong>${areaName}</strong>
@@ -281,15 +284,15 @@ function KakaoMap({
           <dd>${displayValue(congestion?.hospitalCount)}개</dd>
         </div>
         <div>
-          <dt>가용 병상</dt>
-          <dd>${displayValue(congestion?.status?.availableCount)}개</dd>
+          <dt>${metricLabels.availableLabel}</dt>
+          <dd>${displayValue(congestion?.status?.availableCount)}${metricLabels.countSuffix}</dd>
         </div>
         <div>
-          <dt>전체 병상</dt>
-          <dd>${displayValue(congestion?.status?.totalCount)}개</dd>
+          <dt>${metricLabels.totalLabel}</dt>
+          <dd>${displayValue(congestion?.status?.totalCount)}${metricLabels.countSuffix}</dd>
         </div>
         <div>
-          <dt>가용률</dt>
+          <dt>${metricLabels.ratioLabel}</dt>
           <dd>${
             congestion?.status?.rate !== null &&
             congestion?.status?.rate !== undefined
@@ -312,6 +315,9 @@ function KakaoMap({
     const content = document.createElement("div");
     content.className = "map-marker-info map-marker-info-detail";
 
+    const category = hospital.category ?? "GENERAL";
+    const metricLabels = getMapHospitalLabels(category);
+
     const statusLabel = hospital.status?.label ?? "정보없음";
     const availableBeds = hospital.status?.availableCount;
     const totalCount = hospital.status?.totalCount;
@@ -326,15 +332,15 @@ function KakaoMap({
           <dd>${displayValue(hospital.hospitalName) ?? "정보없음"}</dd>
         </div>
         <div>
-          <dt>가용 병상</dt>
-          <dd>${displayValue(availableBeds)}개</dd>
+          <dt>${metricLabels.availableLabel}</dt>
+          <dd>${displayValue(availableBeds)}${metricLabels.countSuffix}</dd>
         </div>
         <div>
-          <dt>전체 병상</dt>
-          <dd>${displayValue(totalCount)}개</dd>
+          <dt>${metricLabels.totalLabel}</dt>
+          <dd>${displayValue(totalCount)}${metricLabels.countSuffix}</dd>
         </div>
         <div>
-          <dt>가용률</dt>
+          <dt>${metricLabels.ratioLabel}</dt>
           <dd>${
             rate !== null && rate !== undefined ? `${rate}%` : "정보없음"
           }</dd>
