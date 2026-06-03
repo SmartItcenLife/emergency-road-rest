@@ -1,7 +1,23 @@
 import "./MapListPanel.css";
 import { displayValue, formatDateTime } from "../utils/mapFormat";
+import { getMapHospitalLabels } from "../utils/mapHospitalDisplay";
+
+function displayStatusRate(hospital, metricLabels) {
+    if (hospital.status?.rate !== null && hospital.status?.rate !== undefined) {
+        return `${hospital.status.rate}%`;
+    }
+
+    if (metricLabels.ratioLabel === "분만 상태") {
+        return hospital.status?.label ?? "정보없음";
+    }
+
+    return "-";
+}
 
 function MapHospitalDetail({ hospital }) {
+    const category = hospital.category ?? "GENERAL";
+    const metricLabels = getMapHospitalLabels(category);
+
     return (
         <div className="map-list-item-detail">
             <section className="map-detail-section">
@@ -16,26 +32,22 @@ function MapHospitalDetail({ hospital }) {
                 </div>
             </section>
             <section className="map-detail-section">
-                <h3 className="map-detail-title">응급실 병상</h3>
+                <h3 className="map-detail-title">{metricLabels.title}</h3>
                 <div className="map-detail-row">
                     <span>혼잡 상태</span>
                     <strong>{displayValue(hospital.status?.label ?? "정보없음")}</strong>
                 </div>
                 <div className="map-detail-row">
-                    <span>가용 병상 수</span>
-                    <strong>{displayValue(hospital.status.availableCount)}</strong>
+                    <span>{metricLabels.availableLabel}</span>
+                    <strong>{displayValue(hospital.status?.availableCount)}</strong>
                 </div>
                 <div className="map-detail-row">
-                    <span>총 병상 수</span>
-                    <strong>{displayValue(hospital.status.totalCount)}</strong>
+                    <span>{metricLabels.totalLabel}</span>
+                    <strong>{displayValue(hospital.status?.totalCount)}</strong>
                 </div>
                 <div className="map-detail-row">
-                    <span>가용률</span>
-                    <strong>
-                      {hospital.status?.rate !== null && hospital.status?.rate !== undefined
-                        ? `${hospital.status.rate}%`
-                        : "-"}
-                    </strong>
+                    <span>{metricLabels.ratioLabel}</span>
+                    <strong>{displayStatusRate(hospital, metricLabels)}</strong>
                 </div>
             </section>
             <section className="map-detail-section">
