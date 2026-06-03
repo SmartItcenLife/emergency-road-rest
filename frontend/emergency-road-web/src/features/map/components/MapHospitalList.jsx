@@ -1,9 +1,8 @@
 import {
   getMapStatusColorByTone,
   getMapStatusRateForDisplay,
-  getMapStatusToneByGrade,
 } from "../utils/mapStatusStyle";
-import { getPregnantNicuStatusByCounts } from "../utils/mapPregnantNicuStatus";
+import { getHospitalMarkerStatus } from "../utils/mapHospitalMarkerStatus";
 import "./MapHospitalList.css";
 
 function displayValue(value) {
@@ -47,21 +46,12 @@ function MapHospitalList({
 
       <div className="map-list">
         {hospitals.map((hospital) => {
-          const statusGrade = hospital.status?.grade ?? "UNKNOWN";
-          const statusTone = getMapStatusToneByGrade(statusGrade);
-          const statusLabel = hospital.status?.label ?? "정보없음";
           const availableBeds = hospital.status?.availableCount;
           const totalBeds = hospital.status?.totalCount;
-          const isPregnantCategory = hospital.category === "PREGNANT";
-          const nicuStatus = getPregnantNicuStatusByCounts(
-            availableBeds,
-            totalBeds
-          );
-          const displayTone = isPregnantCategory ? nicuStatus.tone : statusTone;
-          const displayLabel = isPregnantCategory ? nicuStatus.label : statusLabel;
-          const displayRate = getMapStatusRateForDisplay(
-            isPregnantCategory ? nicuStatus.rate : hospital.status?.rate
-          );
+          const markerStatus = getHospitalMarkerStatus(hospital);
+          const displayTone = markerStatus.tone;
+          const displayLabel = markerStatus.label;
+          const displayRate = getMapStatusRateForDisplay(markerStatus.rate);
           const displayColor = getMapStatusColorByTone(displayTone);
 
           return (
@@ -93,7 +83,7 @@ function MapHospitalList({
                 }}
               >
                 <div className="map-list-status-donut-inner">
-                  <strong>{isPregnantCategory ? "NICU" :displayLabel}</strong>
+                  <strong>{markerStatus.summaryText}</strong>
                   <span>
                     {displayValue(availableBeds)} / {displayValue(totalBeds)}
                   </span>
