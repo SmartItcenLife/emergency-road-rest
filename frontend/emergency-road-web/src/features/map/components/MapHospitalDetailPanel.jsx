@@ -3,12 +3,11 @@ import { getHospitalDetail } from "../../hospitals/api/hospitalDetail";
 import { getMapHospitalLabels} from "../utils/mapHospitalDisplay"
 import { categoryConfig } from "../../hospitals/constants/categoryConfig";
 import {
-  getMapStatusColorByTone,
-  getMapStatusRateForDisplay,
   getMapStatusToneByGrade,
 } from "../utils/mapStatusStyle";
 import "./MapHospitalDetailPanel.css";
 import { getResourceToneByValues } from "../utils/mapResourceStatus";
+import { getMapDetailMetricDisplay } from "../utils/mapDetailMetricDisplay";
 
 
 function displayValue(value) {
@@ -90,9 +89,6 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
   const hospitalName = hospital.hospitalName;
   const address = hospital.address;
   const emergencyPhone = hospital.emergencyPhone;
-  const availableBeds = hospital.status?.availableCount;
-  const totalBeds = hospital.status?.totalCount;
-  const rate = hospital.status?.rate;
   const recordedAt = hospital.recordedAt;
 
   const category = hospital.category ?? "GENERAL";
@@ -101,24 +97,11 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
   const mapDetailSections = detailSections.filter((section) => 
     ["resources", "capabilities"].includes(section.type));
 
-  // 도넛 차트를 위한 변수 선언
-  const isPregnantCategory = category === "PREGNANT"; 
-
-  const donutRate = isPregnantCategory ? 100 : getMapStatusRateForDisplay(rate);
-  const donutRateText = isPregnantCategory ? getDeliveryDisplayLabel(statusLabel) : (rate !== null && rate !== undefined ? `${rate}%` : "-");
-  const donutColor = getMapStatusColorByTone(statusTone);
-
-  function getDeliveryDisplayLabel(label) {
-  if (label === "분만 가능") {
-    return "가능";
-  }
-
-  if (label === "분만 불가") {
-    return "불가능";
-  }
-
-  return label ?? "정보없음";
-}
+  const metricDisplay = getMapDetailMetricDisplay({
+    status: hospital.status,
+    statusTone,
+    metricLabels,
+  });
     
   // hpid 가 바뀔 때 값 마다 잘가져오는지 확인
   useEffect(() => {
@@ -229,24 +212,18 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
 
           <div className="map-detail-bed-status">
             <div className="map-detail-bed-count-card">
-              <strong>
-                {isPregnantCategory ? statusLabel : `${displayValue(availableBeds)} / ${displayValue(totalBeds)}`}
-              </strong>
-              <span>
-                {isPregnantCategory
-                  ? "분만 가능 여부"
-                  : `${metricLabels.availableLabel} / ${metricLabels.totalLabel}`}
-              </span>
+              <strong>{metricDisplay.countText}</strong>
+              <span>{metricDisplay.countLabel}</span>
             </div>
 
             <div
               className="map-detail-donut"
               style={{
-                background: `conic-gradient(${donutColor} ${donutRate}%, #edf2f7 0)`,
+                background: `conic-gradient(${metricDisplay.donutColor} ${metricDisplay.donutRate}%, #edf2f7 0)`,
               }}
             >
               <div className="map-detail-donut-inner">
-                <strong>{donutRateText}</strong>
+                <strong>{metricDisplay.donutText}</strong>
                 <span>{metricLabels.ratioLabel}</span>
               </div>
             </div>

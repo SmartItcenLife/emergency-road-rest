@@ -7,6 +7,7 @@ export function getMapHospitalLabels(category) {
                 availableLabel : "가용 병상",
                 totalLabel : "전체 병상",
                 ratioLabel : "가용률",
+                summaryType: "rate",
                 countSuffix: "개"
             };
         case "PREGNANT" :
@@ -15,6 +16,8 @@ export function getMapHospitalLabels(category) {
                 availableLabel : "가용 NICU 병상",
                 totalLabel : "전체 NICU 병상",
                 ratioLabel : "분만 상태",
+                summaryType: "status",
+                statusSummaryLabel: "분만 가능 여부",
                 countSuffix: "개"
             };
         case "PEDIATRIC" : 
@@ -23,6 +26,7 @@ export function getMapHospitalLabels(category) {
                 availableLabel : "가용 소아 병상",
                 totalLabel : "전체 소아 병상",
                 ratioLabel : "가용률",
+                summaryType: "rate",
                 countSuffix: "개"
             };
         }

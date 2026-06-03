@@ -7,7 +7,7 @@ function displayStatusRate(hospital, metricLabels) {
         return `${hospital.status.rate}%`;
     }
 
-    if (metricLabels.ratioLabel === "분만 상태") {
+    if (metricLabels.summaryType === "status") {
         return hospital.status?.label ?? "정보없음";
     }
 
