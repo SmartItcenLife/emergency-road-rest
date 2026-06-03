@@ -13,8 +13,11 @@ function getElapsedTime(startTime){
 }
 
 export async function getMapHospitals(category = "GENERAL", boundsParams = {}) {
+    const normalizedCategory = category.toUpperCase();
+    const startTime = getNow();
+
     const params = new URLSearchParams({
-        category: category.toUpperCase(),
+        category: normalizedCategory,
         ...boundsParams,
     });
 
@@ -24,6 +27,11 @@ export async function getMapHospitals(category = "GENERAL", boundsParams = {}) {
         throw new Error("병원 정보를 불러오는 데 실패했습니다.");
     }
     const result = await response.json();
+
+    console.log(
+        `[MAP API][HOSPITALS][NETWORK] ${normalizedCategory}: ${getElapsedTime(startTime)}`
+    );
+
     return result.data;
 }
 
