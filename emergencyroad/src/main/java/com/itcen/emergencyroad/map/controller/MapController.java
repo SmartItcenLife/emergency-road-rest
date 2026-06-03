@@ -42,10 +42,11 @@ public class MapController {
 
     @GetMapping("/areas/congestion")
     public ApiResponseDto<List<MapAreaCongestionResponseDto>> getAreaCongestion(
-            @RequestParam(defaultValue = "GENERAL") MapCategory category
+            @RequestParam(defaultValue = "GENERAL") MapCategory category,
+            @RequestParam(defaultValue = "11") String sidoCode
     ) {
         List<MapAreaCongestionResponseDto> areas =
-                mapService.getAreaCongestion(category);
+                mapService.getAreaCongestion(category, sidoCode);
 
         return ApiResponseDto.success("지도 구별 혼잡도 조회 성공", areas);
     }

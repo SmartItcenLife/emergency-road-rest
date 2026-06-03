@@ -30,7 +30,10 @@ public class MapService {
         );
     }
 
-    public List<MapAreaCongestionResponseDto> getAreaCongestion(MapCategory category) {
-        return areaCongestionService.getAreaCongestion(category);
+    public List<MapAreaCongestionResponseDto> getAreaCongestion(
+            MapCategory category,
+            String sidoCode
+    ) {
+        return areaCongestionService.getAreaCongestion(category, sidoCode);
     }
 }

@@ -22,27 +22,33 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MapAreaCongestionService {
     private static final long AREA_CONGESTION_CACHE_TTL_MILLIS = 60_000L;
-    private static final String SEOUL_SIDO_CODE = "11";
+    private static final String DEFAULT_SIDO_CODE = "11";
 
     private final MapHospitalRepository mapHospitalRepository;
     private final MapAreaRepository mapAreaRepository;
     private final MapStatusCalculator statusCalculator;
     private final MapDistrictResolver districtResolver;
 
-    private final Map<MapCategory, CachedAreaCongestion> areaCongestionCache =
+    private final Map<String, CachedAreaCongestion> areaCongestionCache =
             new ConcurrentHashMap<>();
 
-    public List<MapAreaCongestionResponseDto> getAreaCongestion(MapCategory category) {
+    public List<MapAreaCongestionResponseDto> getAreaCongestion(
+            MapCategory category,
+            String sidoCode
+    ) {
         long startTime = System.nanoTime();
         long now = System.currentTimeMillis();
+        String normalizedSidoCode = normalizeSidoCode(sidoCode);
+        String cacheKey = buildAreaCongestionCacheKey(category, normalizedSidoCode);
 
-        CachedAreaCongestion cached = areaCongestionCache.get(category);
+        CachedAreaCongestion cached = areaCongestionCache.get(cacheKey);
 
         if (cached != null && now - cached.cachedAt() < AREA_CONGESTION_CACHE_TTL_MILLIS) {
             double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
             System.out.printf(
-                    "[MAP AREA CONGESTION][AFTER][CACHE] %s: %.2fms%n",
+                    "[MAP AREA CONGESTION][AFTER][CACHE] %s key=%s: %.2fms%n",
                     category,
+                    cacheKey,
                     elapsedMs
             );
 
@@ -50,7 +56,7 @@ public class MapAreaCongestionService {
         }
 
         List<MapArea> areas = mapAreaRepository.findActiveAreasBySidoAndLevel(
-                SEOUL_SIDO_CODE,
+                normalizedSidoCode,
                 MapAreaLevel.DISTRICT
         );
 
@@ -71,12 +77,13 @@ public class MapAreaCongestionService {
                 ))
                 .toList();
 
-        areaCongestionCache.put(category, new CachedAreaCongestion(result, now));
+        areaCongestionCache.put(cacheKey, new CachedAreaCongestion(result, now));
 
         double elapsedMs = (System.nanoTime() - startTime) / 1_000_000.0;
         System.out.printf(
-                "[MAP AREA CONGESTION][AFTER][DB] %s: %.2fms%n",
+                "[MAP AREA CONGESTION][AFTER][DB] %s key=%s: %.2fms%n",
                 category,
+                cacheKey,
                 elapsedMs
         );
 
@@ -138,6 +145,21 @@ public class MapAreaCongestionService {
             case PEDIATRIC -> MapMetricType.PEDIATRIC_BED;
             case PREGNANT -> MapMetricType.NICU;
         };
+    }
+
+    private String normalizeSidoCode(String sidoCode) {
+        if (sidoCode == null || sidoCode.isBlank()) {
+            return DEFAULT_SIDO_CODE;
+        }
+
+        return sidoCode.trim();
+    }
+
+    private String buildAreaCongestionCacheKey(
+            MapCategory category,
+            String sidoCode
+    ) {
+        return category + ":" + sidoCode;
     }
 
     private record CachedAreaCongestion(
