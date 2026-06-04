@@ -102,8 +102,6 @@ public class AdminService {
             comment.delete();
         }
 
-        // 🔥 원래 있던 reportRepository.delete(report); 코드를 과감하게 지워주세요!!
-        // 이걸 지워야 관리자 목록에 "🔒 숨김 처리됨" 상태로 예쁘게 남습니다.
     }
 
     @Transactional(readOnly = true)
