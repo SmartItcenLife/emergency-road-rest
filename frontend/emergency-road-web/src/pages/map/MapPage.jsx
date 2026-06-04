@@ -1,4 +1,4 @@
-import "../../styles/map/map.css";
+import "./MapPage.css";
 import MapLayout from "../../features/map/components/MapLayout";
 import { useSearchParams } from "react-router-dom";
 

@@ -1,0 +1,252 @@
+.kakao-map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.kakao-map {
+  width: 100%;
+  height: 100%;
+}
+
+.map-hospital-marker {
+  position: relative;
+  width: 86px;
+  height: 120px;
+  cursor: pointer;
+  color: #6b7280;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 4px 7px rgba(15, 23, 42, 0.28));
+}
+
+.map-hospital-marker.relaxed {
+  color: #16a34a;
+}
+
+.map-hospital-marker.normal {
+  color: #2563eb;
+}
+
+.map-hospital-marker.crowded {
+  color: #f97316;
+}
+
+.map-hospital-marker.very-crowded {
+  color: #dc2626;
+}
+
+.map-hospital-marker.unknown {
+  color: #6b7280;
+}
+
+.map-hospital-marker.selected {
+  transform: scale(1.12);
+  filter: drop-shadow(0 6px 10px rgba(15, 23, 42, 0.34));
+}
+
+.map-hospital-marker-shape {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  mask-image: url("../../../assets/hospital/hospital_marker.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: url("../../../assets/hospital/hospital_marker.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.map-hospital-marker-count {
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.map-area-info,
+.map-marker-info-detail {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #111827;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.map-area-info {
+  min-width: 180px;
+  padding: 10px 12px;
+}
+
+.map-marker-info-detail {
+  min-width: 190px;
+  max-width: 260px;
+  padding: 10px 12px;
+}
+
+.map-area-info strong,
+.map-marker-info-detail strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.map-marker-info-detail strong {
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+.map-area-info > span,
+.map-marker-info-detail > span {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background-color: #eef2ff;
+  color: #3730a3;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.map-area-info dl,
+.map-marker-info-detail dl {
+  margin: 0;
+}
+
+.map-area-info div,
+.map-marker-info-detail div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.map-area-info dt,
+.map-marker-info-detail dt {
+  color: #6b7280;
+}
+
+.map-area-info dd,
+.map-marker-info-detail dd {
+  margin: 0;
+  color: #111827;
+  font-weight: 700;
+}
+
+.map-marker-info-detail dd {
+  text-align: right;
+}
+
+.map-control-stack {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
+}
+
+.map-control-button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.map-control-button:last-child {
+  border-bottom: 0;
+}
+
+.map-control-button:hover {
+  background-color: #f9fafb;
+}
+
+.map-current-location-button img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.map-current-location-marker {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  pointer-events: none;
+}
+
+.map-current-location-marker::before,
+.map-current-location-marker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background-color: rgba(37, 99, 235, 0.22);
+  animation: current-location-pulse 1.8s ease-out infinite;
+}
+
+.map-current-location-marker::after {
+  animation-delay: 0.9s;
+}
+
+.map-current-location-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  background-color: #2563eb;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
+@keyframes current-location-pulse {
+  0% {
+    transform: scale(0.35);
+    opacity: 0.9;
+  }
+
+  70% {
+    opacity: 0.18;
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-control-stack {
+    right: 12px;
+    bottom: calc(34svh + 16px);
+  }
+
+  .map-area-info {
+    max-width: 220px;
+  }
+}

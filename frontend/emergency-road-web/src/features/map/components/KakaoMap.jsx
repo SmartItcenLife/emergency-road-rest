@@ -5,6 +5,8 @@ import seoulDistrictPolygons from "../data/seoulDistrictPolygons.json";
 import { getPolygonColor } from "../utils/mapPolygonStyle";
 import locationIcon from "../../../assets/location.svg";
 import { getMapHospitalLabels } from "../utils/mapHospitalDisplay";
+import { getPregnantNicuStatusByCounts } from "../utils/mapPregnantNicuStatus";
+import "./KakaoMap.css";
 
 const KAKAO_MAP_SDK_ID = "kakao-map-sdk";
 
@@ -489,6 +491,13 @@ function KakaoMap({
       // Marker 
       const statusTone = getMapStatusToneByGrade(hospital.status?.grade);
       const availableBeds = hospital.status?.availableCount
+      const totalBeds = hospital.status?.totalCount;
+      const isPregnantCategory = hospital.category === "PREGNANT";
+      const nicuStatus = getPregnantNicuStatusByCounts(
+        availableBeds,
+        totalBeds
+      );
+      const displayTone = isPregnantCategory ? nicuStatus.tone : statusTone;
       const availableBedsText = typeof availableBeds == 'number' ? availableBeds : "정보없음";
 
       
@@ -497,8 +506,8 @@ function KakaoMap({
       
       const markerElement = document.createElement("div");
       markerElement.className = isSelected
-        ? `map-hospital-marker ${statusTone} selected`
-        : `map-hospital-marker ${statusTone}`;
+        ? `map-hospital-marker ${displayTone} selected`
+        : `map-hospital-marker ${displayTone}`;
       markerElement.style.opacity = isSelected ? 1 : markerOpacity; // 선택된 병원이 더 잘 보이게
       markerElement.title = hospital.hospitalName ?? "선택한 병원";
       markerElement.innerHTML = `
@@ -513,6 +522,7 @@ function KakaoMap({
         content: infoContent,
         yAnchor: 1.6,
         xAnchor: 0.5,
+        zIndex: 10000,
       });
 
       const marker = new window.kakao.maps.CustomOverlay({
@@ -521,9 +531,11 @@ function KakaoMap({
         content: markerElement,
         yAnchor: 1,
         xAnchor: 0.5,
+        zIndex : isSelected ? 5000 : 1000.
       });
 
         markerElement.addEventListener("mouseover", () => {
+          infoOverlay.setZIndex(10000); // 호버 시 항상 위에 표시
           infoOverlay.setMap(map);
         });
 
@@ -546,6 +558,7 @@ function KakaoMap({
 
       // 선택된 마커를 처리하는 함수
       if (isSelected){
+        infoOverlay.setZIndex(10000);
         infoOverlay.setMap(map);
         activeInfoOverlayRef.current = infoOverlay;
       }
