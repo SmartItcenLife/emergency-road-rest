@@ -15,14 +15,15 @@ import {
   Field,
   Input,
   Icon,
-  SURFACE,
-  BORDER1,
-  INK1,
-  INK2,
-  INK3,
-  ACCENT,
   ConfirmModal,
-} from "../../shared/components/ui/Primitives";
+} from "../../shared/components/ui";
+
+const ACCENT = "#2563EB";
+const BORDER1 = "#E2E6EE";
+const INK1 = "#0F1422";
+const INK2 = "#404757";
+const INK3 = "#7B8392";
+const SURFACE = "#FFFFFF";
 
 export default function MyPage() {
   const navigate = useNavigate();

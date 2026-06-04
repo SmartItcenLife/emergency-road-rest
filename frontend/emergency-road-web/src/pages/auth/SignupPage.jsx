@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { AppBar, Icon } from "../../shared/components/ui/Primitives";
+import { AppBar, Icon } from "../../shared/components/ui";
 import { useSignup } from "../../features/auth/hooks/useSignup";
 import { SignupForm } from "../../features/auth/components/signup/SignupForm";
 import { SignupSuccess } from "../../features/auth/components/signup/SignupSuccess";

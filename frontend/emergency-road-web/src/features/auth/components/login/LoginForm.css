@@ -1,0 +1,50 @@
+.login-form {
+  padding: 4px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.login-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-form__pw-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #7b8392;
+  display: flex;
+}
+
+.login-form__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #7b8392;
+  font-size: 12px;
+  margin: 24px 0 14px; /* ← 위아래 여백 */
+}
+
+.login-form__divider-line {
+  flex: 1;
+  height: 1px;
+  background: #e2e6ee;
+}
+
+.login-form__footer {
+  margin-top: auto;
+  padding-top: 28px; /* ← 위 여백 */
+  text-align: center;
+  font-size: 13px;
+  color: #404757;
+}
+
+.login-form__signup-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}

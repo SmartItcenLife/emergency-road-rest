@@ -1,4 +1,4 @@
-import { Button, Icon } from "../../../../shared/components/ui/Primitives";
+import { Button, Icon } from "../../../../shared/components/ui";
 
 const SURFACE = "#FFFFFF";
 const ACCENT = "#2563EB";

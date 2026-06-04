@@ -1,10 +1,5 @@
 import { Link } from "react-router-dom";
-import {
-  Button,
-  Field,
-  Input,
-  Icon,
-} from "../../../../shared/components/ui/Primitives";
+import { Button, Field, Input, Icon } from "../../../../shared/components/ui";
 import { PasswordStrength } from "./PasswordStrength";
 import { ProfileImagePicker } from "./ProfileImagePicker";
 
