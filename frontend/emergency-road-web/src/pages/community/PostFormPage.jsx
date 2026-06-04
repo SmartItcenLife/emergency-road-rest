@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { usePostForm } from "../../features/community/hooks/usePostForm";
 import { PostImagePicker } from "../../features/community/components/PostImagePicker";
-import { AppBar, Icon } from "../../shared/components/ui/Primitives";
+import { AppBar, Icon } from "../../shared/components/ui";
 
 const SURFACE = "#FFFFFF";
 const BORDER1 = "#E2E6EE";

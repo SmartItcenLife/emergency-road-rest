@@ -5,7 +5,8 @@ export function usePostList(hpid) {
   const [posts, setPosts] = useState([]);
   const [hospitalName, setHospitalName] = useState("");
   const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(false);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [keyword, setKeyword] = useState("");
 
@@ -19,13 +20,13 @@ export function usePostList(hpid) {
       .catch(() => setHospitalName(hpid));
   }, [hpid]);
 
-  async function fetchPosts(p = 0, kw = "", reset = false) {
+  async function fetchPosts(p = 0, kw = "") {
     setLoading(true);
     try {
-      const data = await getPosts(hpid, { page: p, keyword: kw });
-      const list = data.content ?? [];
-      setPosts((prev) => (reset ? list : [...prev, ...list]));
-      setHasMore(!data.last);
+      const data = await getPosts(hpid, { page: p, keyword: kw, size: 5 });
+      setPosts(data.content ?? []);
+      setTotalPages(data.totalPages ?? 0);
+      setTotalElements(data.totalElements ?? 0);
       setPage(p);
     } finally {
       setLoading(false);
@@ -38,23 +39,24 @@ export function usePostList(hpid) {
 
   function onSearch(e) {
     e.preventDefault();
-    fetchPosts(0, keyword, true);
+    fetchPosts(0, keyword);
   }
 
-  function onLoadMore() {
-    fetchPosts(page + 1, keyword);
+  function onPageChange(p) {
+    fetchPosts(p, keyword);
   }
 
   return {
     posts,
     hospitalName,
     page,
-    hasMore,
+    totalPages,
     loading,
     keyword,
     onKeywordChange: (e) => setKeyword(e.target.value),
     onSearch,
-    onLoadMore,
+    onPageChange,
+    totalElements,
   };
 }
 

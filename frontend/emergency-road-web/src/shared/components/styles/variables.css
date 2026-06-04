@@ -1,0 +1,31 @@
+/* src/shared/styles/variables.css */
+:root {
+  /* ── Accent ── */
+  --accent: #2563eb;
+  --accent-hover: #1e50c2;
+  --accent-soft: #eff6ff;
+  --accent-soft-2: #e8f1fe;
+
+  /* ── Surface ── */
+  --surface: #ffffff;
+  --surface-sunk: #eef1f6;
+  --canvas: #f7f9fc;
+
+  /* ── Border ── */
+  --border1: #e2e6ee;
+  --border2: #cdd3dd;
+
+  /* ── Ink (텍스트) ── */
+  --ink1: #0f1422;
+  --ink2: #404757;
+  --ink3: #7b8392;
+
+  /* ── Semantic ── */
+  --danger: #dc2626;
+  --success: #1f8a5b;
+  --warning: #d97706;
+
+  /* ── Brand ── */
+  --kakao: #fee500;
+  --kakao-fg: #181600;
+}

@@ -32,7 +32,13 @@ export function useLogin() {
     setErr(null);
     setLoading(true);
     try {
-      await login({ userName: id.trim(), password: pw });
+      const loginUser = await login({ userName: id.trim(), password: pw });
+
+      if (loginUser.role === "ADMIN") {
+        navigate("/admin", { replace: true });
+        return;
+      }
+
       const from = (location.state?.from || "/").replace(/\/$/, "");
       const safeTo = from === "/login" ? "/" : from;
       navigate(safeTo, { replace: true });

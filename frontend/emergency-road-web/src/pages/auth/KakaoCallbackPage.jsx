@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthContext } from "../../app/providers/AuthProvider";
-import { Icon } from "../../shared/components/ui/Primitives";
+import { Icon } from "../../shared/components/ui";
 
 const SURFACE = "#FFFFFF";
 const ACCENT = "#2563EB";

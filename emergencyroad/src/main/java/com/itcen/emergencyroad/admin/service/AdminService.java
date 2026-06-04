@@ -3,7 +3,7 @@ package com.itcen.emergencyroad.admin.service;
 import com.itcen.emergencyroad.admin.dto.AdminPostListDTO;
 import com.itcen.emergencyroad.admin.dto.AdminUserResponseDTO;
 import com.itcen.emergencyroad.admin.dto.DashboardResponseDto;
-import com.itcen.emergencyroad.community.dto.post.ReportResponseDTO;
+import com.itcen.emergencyroad.community.dto.report.ReportResponseDTO;
 import com.itcen.emergencyroad.community.entity.Comment;
 import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.Report;
@@ -102,8 +102,6 @@ public class AdminService {
             comment.delete();
         }
 
-        // 🔥 원래 있던 reportRepository.delete(report); 코드를 과감하게 지워주세요!!
-        // 이걸 지워야 관리자 목록에 "🔒 숨김 처리됨" 상태로 예쁘게 남습니다.
     }
 
     @Transactional(readOnly = true)

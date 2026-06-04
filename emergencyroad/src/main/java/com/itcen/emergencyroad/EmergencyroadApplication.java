@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @EnableScheduling
-@EnableJpaAuditing
 @SpringBootApplication
 public class EmergencyroadApplication {
 

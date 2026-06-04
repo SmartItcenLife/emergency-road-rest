@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Icon } from "../../../shared/components/ui/Primitives";
+import { Icon } from "../../../shared/components/ui";
 
 const BORDER1 = "#E2E6EE";
 const INK1 = "#0F1422";
@@ -49,25 +49,27 @@ export function MoreMenu({ onEdit, onDelete, size = 20, topOffset = 36 }) {
               overflow: "hidden",
             }}
           >
-            <button
-              onClick={() => {
-                setOpen(false);
-                onEdit();
-              }}
-              style={{
-                width: "100%",
-                padding: size === 20 ? "14px 16px" : "12px 14px",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                fontSize: size === 20 ? 14 : 13,
-                color: INK1,
-                textAlign: "left",
-                fontFamily: "inherit",
-              }}
-            >
-              수정
-            </button>
+            {onEdit && (
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  onEdit();
+                }}
+                style={{
+                  width: "100%",
+                  padding: size === 20 ? "14px 16px" : "12px 14px",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: size === 20 ? 14 : 13,
+                  color: INK1,
+                  textAlign: "left",
+                  fontFamily: "inherit",
+                }}
+              >
+                수정
+              </button>
+            )}
             <button
               onClick={() => {
                 setOpen(false);
