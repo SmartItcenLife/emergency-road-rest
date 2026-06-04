@@ -7,6 +7,7 @@ import {
   getMapStatusRateForDisplay,
   getMapStatusToneByGrade,
 } from "../utils/mapStatusStyle";
+import "./MapHospitalDetailPanel.css";
 
 
 function displayValue(value) {
@@ -40,23 +41,70 @@ function normalizeAvailableStatus(value) {
   return "unknown";
 }
 
+function getResourceToneByValues(currentValue, totalValue) {
+  const current = Number(currentValue);
+  const total = Number(totalValue);
+
+  if (!Number.isFinite(current) || !Number.isFinite(total) || total <= 0) {
+    return "unknown";
+  }
+
+  const rate = Math.round((current / total) * 100);
+
+  if (rate >= 70) {
+    return "relaxed";
+  }
+
+  if (rate >= 50) {
+    return "normal";
+  }
+
+  if (rate >= 30) {
+    return "crowded";
+  }
+
+  return "very-crowded";
+}
+
 function MapHospitalDetailPanel({ hospital, onBack }) {
   const statusGrade = hospital.status?.grade ?? "UNKNOWN";
   const statusLabel = hospital.status?.label ?? "정보없음";
   const statusTone = getMapStatusToneByGrade(statusGrade);
 
   // 사용자의 좌표값이 안들어올 경우에 대한 안전장치
-  const hasLocation =
+  const hasLocation = 
     hospital.latitude !== null &&
     hospital.latitude !== undefined &&
     hospital.longitude !== null &&
     hospital.longitude !== undefined;
 
-  const kakaoRouteUrl = hasLocation
-    ? `https://map.kakao.com/link/to/${encodeURIComponent(
-        hospital.hospitalName
-      )},${hospital.latitude},${hospital.longitude}`
-    : null;
+  function openKakaoCarRoute() {
+    if (!hasLocation) {
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      alert("현재 위치 정보를 사용할 수 없습니다.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        const url = `https://map.kakao.com/link/by/car/${encodeURIComponent(
+          "현재위치"
+        )},${latitude},${longitude}/${encodeURIComponent(
+          hospital.hospitalName
+        )},${hospital.latitude},${hospital.longitude}`;
+
+        window.open(url, "_blank");
+      },
+      () => {
+        alert("현재 위치를 가져오지 못했습니다.");
+      }
+    );
+  }
 
   // detail Panel 을 위한 상태값
   const [hospitalDetail, setHospitalDetail] = useState(null);
@@ -181,25 +229,14 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
               전화
             </button>
           )}
-          {kakaoRouteUrl ? (
-              <a
-                href={kakaoRouteUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="map-detail-action-button"
-              >
-                길찾기
-              </a>
-            ) : (
               <button
                 type="button"
-                className="map-detail-action-button disabled"
-                disabled
+                onClick={openKakaoCarRoute}
+                className="map-detail-action-button"
+                disabled={!hasLocation}
               >
                 길찾기
               </button>
-            )}
-
           <a
             href={`/community/${hospital.hpid}`}
             className="map-detail-action-button"
@@ -254,13 +291,26 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
               <h3 className="map-detail-title">{section.title}</h3>
               {section.type === "resources" && (
                 <div className="map-detail-chip-list">
-                  {section.items.map((item) => (
-                    <span key={item.label} className="map-detail-chip available">
-                      {item.label} {displayValue(hospitalDetail?.[item.currentKey])}
-                      /
-                      {displayValue(hospitalDetail?.[item.totalKey])}
-                    </span>
-                  ))}
+                      {section.items.map((item) => {
+                        const currentValue = hospitalDetail?.[item.currentKey];
+                        const totalValue = hospitalDetail?.[item.totalKey];
+                        const currentDisplayValue = displayValue(currentValue);
+                        const totalDisplayvalue = displayValue(totalValue);
+                        const resourceStatus = getResourceToneByValues(
+                          currentValue,
+                          totalValue
+                        );
+
+                        return (
+                          <span
+                            key={item.label}
+                            className={`map-detail-chip ${resourceStatus}`}
+                          >
+                            {item.label} {currentDisplayValue} / {totalDisplayvalue}
+                          </span>
+                        )
+                      }
+                  )}
                 </div>
               )}
               {section.type === "capabilities" && (
@@ -270,7 +320,7 @@ function MapHospitalDetailPanel({ hospital, onBack }) {
 
                     return (
                       <span
-                        key={item.lable}
+                        key={item.label}
                         className={`map-detail-chip ${status}`}
                         >
                           {item.label}

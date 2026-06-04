@@ -1,3 +1,5 @@
+import "./MapListPanel.css";
+
 function displayValue(value) {
     if ( value == null || value == "" || value == undefined ) {
         return "-";

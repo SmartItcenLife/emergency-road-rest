@@ -118,6 +118,7 @@ public class MapService {
     ) {
         return baseMarkerBuilder(hospital, MapCategory.GENERAL)
                 .status(createEmergencyBedStatus(
+                        MapMetricType.EMERGENCY_BED,
                         hospital.getEmergencyAvailableBeds(),
                         hospital.getEmergencyTotalBeds()
                 ))
@@ -128,8 +129,7 @@ public class MapService {
             MapPediatricHospitalMarkerProjection hospital
     ) {
         return baseMarkerBuilder(hospital, MapCategory.PEDIATRIC)
-                .status(createResourceRateStatus(
-                        MapMetricType.PEDIATRIC_BED,
+                .status(createPediatricBedStatus(
                         hospital.getPediatricAvailableBeds(),
                         hospital.getPediatricTotalBeds()
                 ))
@@ -200,6 +200,7 @@ public class MapService {
     }
 
     private MapDisplayStatusDto createEmergencyBedStatus(
+            MapMetricType mapMetricType,
             Integer availableCount,
             Integer totalCount
     ) {
@@ -309,6 +310,59 @@ public class MapService {
                 .totalCount(totalCount)
                 .rate(rate)
                 .build();
+    }
+
+    private MapDisplayStatusDto createPediatricBedStatus(
+            Integer availableCount,
+            Integer totalCount
+    ) {
+        if (availableCount == null || totalCount == null || totalCount == 0) {
+            return MapDisplayStatusDto.builder()
+                    .type(MapStatusType.SCORE)
+                    .metricType(MapMetricType.PEDIATRIC_BED)
+                    .grade(MapCongestionGrade.UNKNOWN)
+                    .label("정보없음")
+                    .colorLevel(0)
+                    .score(null)
+                    .availableCount(availableCount)
+                    .totalCount(totalCount)
+                    .rate(null)
+                    .build();
+        }
+
+        int rate = (int) Math.round(availableCount * 100.0 / totalCount);
+        int finalScore = rate;
+
+        MapCongestionGrade grade;
+        String label;
+        int colorLevel;
+
+        if ( rate >= 60 ){
+            grade = MapCongestionGrade.RELAXED;
+            label = "여유";
+            colorLevel = 4;
+        } else if ( rate >= 25 ) {
+            grade = MapCongestionGrade.CROWDED;
+            label = "혼잡";
+            colorLevel = 2;
+        } else {
+            grade = MapCongestionGrade.VERY_CROWDED;
+            label = "매우혼잡";
+            colorLevel = 1;
+        }
+
+        return MapDisplayStatusDto.builder()
+                .type(MapStatusType.SCORE)
+                .metricType(MapMetricType.PEDIATRIC_BED)
+                .grade(grade)
+                .label(label)
+                .colorLevel(colorLevel)
+                .score(finalScore)
+                .availableCount(availableCount)
+                .totalCount(totalCount)
+                .rate(rate)
+                .build();
+
     }
 
     private MapDisplayStatusDto createPregnantStatus(

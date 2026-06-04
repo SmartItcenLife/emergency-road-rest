@@ -1,5 +1,6 @@
 import MapHospitalList from "./MapHospitalList";
 import MapHospitalDetailPanel from "./MapHospitalDetailPanel.jsx"
+import "./MapSidePanel.css";
 
 function MapSidePanel({
   hospitals,
