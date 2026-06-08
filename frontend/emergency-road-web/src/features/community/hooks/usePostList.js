@@ -40,7 +40,7 @@ export function usePostList(hpid) {
   }
 
   useEffect(() => {
-    fetchPosts(0, "", true);
+    fetchPosts(0, "");
   }, [hpid]);
 
   function onSearch(e) {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../../app/providers/AuthProvider";
+import { getKakaoRedirectUrl } from "../api/api";
 import { getLastCommunityPath } from "../../community/utils/communityLocation";
 
 /**
@@ -60,14 +61,10 @@ export function useLogin() {
         location.state?.from ||
         getLastCommunityPath() ||
         location.pathname
-      ).replace(
-        /\/$/,
-        "",
-      );
+      ).replace(/\/$/, "");
       sessionStorage.setItem("loginFrom", from);
-      const res = await fetch("/api/auth/kakao/redirect");
-      const data = await res.json();
-      window.location.href = data.data;
+      const redirectUrl = await getKakaoRedirectUrl();
+      window.location.href = redirectUrl;
     } catch {
       alert("카카오 로그인을 시작할 수 없어요. 잠시 후 다시 시도해 주세요.");
     }
