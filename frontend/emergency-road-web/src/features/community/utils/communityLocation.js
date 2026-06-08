@@ -57,13 +57,3 @@ export function getLastCommunityLocation() {
   return legacyHpid ? { hpid: legacyHpid, postId: null, hospitalName: null } : null;
 }
 
-export function getLastCommunityPath() {
-  const savedLocation = getLastCommunityLocation();
-  if (!savedLocation?.hpid) return null;
-
-  if (savedLocation.postId) {
-    return `/community/${savedLocation.hpid}/posts/${savedLocation.postId}`;
-  }
-
-  return `/community/${savedLocation.hpid}`;
-}

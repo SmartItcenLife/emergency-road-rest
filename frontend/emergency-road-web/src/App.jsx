@@ -39,7 +39,7 @@ const PrivateRoute = ({ children }) => {
     <Navigate
       to="/login"
       replace
-      state={{ from: getLoginRedirectPath(location.pathname) }}
+      state={{ from: getLoginRedirectPath(location.pathname) + location.search + location.hash }}
     />
   );
 };

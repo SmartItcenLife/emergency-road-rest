@@ -1,21 +1,9 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useAuthContext } from "../../../app/providers/AuthProvider";
 import { getKakaoRedirectUrl } from "../api/api";
-import { getLastCommunityPath } from "../../community/utils/communityLocation";
 
-/**
- * useLogin — 로그인 폼 상태 + API 호출
- *
- * 반환값:
- * - id, pw, show, err, loading : 폼 상태
- * - onChangeId, onChangePw     : 입력 핸들러
- * - onToggleShow               : 비밀번호 표시 토글
- * - onSubmit                   : 로컬 로그인 제출
- * - onKakao                    : 카카오 로그인 시작
- */
 export function useLogin() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuthContext();
 
@@ -34,20 +22,8 @@ export function useLogin() {
     setErr(null);
     setLoading(true);
     try {
-      const loginUser = await login({ userName: id.trim(), password: pw });
-
-      if (loginUser.role === "ADMIN") {
-        navigate("/admin", { replace: true });
-        return;
-      }
-
-      const from = (
-        location.state?.from ||
-        getLastCommunityPath() ||
-        "/"
-      ).replace(/\/$/, "");
-      const safeTo = from === "/login" ? "/" : from;
-      navigate(safeTo, { replace: true });
+      await login({ userName: id.trim(), password: pw });
+      // GuestRoute가 location.state.from을 읽어 redirect 처리
     } catch (error) {
       setErr(error.message || "아이디 또는 비밀번호를 확인해 주세요");
     } finally {
@@ -57,11 +33,7 @@ export function useLogin() {
 
   async function onKakao() {
     try {
-      const from = (
-        location.state?.from ||
-        getLastCommunityPath() ||
-        location.pathname
-      ).replace(/\/$/, "");
+      const from = (location.state?.from || "/").replace(/\/$/, "");
       sessionStorage.setItem("loginFrom", from);
       const redirectUrl = await getKakaoRedirectUrl();
       window.location.href = redirectUrl;
