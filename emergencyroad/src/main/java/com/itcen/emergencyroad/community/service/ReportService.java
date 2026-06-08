@@ -5,6 +5,8 @@ import com.itcen.emergencyroad.community.entity.User;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
 import com.itcen.emergencyroad.community.repository.ReportRepository;
 import com.itcen.emergencyroad.community.repository.UserRepository;
+import com.itcen.emergencyroad.global.exception.CustomException;
+import com.itcen.emergencyroad.global.exception.ExceptionStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,11 +22,11 @@ public class ReportService {
     public void createReport(Long reporterId, ReportTargetType targetType, Long targetId, String reason, String hpid){
         boolean alreadyReported = reportRepository.existsByReporterIdAndTargetTypeAndTargetId(reporterId, targetType, targetId);
         if(alreadyReported){
-            throw new IllegalArgumentException("이미 신고가 접수된 항목입니다.");
+            throw new CustomException(ExceptionStatus.DUPLICATE_REPORT);
         }
 
         User reporter = userRepository.findById(reporterId)
-                .orElseThrow(()->new IllegalArgumentException("해당 유저가 존재하지 않습니다"));
+                .orElseThrow(() -> new CustomException(ExceptionStatus.USER_NOT_FOUND));
 
         Report newReport = Report.createReport(reporter, targetType, targetId, reason, hpid); // 신고자 이름, 신고 대상을 적음
 

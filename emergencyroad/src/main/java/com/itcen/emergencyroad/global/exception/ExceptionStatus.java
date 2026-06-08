@@ -37,6 +37,7 @@ public enum ExceptionStatus {
   DUPLICATED_EMAIL(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다."),
   DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "이미 사용중인 닉네임입니다."),
   DUPLICATED_USERNAME(HttpStatus.CONFLICT, "이미 사용중인 아이디입니다."),
+  DUPLICATE_REPORT(HttpStatus.CONFLICT, "이미 신고가 접수된 항목입니다."),
 
   /* 415 UNSUPPORTED_MEDIA_TYPE */
   UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원하지 않는 파일 형식입니다."),

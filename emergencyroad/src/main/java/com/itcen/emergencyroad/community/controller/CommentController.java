@@ -4,7 +4,6 @@ import com.itcen.emergencyroad.community.dto.comment.CommentRequestDto;
 import com.itcen.emergencyroad.community.dto.comment.CommentResponseDto;
 import com.itcen.emergencyroad.community.dto.report.ReportRequestDTO;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
-import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.service.CommentService;
 import com.itcen.emergencyroad.community.service.ReportService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
@@ -14,18 +13,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/hospitals/{hpid}/posts/{postId}/comments")
 @RequiredArgsConstructor
 public class CommentController {
-
-  private static final String ROLE_USER = "USER";
-  private static final String ROLE_PREFIX = "ROLE_";
 
   private final CommentService commentService;
   private final ReportService reportService;
@@ -69,19 +63,6 @@ public class CommentController {
 
     commentService.deleteComment(commentId, userId, SecurityUtil.getCurrentUserRole());
     return ResponseEntity.ok(ApiResponseDto.success("댓글이 삭제되었습니다."));
-  }
-
-  private String getCurrentUserRole() {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-    if (auth == null) {
-      return String.valueOf(Role.USER);
-    }
-
-    return auth.getAuthorities().stream()
-        .findFirst()
-        .map(a -> a.getAuthority().replace(ROLE_PREFIX, ""))
-        .orElse(ROLE_USER);
   }
 
   // 댓글 신고 접수
