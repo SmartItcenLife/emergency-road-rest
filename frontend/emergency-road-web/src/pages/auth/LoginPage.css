@@ -1,0 +1,21 @@
+.login-page {
+  min-height: 100dvh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  max-width: 430px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.login-page__header {
+  padding: 40px 24px 28px;
+}
+
+.login-page__subtitle {
+  margin: 14px 0 0;
+  font-size: 15px;
+  color: #404757;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+}

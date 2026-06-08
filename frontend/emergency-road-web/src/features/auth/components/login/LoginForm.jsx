@@ -1,11 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button, Field, Input, Icon } from "../../../../shared/components/ui";
 import { KakaoLoginButton } from "./KakaoLoginButton";
-
-const BORDER1 = "#E2E6EE";
-const INK2 = "#404757";
-const INK3 = "#7B8392";
-const ACCENT = "#2563EB";
+import "./LoginForm.css";
 
 /**
  * LoginForm — 로그인 폼 UI
@@ -24,18 +20,8 @@ export function LoginForm({
   onKakao,
 }) {
   return (
-    <div
-      style={{
-        padding: "4px 24px 24px",
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-      }}
-    >
-      <form
-        onSubmit={onSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 14 }}
-      >
+    <div className="login-form">
+      <form onSubmit={onSubmit} className="login-form__fields">
         <Field
           label="아이디"
           error={err && !id.trim() ? "아이디를 입력해 주세요" : undefined}
@@ -69,14 +55,7 @@ export function LoginForm({
               <button
                 type="button"
                 onClick={onToggleShow}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: 6,
-                  color: INK3,
-                  display: "flex",
-                }}
+                className="login-form__pw-toggle"
               >
                 <Icon name={show ? "eyeOff" : "eye"} size={18} />
               </button>
@@ -96,39 +75,19 @@ export function LoginForm({
       </form>
 
       {/* 구분선 */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          color: INK3,
-          fontSize: 12,
-          margin: "24px 0 14px",
-        }}
-      >
-        <span style={{ flex: 1, height: 1, background: BORDER1 }} />
+      <div className="login-form__divider">
+        <span className="login-form__divider-line" />
         <span>또는</span>
-        <span style={{ flex: 1, height: 1, background: BORDER1 }} />
+        <span className="login-form__divider-line" />
       </div>
 
       {/* 카카오 로그인 */}
       <KakaoLoginButton onClick={onKakao} />
 
       {/* 회원가입 유도 */}
-      <div
-        style={{
-          marginTop: "auto",
-          paddingTop: 28,
-          textAlign: "center",
-          fontSize: 13,
-          color: INK2,
-        }}
-      >
+      <div className="login-form__footer">
         응급길이 처음이신가요?{" "}
-        <Link
-          to="/signup"
-          style={{ color: ACCENT, fontWeight: 600, textDecoration: "none" }}
-        >
+        <Link to="/signup" className="login-form__signup-link">
           회원가입
         </Link>
       </div>

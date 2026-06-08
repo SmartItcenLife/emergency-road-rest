@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { Icon } from "../../../shared/components/ui";
-
-const BORDER1 = "#E2E6EE";
-const INK1 = "#0F1422";
-const INK3 = "#7B8392";
+import "./MoreMenu.css";
 
 /**
  * MoreMenu — 점점점 메뉴 (게시글/댓글 공용)
@@ -14,79 +11,33 @@ const INK3 = "#7B8392";
  */
 export function MoreMenu({ onEdit, onDelete, size = 20, topOffset = 36 }) {
   const [open, setOpen] = useState(false);
+  const sm = size !== 20;
   return (
-    <div style={{ position: "relative" }}>
+    <div className="more-menu">
       <button
         onClick={() => setOpen((s) => !s)}
-        style={{
-          background: "transparent",
-          border: "none",
-          padding: size === 20 ? 8 : 4,
-          color: size === 20 ? INK1 : INK3,
-          cursor: "pointer",
-          display: "flex",
-        }}
+        className={`more-menu__btn${sm ? " more-menu__btn--sm" : ""}`}
       >
         <Icon name="more" size={size} />
       </button>
       {open && (
         <>
+          <div className="more-menu__backdrop" onClick={() => setOpen(false)} />
           <div
-            onClick={() => setOpen(false)}
-            style={{ position: "fixed", inset: 0, zIndex: 29 }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              right: 0,
-              top: topOffset,
-              background: "#fff",
-              border: `1px solid ${BORDER1}`,
-              borderRadius: 12,
-              boxShadow: "0 8px 24px -8px rgba(15,20,34,0.12)",
-              minWidth: size === 20 ? 120 : 100,
-              zIndex: 30,
-              overflow: "hidden",
-            }}
+            className={`more-menu__dropdown${sm ? " more-menu__dropdown--sm" : ""}`}
+            style={{ top: topOffset }}
           >
             {onEdit && (
               <button
-                onClick={() => {
-                  setOpen(false);
-                  onEdit();
-                }}
-                style={{
-                  width: "100%",
-                  padding: size === 20 ? "14px 16px" : "12px 14px",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: size === 20 ? 14 : 13,
-                  color: INK1,
-                  textAlign: "left",
-                  fontFamily: "inherit",
-                }}
+                className={`more-menu__item${sm ? " more-menu__item--sm" : ""}`}
+                onClick={() => { setOpen(false); onEdit(); }}
               >
                 수정
               </button>
             )}
             <button
-              onClick={() => {
-                setOpen(false);
-                onDelete();
-              }}
-              style={{
-                width: "100%",
-                padding: size === 20 ? "14px 16px" : "12px 14px",
-                background: "transparent",
-                border: "none",
-                borderTop: `1px solid ${BORDER1}`,
-                cursor: "pointer",
-                fontSize: size === 20 ? 14 : 13,
-                color: "#DC2626",
-                textAlign: "left",
-                fontFamily: "inherit",
-              }}
+              className={`more-menu__item more-menu__item--delete${sm ? " more-menu__item--sm" : ""}`}
+              onClick={() => { setOpen(false); onDelete(); }}
             >
               삭제
             </button>

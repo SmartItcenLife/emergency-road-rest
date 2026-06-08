@@ -1,4 +1,5 @@
 import { Icon } from "../../../../shared/components/ui";
+import "./PasswordStrength.css";
 
 const SUCCESS = "#1F8A5B";
 const INK3 = "#7B8392";
@@ -12,18 +13,12 @@ const CHECKS = [
 
 export function PasswordStrength({ value }) {
   return (
-    <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+    <div className="password-strength__list">
       {CHECKS.map((c) => (
         <span
           key={c.label}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            fontSize: 11,
-            fontWeight: 500,
-            color: c.test(value) ? SUCCESS : INK3,
-          }}
+          className="password-strength__item"
+          style={{ color: c.test(value) ? SUCCESS : INK3 }}
         >
           <Icon name="check" size={12} />
           {c.label}

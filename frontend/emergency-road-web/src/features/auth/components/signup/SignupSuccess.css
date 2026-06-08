@@ -1,0 +1,39 @@
+.signup-success {
+  min-height: 100dvh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32px;
+}
+
+.signup-success__body {
+  text-align: center;
+}
+
+.signup-success__icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.signup-success__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f1422;
+  letter-spacing: -0.02em;
+}
+
+.signup-success__desc {
+  margin: 0 0 32px;
+  font-size: 15px;
+  color: #404757;
+  line-height: 1.6;
+}

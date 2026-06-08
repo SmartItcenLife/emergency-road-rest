@@ -1,0 +1,27 @@
+.post-like-bar {
+  padding: 12px 20px;
+  border-top: 1px solid #e2e6ee;
+  border-bottom: 1px solid #e2e6ee;
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: #404757;
+  font-variant-numeric: tabular-nums;
+}
+
+.post-like-bar__like-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.post-like-bar__comment {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}

@@ -5,13 +5,7 @@ import { HospitalHeader } from "../../features/community/components/HospitalHead
 import { PostCard } from "../../features/community/components/PostCard";
 import { PostSearchBar } from "../../features/community/components/PostSearchBar";
 import { AppBar, Avatar, Icon, Wordmark } from "../../shared/components/ui";
-
-const SURFACE = "#FFFFFF";
-const BORDER1 = "#E2E6EE";
-const INK1 = "#0F1422";
-const INK2 = "#404757";
-const INK3 = "#7B8392";
-const ACCENT = "#2563EB";
+import "./PostListPage.css";
 
 function getPageNumbers(current, total) {
   if (total <= 5) {
@@ -58,30 +52,11 @@ export default function PostListPage() {
   } = usePostList(hpid);
 
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        background: SURFACE,
-        display: "flex",
-        flexDirection: "column",
-        maxWidth: 430,
-        margin: "0 auto",
-        width: "100%",
-      }}
-    >
+    <div className="post-list-page">
       <AppBar
         title="커뮤니티"
         leftAction={
-          <button
-            onClick={() => navigate("/")}
-            style={{
-              background: "transparent",
-              border: "none",
-              padding: 6,
-              cursor: "pointer",
-              display: "flex",
-            }}
-          >
+          <button onClick={() => navigate("/")} className="post-list-page__home-btn">
             <Wordmark size={26} withText={false} />
           </button>
         }
@@ -89,34 +64,14 @@ export default function PostListPage() {
           user ? (
             <button
               onClick={() => navigate("/mypage")}
-              style={{
-                background: "transparent",
-                border: "none",
-                padding: 6,
-                cursor: "pointer",
-                display: "flex",
-              }}
+              className="post-list-page__avatar-btn"
             >
-              <Avatar
-                name={user.nickname}
-                src={user.profileImageUrl}
-                size={28}
-              />
+              <Avatar name={user.nickname} src={user.profileImageUrl} size={28} />
             </button>
           ) : (
             <button
-              onClick={() =>
-                navigate("/login", { state: { from: location.pathname } })
-              }
-              style={{
-                background: "transparent",
-                border: "none",
-                padding: "6px 10px",
-                cursor: "pointer",
-                fontSize: 13,
-                fontWeight: 600,
-                color: ACCENT,
-              }}
+              onClick={() => navigate("/login", { state: { from: location.pathname } })}
+              className="post-list-page__login-btn"
             >
               로그인
             </button>
@@ -125,49 +80,21 @@ export default function PostListPage() {
       />
 
       <HospitalHeader hospitalName={hospitalName || hpid} />
-      <PostSearchBar
-        keyword={keyword}
-        onChange={onKeywordChange}
-        onSubmit={onSearch}
-      />
+      <PostSearchBar keyword={keyword} onChange={onKeywordChange} onSubmit={onSearch} />
 
-      {/* 목록 헤더 */}
-      <div
-        style={{
-          padding: "16px 20px 10px",
-          display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
-          background: SURFACE,
-          borderBottom: `1px solid ${BORDER1}`,
-        }}
-      >
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: INK1 }}>
+      <div className="post-list-page__list-header">
+        <h3 className="post-list-page__count-label">
           후기 갯수 :{" "}
-          <span style={{ color: ACCENT, fontVariantNumeric: "tabular-nums" }}>
-            {totalElements}
-          </span>
+          <span className="post-list-page__count-value">{totalElements}</span>
         </h3>
-        <span style={{ fontSize: 12, color: INK3 }}>최신순</span>
+        <span className="post-list-page__sort-label">최신순</span>
       </div>
 
-      {/* 목록 */}
-      <div style={{ flex: 1, background: "#fff" }}>
+      <div className="post-list-page__feed">
         {loading && posts.length === 0 ? (
-          <div
-            style={{ padding: "60px 24px", textAlign: "center", color: INK3 }}
-          >
-            불러오는 중...
-          </div>
+          <div className="post-list-page__loading">불러오는 중...</div>
         ) : posts.length === 0 ? (
-          <div
-            style={{
-              padding: "60px 24px",
-              textAlign: "center",
-              fontSize: 14,
-              color: INK2,
-            }}
-          >
+          <div className="post-list-page__empty">
             아직 후기가 없어요.
             <br />첫 번째로 남겨 주세요.
           </div>
@@ -181,125 +108,45 @@ export default function PostListPage() {
           ))
         )}
         {totalPages > 1 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-              padding: "20px 0 28px",
-            }}
-          >
-            {/* 이전 버튼 */}
+          <div className="post-list-page__pagination">
             <button
               onClick={() => onPageChange(page - 1)}
               disabled={page === 0}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 8,
-                border: `1px solid ${BORDER1}`,
-                background: "transparent",
-                color: page === 0 ? INK3 : INK1,
-                cursor: page === 0 ? "default" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: page === 0 ? 0.4 : 1,
-              }}
+              className={`post-list-page__page-btn${page === 0 ? " post-list-page__page-btn--disabled" : ""}`}
             >
               <Icon name="arrowLeft" size={16} />
             </button>
 
-            {/* 페이지 번호 버튼 */}
             {getPageNumbers(page, totalPages).map((p, i) =>
               p === "..." ? (
-                <span
-                  key={`dots-${i}`}
-                  style={{ color: INK3, fontSize: 14, padding: "0 4px" }}
-                >
-                  ···
-                </span>
+                <span key={`dots-${i}`} className="post-list-page__dots">···</span>
               ) : (
                 <button
                   key={p}
                   onClick={() => onPageChange(p)}
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
-                    border: `1px solid ${p === page ? ACCENT : BORDER1}`,
-                    background: p === page ? ACCENT : "transparent",
-                    color: p === page ? "#fff" : INK1,
-                    fontWeight: p === page ? 600 : 400,
-                    fontSize: 14,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  className={`post-list-page__page-btn${p === page ? " post-list-page__page-btn--active" : ""}`}
                 >
-                  {p + 1} {/* ← 0-based → 1-based 표시 */}
+                  {p + 1}
                 </button>
               ),
             )}
 
-            {/* 다음 버튼 */}
             <button
               onClick={() => onPageChange(page + 1)}
               disabled={page === totalPages - 1}
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 8,
-                border: `1px solid ${BORDER1}`,
-                background: "transparent",
-                color: page === totalPages - 1 ? INK3 : INK1,
-                cursor: page === totalPages - 1 ? "default" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                opacity: page === totalPages - 1 ? 0.4 : 1,
-              }}
+              className={`post-list-page__page-btn${page === totalPages - 1 ? " post-list-page__page-btn--disabled" : ""}`}
             >
-              <Icon
-                name="arrowLeft"
-                size={16}
-                style={{ transform: "rotate(180deg)" }}
-              />
+              <Icon name="arrowLeft" size={16} style={{ transform: "rotate(180deg)" }} />
             </button>
           </div>
         )}
       </div>
 
-      {/* FAB */}
       {user && (
-        <div
-          style={{
-            position: "sticky",
-            bottom: 24,
-            display: "flex",
-            justifyContent: "flex-end",
-            padding: "0 20px",
-            pointerEvents: "none",
-          }}
-        >
+        <div className="post-list-page__fab-wrap">
           <button
             onClick={() => navigate(`/community/${hpid}/posts/new`)}
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 999,
-              background: ACCENT,
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-              boxShadow: "0 8px 24px -8px rgba(37,99,235,0.4)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              pointerEvents: "auto",
-            }}
+            className="post-list-page__fab"
           >
             <Icon name="plus" size={26} strokeWidth={2} />
           </button>

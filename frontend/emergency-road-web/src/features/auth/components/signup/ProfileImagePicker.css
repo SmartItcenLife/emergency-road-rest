@@ -1,0 +1,40 @@
+.profile-image-picker {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.profile-image-picker__btn {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  position: relative;
+  border: 1px dashed #cdd3dd;
+  background: #eef1f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7b8392;
+  padding: 0;
+}
+
+.profile-image-picker__badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.profile-image-picker__input {
+  display: none;
+}

@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthContext } from "../../app/providers/AuthProvider";
 import { Icon } from "../../shared/components/ui";
-
-const SURFACE = "#FFFFFF";
-const ACCENT = "#2563EB";
-const INK1 = "#0F1422";
-const INK3 = "#7B8392";
+import "./KakaoCallbackPage.css";
 
 export default function KakaoCallbackPage() {
   const [searchParams] = useSearchParams();
@@ -28,75 +24,25 @@ export default function KakaoCallbackPage() {
         localStorage.setItem("accessToken", data.data.accessToken);
         await refreshUser();
 
-        // 로그인 성공후 로직
         const from = sessionStorage.getItem("loginFrom") || "/";
-        sessionStorage.removeItem("loginFrom"); // 사용 후 삭제
+        sessionStorage.removeItem("loginFrom");
         navigate(from, { replace: true });
       })
       .catch((err) => setError(err.message || "카카오 로그인에 실패했어요."));
   }, []);
 
-  /* ── 에러 화면 ── */
   if (error) {
     return (
-      <div
-        style={{
-          minHeight: "100dvh",
-          background: SURFACE,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 32px",
-        }}
-      >
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: "50%",
-              background: "#FEF2F2",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 20px",
-            }}
-          >
+      <div className="kakao-callback-page">
+        <div className="kakao-callback-page__inner">
+          <div className="kakao-callback-page__error-icon">
             <Icon name="x" size={36} color="#DC2626" strokeWidth={2.5} />
           </div>
-          <h2
-            style={{
-              margin: "0 0 8px",
-              fontSize: 22,
-              fontWeight: 700,
-              color: INK1,
-            }}
-          >
-            로그인에 실패했어요
-          </h2>
-          <p
-            style={{
-              margin: "0 0 32px",
-              fontSize: 15,
-              color: "#404757",
-              lineHeight: 1.6,
-            }}
-          >
-            {error}
-          </p>
+          <h2 className="kakao-callback-page__error-title">로그인에 실패했어요</h2>
+          <p className="kakao-callback-page__error-message">{error}</p>
           <button
             onClick={() => navigate("/login")}
-            style={{
-              font: "600 16px inherit",
-              color: "#fff",
-              background: ACCENT,
-              border: "none",
-              borderRadius: 12,
-              padding: "14px 24px",
-              cursor: "pointer",
-              width: "100%",
-            }}
+            className="kakao-callback-page__retry-btn"
           >
             로그인으로 돌아가기
           </button>
@@ -105,18 +51,9 @@ export default function KakaoCallbackPage() {
     );
   }
 
-  /* ── 처리 중 ── */
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        background: SURFACE,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ textAlign: "center", color: INK3, fontSize: 15 }}>
+    <div className="kakao-callback-page--loading">
+      <div className="kakao-callback-page__loading-text">
         카카오 로그인 처리 중...
       </div>
     </div>

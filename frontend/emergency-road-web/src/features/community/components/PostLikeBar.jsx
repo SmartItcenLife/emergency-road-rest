@@ -1,6 +1,6 @@
 import { Icon } from "../../../shared/components/ui";
+import "./PostLikeBar.css";
 
-const BORDER1 = "#E2E6EE";
 const INK2 = "#404757";
 const ACCENT = "#2563EB";
 
@@ -9,32 +9,11 @@ const ACCENT = "#2563EB";
  */
 export function PostLikeBar({ isLiked, recommendCount, commentCount, onLike }) {
   return (
-    <div
-      style={{
-        padding: "12px 20px",
-        borderTop: `1px solid ${BORDER1}`,
-        borderBottom: `1px solid ${BORDER1}`,
-        display: "flex",
-        gap: 24,
-        fontSize: 13,
-        color: INK2,
-        fontVariantNumeric: "tabular-nums",
-      }}
-    >
+    <div className="post-like-bar">
       <button
         onClick={onLike}
-        style={{
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 5,
-          color: isLiked ? ACCENT : INK2,
-          fontWeight: isLiked ? 600 : 500,
-          fontSize: 13,
-        }}
+        className="post-like-bar__like-btn"
+        style={{ color: isLiked ? ACCENT : INK2, fontWeight: isLiked ? 600 : 500 }}
       >
         <Icon
           name="heart"
@@ -43,7 +22,7 @@ export function PostLikeBar({ isLiked, recommendCount, commentCount, onLike }) {
         />
         {recommendCount}
       </button>
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+      <span className="post-like-bar__comment">
         <Icon name="message" size={16} /> {commentCount}
       </span>
     </div>

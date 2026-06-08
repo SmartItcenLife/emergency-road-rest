@@ -1,0 +1,31 @@
+.post-search-bar {
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e6ee;
+}
+
+.post-search-bar__wrapper {
+  position: relative;
+}
+
+.post-search-bar__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7b8392;
+  display: flex;
+  pointer-events: none;
+}
+
+.post-search-bar__input {
+  width: 100%;
+  font: 400 14px inherit;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid #e2e6ee;
+  border-radius: 999px;
+  background: #eef1f6;
+  color: #0f1422;
+  outline: none;
+  box-sizing: border-box;
+}
