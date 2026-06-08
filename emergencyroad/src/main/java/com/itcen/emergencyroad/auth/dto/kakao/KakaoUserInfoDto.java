@@ -1,4 +1,4 @@
-package com.itcen.emergencyroad.community.dto.kakao;
+package com.itcen.emergencyroad.auth.dto.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -13,14 +13,13 @@ public class KakaoUserInfoDto {
   @JsonProperty("kakao_account")
   private KakaoAccountDto kakaoAccount;
 
-  public String getNickname(){
+  public String getNickname() {
     return kakaoAccount != null && kakaoAccount.getProfile() != null
         ? kakaoAccount.getProfile().getNickname() : null;
   }
 
-  public String getProfileImageUrl(){
+  public String getProfileImageUrl() {
     return kakaoAccount != null && kakaoAccount.getProfile() != null
         ? kakaoAccount.getProfile().getProfileImageUrl() : null;
   }
-
 }

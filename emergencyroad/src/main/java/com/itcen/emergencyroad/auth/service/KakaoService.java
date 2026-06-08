@@ -1,11 +1,12 @@
-package com.itcen.emergencyroad.community.service;
+package com.itcen.emergencyroad.auth.service;
 
-import com.itcen.emergencyroad.community.dto.kakao.KakaoUserInfoDto;
+import com.itcen.emergencyroad.auth.dto.kakao.KakaoUserInfoDto;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpHeaders;
 
 @Service
 @Slf4j
@@ -21,7 +21,7 @@ public class KakaoService {
 
   private final RestTemplate restTemplate;
 
-  public KakaoService(@Qualifier("kakaoRestTemplate") RestTemplate restTemplate){
+  public KakaoService(@Qualifier("kakaoRestTemplate") RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
   }
 
@@ -39,14 +39,14 @@ public class KakaoService {
         + "&redirect_uri=" + redirectUri + "&response_type=code" + "&prompt=login";
   }
 
-  public String getAccessToken(String code){
+  public String getAccessToken(String code) {
     String url = "https://kauth.kakao.com/oauth/token";
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
     MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-    body.add("grant_type","authorization_code");
+    body.add("grant_type", "authorization_code");
     body.add("client_id", clientId);
     body.add("redirect_uri", redirectUri);
     body.add("code", code);
@@ -60,7 +60,7 @@ public class KakaoService {
     return (String) response.getBody().get("access_token");
   }
 
-  public KakaoUserInfoDto getUserInfo(String accessToken){
+  public KakaoUserInfoDto getUserInfo(String accessToken) {
     String url = "https://kapi.kakao.com/v2/user/me";
 
     HttpHeaders headers = new HttpHeaders();
@@ -93,6 +93,4 @@ public class KakaoService {
       log.warn("카카오 로그아웃 API 호출 실패: {}", e.getMessage());
     }
   }
-
 }
-
