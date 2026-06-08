@@ -27,7 +27,6 @@ export default function PostDetailPage() {
     loading,
     editing,
     confirmTarget,
-    setConfirmTarget,
     handleLike,
     handleCommentLike,
     handleAddComment,
@@ -37,13 +36,14 @@ export default function PostDetailPage() {
     handleAskDeleteComment,
     handleAskDeletePost,
     handleConfirmDelete,
+    handleCloseConfirm,
     handleAskReportPost,
     handleAskReportComment,
     handleSubmitReport,
     reportTarget,
-    setReportTarget,
+    handleCloseReport,
     reportSuccess,
-    setReportSuccess,
+    handleCloseReportSuccess,
   } = usePostDetail(hpid, postId, user);
 
   const [searchParams] = useSearchParams();
@@ -193,20 +193,20 @@ export default function PostDetailPage() {
           cancelLabel="취소"
           danger
           onConfirm={handleConfirmDelete}
-          onClose={() => setConfirmTarget(null)}
+          onClose={handleCloseConfirm}
         />
 
         <ReportModal
           open={!!reportTarget}
           type={reportTarget?.kind}
           onSubmit={handleSubmitReport}
-          onClose={() => setReportTarget(null)}
+          onClose={handleCloseReport}
         />
 
         {reportSuccess && (
           <div
             className="post-detail-page__report-toast"
-            onClick={() => setReportSuccess(false)}
+            onClick={handleCloseReportSuccess}
           >
             신고가 접수되었습니다.
           </div>
