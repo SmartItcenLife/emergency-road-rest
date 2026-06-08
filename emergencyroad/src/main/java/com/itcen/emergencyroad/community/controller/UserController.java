@@ -5,6 +5,8 @@ import com.itcen.emergencyroad.community.dto.auth.SignupRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.UpdateUserRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.AuthTokenResponseDto;
 import com.itcen.emergencyroad.community.dto.auth.UserResponseDto;
+import com.itcen.emergencyroad.community.entity.User;
+import com.itcen.emergencyroad.community.enums.LoginType;
 import com.itcen.emergencyroad.community.service.KakaoService;
 import com.itcen.emergencyroad.community.service.TokenService;
 import com.itcen.emergencyroad.community.service.UserService;
@@ -109,7 +111,11 @@ public class UserController {
       HttpServletResponse response) {
 
     if (refreshToken != null) {
+      User user = tokenService.findUserByToken(refreshToken);
       tokenService.revoke(refreshToken);
+      if (user != null && LoginType.KAKAO.equals(user.getLoginType()) && user.getKakaoId() != null) {
+        kakaoService.logout(user.getKakaoId());
+      }
     }
     clearRefreshCookie(response);
     return ResponseEntity.ok(ApiResponseDto.success("로그아웃 되었습니다."));

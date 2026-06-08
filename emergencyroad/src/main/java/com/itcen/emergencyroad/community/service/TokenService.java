@@ -48,6 +48,13 @@ public class TokenService {
         .build();
   }
 
+  @Transactional(readOnly = true)
+  public User findUserByToken(String refreshTokenStr) {
+    return refreshTokenRepository.findByToken(refreshTokenStr)
+        .map(RefreshToken::getUser)
+        .orElse(null);
+  }
+
   @Transactional
   public void revoke(String refreshTokenStr) {
     refreshTokenRepository.findByToken(refreshTokenStr)

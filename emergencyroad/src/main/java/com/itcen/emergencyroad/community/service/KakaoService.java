@@ -31,6 +31,9 @@ public class KakaoService {
   @Value("${kakao.redirect-uri}")
   private String redirectUri;
 
+  @Value("${kakao.admin-key}")
+  private String adminKey;
+
   public String getKakaoLoginUrl() {
     return "https://kauth.kakao.com/oauth/authorize" + "?client_id=" + clientId
         + "&redirect_uri=" + redirectUri + "&response_type=code" + "&prompt=login";
@@ -71,18 +74,23 @@ public class KakaoService {
     return response.getBody();
   }
 
-  public void logout(String accessToken){
+  public void logout(String kakaoId) {
     String url = "https://kapi.kakao.com/v1/user/logout";
 
     HttpHeaders headers = new HttpHeaders();
-    headers.add("Authorization", "Bearer " + accessToken);
+    headers.add("Authorization", "KakaoAK " + adminKey);
+    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-    HttpEntity<Void> request = new HttpEntity<>(headers);
+    MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+    body.add("target_id_type", "user_id");
+    body.add("target_id", kakaoId);
 
-    try{
+    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+    try {
       restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
-    } catch (Exception e){
-      log.warn("카카오 로그아웃 API 호출 실패 : {}", e.getMessage());
+    } catch (Exception e) {
+      log.warn("카카오 로그아웃 API 호출 실패: {}", e.getMessage());
     }
   }
 
