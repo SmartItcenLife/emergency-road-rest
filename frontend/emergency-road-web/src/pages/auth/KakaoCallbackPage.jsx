@@ -21,12 +21,11 @@ export default function KakaoCallbackPage() {
       return;
     }
 
-    fetch(`/api/auth/kakao?code=${code}`)
+    fetch(`/api/auth/kakao?code=${code}`, { credentials: "include" })
       .then((res) => res.json())
       .then(async (data) => {
         if (!data.data?.accessToken) throw new Error(data.message);
         localStorage.setItem("accessToken", data.data.accessToken);
-        localStorage.setItem("refreshToken", data.data.refreshToken);
         await refreshUser();
 
         // 로그인 성공후 로직
