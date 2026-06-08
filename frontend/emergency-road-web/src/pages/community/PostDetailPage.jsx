@@ -1,4 +1,9 @@
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import { useAuthContext } from "../../app/providers/AuthProvider";
 import { usePostDetail } from "../../features/community/hooks/usePostDetail";
 import { PostBody } from "../../features/community/components/PostBody";
@@ -18,6 +23,7 @@ const ACCENT_SOFT = "#EFF6FF";
 export default function PostDetailPage() {
   const { hpid, postId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthContext();
   const {
     post,
@@ -40,6 +46,8 @@ export default function PostDetailPage() {
     handleSubmitReport,
     reportTarget,
     setReportTarget,
+    reportSuccess,
+    setReportSuccess,
   } = usePostDetail(hpid, postId, user);
 
   const [searchParams] = useSearchParams();
@@ -88,11 +96,52 @@ export default function PostDetailPage() {
           </button>
         }
         rightAction={
-          (isMyPost || isAdmin) && (
-            <MoreMenu
-              onEdit={() => navigate(`/community/${hpid}/posts/${postId}/edit`)}
-              onDelete={handleAskDeletePost}
-            />
+          !user ? (
+            <button
+              onClick={() =>
+                navigate("/login", {
+                  state: { from: location.pathname.replace(/\/$/, "") },
+                })
+              }
+              style={{
+                background: "transparent",
+                border: "none",
+                padding: "6px 10px",
+                cursor: "pointer",
+                fontSize: 13,
+                fontWeight: 600,
+                color: ACCENT,
+              }}
+            >
+              로그인
+            </button>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <button
+                onClick={() => navigate("/mypage")}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  padding: 6,
+                  cursor: "pointer",
+                  display: "flex",
+                }}
+              >
+                <Avatar
+                  name={user.nickname}
+                  src={user.profileImageUrl}
+                  size={28}
+                />
+              </button>
+              {(isMyPost || isAdmin) && (
+                <MoreMenu
+                  onEdit={() =>
+                    navigate(`/community/${hpid}/posts/${postId}/edit`)
+                  }
+                  onDelete={handleAskDeletePost}
+                />
+              )}
+            </div>
           )
         }
       />
@@ -276,6 +325,29 @@ export default function PostDetailPage() {
           onSubmit={handleSubmitReport}
           onClose={() => setReportTarget(null)}
         />
+
+        {/* 신고 접수 완료 배너 */}
+        {reportSuccess && (
+          <div
+            style={{
+              position: "fixed",
+              bottom: 88,
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "#1e293b",
+              color: "#fff",
+              padding: "12px 20px",
+              borderRadius: 10,
+              fontSize: 14,
+              fontWeight: 600,
+              zIndex: 9999,
+              whiteSpace: "nowrap",
+            }}
+            onClick={() => setReportSuccess(false)}
+          >
+            신고가 접수되었습니다.
+          </div>
+        )}
       </div>
     </div>
   );

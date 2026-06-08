@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   getPost,
   togglePostLike,
@@ -12,6 +12,7 @@ import {
   reportPost,
   reportComment,
 } from "../api/api";
+import { saveLastCommunityLocation } from "../utils/communityLocation";
 
 /**
  * usePostDetail — 게시글 상세 상태 + 로직
@@ -21,12 +22,20 @@ import {
  */
 export function usePostDetail(hpid, postId, user) {
   const navigate = useNavigate();
-  const location = useLocation();
+  const boardPath = `/community/${hpid}`;
+  const detailPath = `${boardPath}/posts/${postId}`;
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null);
+  const [reportSuccess, setReportSuccess] = useState(false);
+
+  useEffect(() => {
+    if (hpid && postId) {
+      saveLastCommunityLocation({ hpid, postId });
+    }
+  }, [hpid, postId]);
 
   useEffect(() => {
     async function load() {
@@ -37,6 +46,11 @@ export function usePostDetail(hpid, postId, user) {
         ]);
         setPost(p);
         setComments(cs);
+        saveLastCommunityLocation({
+          hpid,
+          postId,
+          hospitalName: p?.hospitalName,
+        });
       } finally {
         setLoading(false);
       }
@@ -47,7 +61,7 @@ export function usePostDetail(hpid, postId, user) {
   async function handleLike() {
     if (!user)
       return navigate("/login", {
-        state: { from: location.pathname.replace(/\/$/, "") },
+        state: { from: detailPath },
       });
     const isLiked = await togglePostLike(hpid, postId);
     setPost((p) => ({
@@ -60,7 +74,7 @@ export function usePostDetail(hpid, postId, user) {
   async function handleCommentLike(commentId) {
     if (!user)
       return navigate("/login", {
-        state: { from: location.pathname.replace(/\/$/, "") },
+        state: { from: detailPath },
       });
     const isLiked = await toggleCommentLike(hpid, postId, commentId);
     setComments((cs) =>
@@ -124,7 +138,7 @@ export function usePostDetail(hpid, postId, user) {
   function handleAskReportPost(){
     if(!user){
       return navigate("/login",{
-        state: {from:location.pathname.replace(/\/$/, "")},
+        state: {from:detailPath},
       });
     }
 
@@ -139,7 +153,7 @@ export function usePostDetail(hpid, postId, user) {
   function handleAskReportComment(commentId){
     if(!user){
       return navigate("/login",{
-        state: {from:location.pathname.replace(/\/$/, "")},
+        state: {from:detailPath},
       })
     }
 
@@ -159,7 +173,7 @@ export function usePostDetail(hpid, postId, user) {
     }
 
     setReportTarget(null);
-    alert("신고가 접수되었습니다.");
+    setReportSuccess(true);
   }
 
   return {
@@ -183,6 +197,8 @@ export function usePostDetail(hpid, postId, user) {
     handleSubmitReport,
     reportTarget,
     setReportTarget,
+    reportSuccess,
+    setReportSuccess,
   };
 }
 
