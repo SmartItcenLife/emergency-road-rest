@@ -7,7 +7,6 @@ import com.itcen.emergencyroad.community.enums.ReportTargetType;
 import com.itcen.emergencyroad.community.service.CommentService;
 import com.itcen.emergencyroad.community.service.ReportService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
-import com.itcen.emergencyroad.global.util.SecurityUtil;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +60,7 @@ public class CommentController {
       @PathVariable Long commentId,
       @AuthenticationPrincipal Long userId) {
 
-    commentService.deleteComment(commentId, userId, SecurityUtil.getCurrentUserRole());
+    commentService.deleteComment(commentId, userId);
     return ResponseEntity.ok(ApiResponseDto.success("댓글이 삭제되었습니다."));
   }
 
@@ -73,11 +72,6 @@ public class CommentController {
           @PathVariable Long commentId, // 타겟 번호가 댓글 번호임
           @Valid @RequestBody ReportRequestDTO requestDTO,
           @AuthenticationPrincipal Long userId) {
-
-    if(userId == null){
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-              .body(ApiResponseDto.fail(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다"));
-    }
 
     reportService.createReport(
             userId,

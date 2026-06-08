@@ -7,6 +7,7 @@ import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.User;
 import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.repository.CommentRepository;
+import com.itcen.emergencyroad.global.util.SecurityUtil;
 import com.itcen.emergencyroad.community.repository.PostLikeRepository;
 import com.itcen.emergencyroad.community.repository.PostRepository;
 import com.itcen.emergencyroad.community.repository.UserRepository;
@@ -119,11 +120,11 @@ public class PostService {
   }
 
   @Transactional
-  public void deletePost(Long postId, Long userId, String role) {
+  public void deletePost(Long postId, Long userId) {
     Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ExceptionStatus.POST_NOT_FOUND));
 
     boolean isAuthor = Objects.equals(post.getUser().getId(), userId);
-    boolean isAdmin = Role.ADMIN.name().equals(role);
+    boolean isAdmin = Role.ADMIN.name().equals(SecurityUtil.getCurrentUserRole());
 
     if (!isAdmin && !isAuthor) {
       throw new CustomException(ExceptionStatus.DELETE_FORBIDDEN);

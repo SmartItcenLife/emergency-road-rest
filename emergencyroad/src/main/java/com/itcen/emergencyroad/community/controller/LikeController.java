@@ -3,7 +3,6 @@ package com.itcen.emergencyroad.community.controller;
 import com.itcen.emergencyroad.community.service.LikeService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,10 +23,6 @@ public class LikeController {
       @PathVariable Long postId,
       @AuthenticationPrincipal Long userId) {
 
-    if (userId == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body(ApiResponseDto.fail(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
-    }
     boolean isLiked = likeService.togglePostLike(postId, userId);
     String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
     return ResponseEntity.ok(ApiResponseDto.success(message, isLiked));
@@ -39,10 +34,6 @@ public class LikeController {
       @PathVariable Long commentId,
       @AuthenticationPrincipal Long userId) {
 
-    if (userId == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body(ApiResponseDto.fail(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
-    }
     boolean isLiked = likeService.toggleCommentLike(commentId, userId);
     String message = isLiked ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
     return ResponseEntity.ok(ApiResponseDto.success(message, isLiked));
