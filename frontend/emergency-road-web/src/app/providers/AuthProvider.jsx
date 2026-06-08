@@ -69,6 +69,7 @@ export function AuthProvider({ children }) {
     try {
       const me = await getMe();
       setUser(me);
+      return me;
     } catch {
       /* ignore */
     }

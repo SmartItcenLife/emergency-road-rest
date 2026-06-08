@@ -22,11 +22,15 @@ export default function KakaoCallbackPage() {
       .then(async (data) => {
         if (!data.data?.accessToken) throw new Error(data.message);
         localStorage.setItem("accessToken", data.data.accessToken);
-        await refreshUser();
+        const me = await refreshUser();
 
-        const from = sessionStorage.getItem("loginFrom") || "/";
-        sessionStorage.removeItem("loginFrom");
-        navigate(from, { replace: true });
+        if (me?.role === "ADMIN") {
+          navigate("/admin", { replace: true });
+        } else {
+          const from = sessionStorage.getItem("loginFrom") || "/";
+          sessionStorage.removeItem("loginFrom");
+          navigate(from, { replace: true });
+        }
       })
       .catch((err) => setError(err.message || "카카오 로그인에 실패했어요."));
   }, []);
