@@ -1,5 +1,6 @@
 package com.itcen.emergencyroad.community.dto.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +9,7 @@ import lombok.Getter;
 public class AuthTokenResponseDto {
 
   private String accessToken;
+  @JsonIgnore
   private String refreshToken;
   private Long userId;
   private String nickname;

@@ -4,23 +4,29 @@ import com.itcen.emergencyroad.community.dto.auth.LoginRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.SignupRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.UpdateUserRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.AuthTokenResponseDto;
-import com.itcen.emergencyroad.community.dto.auth.RefreshTokenRequestDto;
 import com.itcen.emergencyroad.community.dto.auth.UserResponseDto;
 import com.itcen.emergencyroad.community.service.KakaoService;
 import com.itcen.emergencyroad.community.service.TokenService;
 import com.itcen.emergencyroad.community.service.UserService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
+import com.itcen.emergencyroad.global.exception.CustomException;
+import com.itcen.emergencyroad.global.exception.ExceptionStatus;
+import com.itcen.emergencyroad.global.jwt.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +47,7 @@ public class UserController {
   private final UserService userService;
   private final TokenService tokenService;
   private final KakaoService kakaoService;
+  private final JwtProvider jwtProvider;
 
   @Operation(summary = "회원가입", description = "로컬 회원가입 (multipart/form-data)")
   @ApiResponses({
@@ -65,22 +72,24 @@ public class UserController {
   })
   @PostMapping("/login")
   public ResponseEntity<ApiResponseDto<AuthTokenResponseDto>> login(
-      @Valid @RequestBody LoginRequestDto dto) {
+      @Valid @RequestBody LoginRequestDto dto,
+      HttpServletResponse response) {
 
-    return ResponseEntity.ok(
-        ApiResponseDto.success("로그인 성공", userService.login(dto))
-    );
+    AuthTokenResponseDto tokens = userService.login(dto);
+    setRefreshCookie(response, tokens.getRefreshToken());
+    return ResponseEntity.ok(ApiResponseDto.success("로그인 성공", tokens));
   }
 
   @Operation(summary = "카카오 로그인", description = "카카오 인가코드로 JWT 발급")
   @ApiResponse(responseCode = "200", description = "카카오 로그인 성공")
   @GetMapping("/kakao")
   public ResponseEntity<ApiResponseDto<AuthTokenResponseDto>> kakaoLogin(
-      @RequestParam String code) {
+      @RequestParam String code,
+      HttpServletResponse response) {
 
-    return ResponseEntity.ok(
-        ApiResponseDto.success("카카오 로그인 성공", userService.kakaoLogin(code))
-    );
+    AuthTokenResponseDto tokens = userService.kakaoLogin(code);
+    setRefreshCookie(response, tokens.getRefreshToken());
+    return ResponseEntity.ok(ApiResponseDto.success("카카오 로그인 성공", tokens));
   }
 
   @Operation(summary = "카카오 로그인 URL 조회", description = "카카오 인가 URL 반환")
@@ -96,24 +105,32 @@ public class UserController {
   @ApiResponse(responseCode = "200", description = "로그아웃 성공")
   @PostMapping("/logout")
   public ResponseEntity<ApiResponseDto<Void>> logout(
-      @Valid @RequestBody RefreshTokenRequestDto dto) {
+      @CookieValue(name = "refreshToken", required = false) String refreshToken,
+      HttpServletResponse response) {
 
-    tokenService.revoke(dto.getRefreshToken());
+    if (refreshToken != null) {
+      tokenService.revoke(refreshToken);
+    }
+    clearRefreshCookie(response);
     return ResponseEntity.ok(ApiResponseDto.success("로그아웃 되었습니다."));
   }
 
   @Operation(summary = "토큰 재발급", description = "Refresh Token으로 Access Token 재발급")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "재발급 성공"),
-      @ApiResponse(responseCode = "401", description = "유효하지 않은/만료된/블랙리스트 토큰")
+      @ApiResponse(responseCode = "401", description = "유효하지 않은/만료된 토큰")
   })
   @PostMapping("/refresh")
   public ResponseEntity<ApiResponseDto<AuthTokenResponseDto>> refresh(
-      @Valid @RequestBody RefreshTokenRequestDto dto) {
+      @CookieValue(name = "refreshToken", required = false) String refreshToken,
+      HttpServletResponse response) {
 
-    return ResponseEntity.ok(
-        ApiResponseDto.success("토큰 재발급 성공", tokenService.refresh(dto.getRefreshToken()))
-    );
+    if (refreshToken == null) {
+      throw new CustomException(ExceptionStatus.TOKEN_NOT_FOUND);
+    }
+    AuthTokenResponseDto tokens = tokenService.refresh(refreshToken);
+    setRefreshCookie(response, tokens.getRefreshToken());
+    return ResponseEntity.ok(ApiResponseDto.success("토큰 재발급 성공", tokens));
   }
 
   @Operation(summary = "내 정보 조회", description = "로그인한 사용자 정보 조회")
@@ -139,5 +156,24 @@ public class UserController {
 
     userService.updateUser(userId, dto, profileImage);
     return ResponseEntity.ok(ApiResponseDto.success("회원정보가 수정되었습니다."));
+  }
+
+  private void setRefreshCookie(HttpServletResponse response, String token) {
+    ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
+        .httpOnly(true)
+        .path("/api/auth")
+        .maxAge(jwtProvider.getRefreshTokenExpiry() / 1000)
+        .sameSite("Lax")
+        .build();
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+  }
+
+  private void clearRefreshCookie(HttpServletResponse response) {
+    ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+        .httpOnly(true)
+        .path("/api/auth")
+        .maxAge(0)
+        .build();
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
   }
 }
