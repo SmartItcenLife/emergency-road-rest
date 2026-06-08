@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthContext } from "../../../app/providers/AuthProvider";
+import { getLastCommunityPath } from "../../community/utils/communityLocation";
 
 /**
  * useLogin — 로그인 폼 상태 + API 호출
@@ -39,7 +40,11 @@ export function useLogin() {
         return;
       }
 
-      const from = (location.state?.from || "/").replace(/\/$/, "");
+      const from = (
+        location.state?.from ||
+        getLastCommunityPath() ||
+        "/"
+      ).replace(/\/$/, "");
       const safeTo = from === "/login" ? "/" : from;
       navigate(safeTo, { replace: true });
     } catch (error) {
@@ -51,7 +56,11 @@ export function useLogin() {
 
   async function onKakao() {
     try {
-      const from = (location.state?.from || location.pathname).replace(
+      const from = (
+        location.state?.from ||
+        getLastCommunityPath() ||
+        location.pathname
+      ).replace(
         /\/$/,
         "",
       );

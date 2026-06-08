@@ -31,6 +31,14 @@ function authHeaders() {
 
 const base = (hpid) => `/api/hospitals/${hpid}/posts`;
 
+export async function getHospital(hpid) {
+  const res = await fetch(`/api/hospitals/${hpid}`);
+  const data = await res.json();
+  if (!res.ok)
+    throw new Error(data.message || "병원 정보를 불러오는데 실패했어요.");
+  return data.data;
+}
+
 // ── 게시글 ────────────────────────────────────────────────────────────────────
 
 /** GET /api/hospitals/{hpid}/posts?page=&keyword= → Page<PostResponseDto> */

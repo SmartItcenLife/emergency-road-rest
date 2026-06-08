@@ -25,11 +25,23 @@ import PostDetailPage from "./pages/community/PostDetailPage";
 import PostFormPage from "./pages/community/PostFormPage";
 
 
+function getLoginRedirectPath(pathname) {
+  return pathname.replace(/\/$/, "") || "/";
+}
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuthContext();
+  const location = useLocation();
   if (loading) return null;
-  return user ? children : <Navigate to="/login" replace />;
+  return user ? (
+    children
+  ) : (
+    <Navigate
+      to="/login"
+      replace
+      state={{ from: getLoginRedirectPath(location.pathname) }}
+    />
+  );
 };
 
 const GuestRoute = ({ children }) => {
