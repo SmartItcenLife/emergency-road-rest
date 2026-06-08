@@ -3,16 +3,9 @@
  * accessToken은 localStorage, refreshToken은 HttpOnly 쿠키로 관리
  */
 
+import { authHeaders } from "../../../shared/utils/authHeaders";
+
 const BASE = "/api/auth";
-
-function getToken() {
-  return localStorage.getItem("accessToken");
-}
-
-function authHeaders() {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 /** POST /api/auth/signup  (multipart/form-data) */
 export async function signup({
@@ -60,6 +53,13 @@ export async function logout() {
     headers: { ...authHeaders() },
     credentials: "include",
   });
+}
+
+/** GET /api/auth/kakao/redirect */
+export async function getKakaoRedirectUrl() {
+  const res = await fetch(`${BASE}/kakao/redirect`);
+  const data = await res.json();
+  return data.data;
 }
 
 /** POST /api/auth/refresh — refreshToken은 쿠키로 자동 전송 */

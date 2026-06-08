@@ -1,11 +1,7 @@
 import { refreshToken } from "../../auth/api/api";
+import { authHeaders } from "../../../shared/utils/authHeaders";
 
 const ADMIN_API_BASE_URL = "/api/admin";
-
-function authHeaders() {
-  const token = localStorage.getItem("accessToken");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 async function fetchWithAuth(url, options = {}) {
   const res = await fetch(url, {

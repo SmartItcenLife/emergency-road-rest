@@ -4,6 +4,8 @@
  *           comment.id, comment.likeCount, comment.isLiked
  */
 
+import { authHeaders } from "../../../shared/utils/authHeaders";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 /** 이미지 URL 정규화 — 상대경로 → 절대경로, 이중 슬래시 제거 */
@@ -24,15 +26,10 @@ function normalizePost(post) {
   };
 }
 
-function authHeaders() {
-  const token = localStorage.getItem("accessToken");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 const base = (hpid) => `/api/hospitals/${hpid}/posts`;
 
 export async function getHospital(hpid) {
-  const res = await fetch(`/api/hospitals/${hpid}`);
+  const res = await fetch(`/api/hospitals/${hpid}`, { credentials: "include" });
   const data = await res.json();
   if (!res.ok)
     throw new Error(data.message || "병원 정보를 불러오는데 실패했어요.");
@@ -47,6 +44,7 @@ export async function getPosts(hpid, { page = 0, keyword, size = 5 } = {}) {
   if (keyword) params.set("keyword", keyword);
   const res = await fetch(`${base(hpid)}?${params}`, {
     headers: authHeaders(),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok)
@@ -60,6 +58,7 @@ export async function getPosts(hpid, { page = 0, keyword, size = 5 } = {}) {
 export async function getPost(hpid, postId) {
   const res = await fetch(`${base(hpid)}/${postId}`, {
     headers: authHeaders(),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok)
@@ -77,6 +76,7 @@ export async function createPost(hpid, { title, content, images = [] }) {
     method: "POST",
     headers: authHeaders(),
     body: form,
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "게시글 작성에 실패했어요.");
@@ -84,11 +84,7 @@ export async function createPost(hpid, { title, content, images = [] }) {
 }
 
 /** PUT /api/hospitals/{hpid}/posts/{postId} (multipart/form-data) */
-export async function updatePost(
-  hpid,
-  postId,
-  { title, content, images = [] },
-) {
+export async function updatePost(hpid, postId, { title, content, images = [] }) {
   const form = new FormData();
   form.append("title", title);
   form.append("content", content);
@@ -97,6 +93,7 @@ export async function updatePost(
     method: "PUT",
     headers: authHeaders(),
     body: form,
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "게시글 수정에 실패했어요.");
@@ -108,6 +105,7 @@ export async function deletePost(hpid, postId) {
   const res = await fetch(`${base(hpid)}/${postId}`, {
     method: "DELETE",
     headers: authHeaders(),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "게시글 삭제에 실패했어요.");
@@ -121,6 +119,7 @@ export async function togglePostLike(hpid, postId) {
   const res = await fetch(`${base(hpid)}/${postId}/like`, {
     method: "POST",
     headers: authHeaders(),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "좋아요 처리에 실패했어요.");
@@ -129,10 +128,11 @@ export async function togglePostLike(hpid, postId) {
 
 /** POST /api/hospitals/{hpid}/posts/{postId}/comments/{commentId}/like */
 export async function toggleCommentLike(hpid, postId, commentId) {
-  const res = await fetch(
-    `${base(hpid)}/${postId}/comments/${commentId}/like`,
-    { method: "POST", headers: authHeaders() },
-  );
+  const res = await fetch(`${base(hpid)}/${postId}/comments/${commentId}/like`, {
+    method: "POST",
+    headers: authHeaders(),
+    credentials: "include",
+  });
   const data = await res.json();
   if (!res.ok)
     throw new Error(data.message || "댓글 좋아요 처리에 실패했어요.");
@@ -145,6 +145,7 @@ export async function toggleCommentLike(hpid, postId, commentId) {
 export async function getComments(hpid, postId) {
   const res = await fetch(`${base(hpid)}/${postId}/comments`, {
     headers: authHeaders(),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "댓글을 불러오는데 실패했어요.");
@@ -162,6 +163,7 @@ export async function createComment(hpid, postId, content) {
     method: "POST",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ content }),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "댓글 작성에 실패했어요.");
@@ -174,6 +176,7 @@ export async function updateComment(hpid, postId, commentId, content) {
     method: "PUT",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ content }),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "댓글 수정에 실패했어요.");
@@ -185,45 +188,38 @@ export async function deleteComment(hpid, postId, commentId) {
   const res = await fetch(`${base(hpid)}/${postId}/comments/${commentId}`, {
     method: "DELETE",
     headers: authHeaders(),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "댓글 삭제에 실패했어요.");
   return data;
 }
 
-// 게시글 신고
+/** POST /api/hospitals/{hpid}/posts/{postId}/report */
 export async function reportPost(hpid, postId, reason) {
-  const response = await fetch(`${base(hpid)}/${postId}/report`, {
+  const res = await fetch(`${base(hpid)}/${postId}/report`, {
     method: "POST",
-    headers: {
-      "Content-type": "application/json",
-      ...authHeaders(),
-    },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ reason }),
+    credentials: "include",
   });
-
-  const data = await response.json();
-
-  if (!response.ok)
-    throw new Error(data.message || "게시글 신고에 실패했어요.");
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "게시글 신고에 실패했어요.");
   return data;
 }
 
-// 댓글 신고
+/** POST /api/hospitals/{hpid}/posts/{postId}/comments/{commentId}/report */
 export async function reportComment(hpid, postId, commentId, reason) {
-  const response = await fetch(
+  const res = await fetch(
     `${base(hpid)}/${postId}/comments/${commentId}/report`,
     {
       method: "POST",
-      headers: {
-        "Content-type": "application/json",
-        ...authHeaders(),
-      },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify({ reason }),
+      credentials: "include",
     },
   );
-  const data = await response.json();
-
-  if (!response.ok) throw new Error(data.message || "댓글 신고에 실패했어요.");
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "댓글 신고에 실패했어요.");
   return data;
 }
