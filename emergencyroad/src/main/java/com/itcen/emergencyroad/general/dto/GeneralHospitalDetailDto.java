@@ -24,7 +24,7 @@ public class GeneralHospitalDetailDto {
     private Integer icuAvailableBeds;
     private Integer icuTotalBeds;
     private Integer neuroIcuAvailableBeds;
-    private String neuroIcuTotalBeds;
+    private Integer neuroIcuTotalBeds;
     private Integer chestIcuAvailableBeds;
     private Integer chestIcuTotalBeds;
 

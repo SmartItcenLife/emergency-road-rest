@@ -21,10 +21,11 @@ public interface MapHospitalRepository extends JpaRepository<Hospital, String> {
             h.address as address,
             h.emergencyPhone as emergencyPhone,
             gr.emergencyAvailableBeds as emergencyAvailableBeds,
-            gr.emergencyTotalBeds as emergencyTotalBeds,
+            gs.emergencyTotalBeds as emergencyTotalBeds,
             gr.recordedAt as recordedAt
         from Hospital h
-        left join GeneralRealTimeAndStandard gr on gr.hospital = h
+        left join GeneralRealtime gr on gr.hospital = h
+        left join GeneralStandard gs on gs.hospital = h
         where h.latitude is not null
           and h.longitude is not null
           and h.hasEmergency = true
@@ -40,10 +41,11 @@ public interface MapHospitalRepository extends JpaRepository<Hospital, String> {
             h.address as address,
             h.emergencyPhone as emergencyPhone,
             gr.emergencyAvailableBeds as emergencyAvailableBeds,
-            gr.emergencyTotalBeds as emergencyTotalBeds,
+            gs.emergencyTotalBeds as emergencyTotalBeds,
             gr.recordedAt as recordedAt
         from Hospital h
-        left join GeneralRealTimeAndStandard gr on gr.hospital = h
+        left join GeneralRealtime gr on gr.hospital = h
+        left join GeneralStandard gs on gs.hospital = h
         where h.latitude is not null
           and h.longitude is not null
           and h.hasEmergency = true
@@ -153,10 +155,11 @@ public interface MapHospitalRepository extends JpaRepository<Hospital, String> {
     select
         h.address as address,
         gr.emergencyAvailableBeds as availableCount,
-        gr.emergencyTotalBeds as totalCount,
+        gs.emergencyTotalBeds as totalCount,
         gr.recordedAt as recordedAt
     from Hospital h
-    left join GeneralRealTimeAndStandard gr on gr.hospital = h
+    left join GeneralRealtime gr on gr.hospital = h
+    left join GeneralStandard gs on gs.hospital = h
     where h.hasEmergency = true
       and h.address is not null
 """)

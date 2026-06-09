@@ -5,15 +5,17 @@ import com.itcen.emergencyroad.hospital.entity.Hospital;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "general_srsill_available_yn")
+@Table(name = "general_mkioskty")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 
-public class GeneralSrsIll extends BaseEntity {
+public class GeneralMkioskty extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,6 +24,9 @@ public class GeneralSrsIll extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hpid", nullable = false)
     private Hospital hospital;
+
+    @Column(name = "recorded_at")
+    private LocalDateTime recordedAt;
 
     // --- 중증 질환 수용 여부 (일반) ---
     @Column(name = "mi_yn")
@@ -59,5 +64,36 @@ public class GeneralSrsIll extends BaseEntity {
 
     @Column(name = "angio_adult_yn")
     private String MKioskTy26; // 영상의학혈관중재-성인
+
+    public void updateGeneralMkiosktyData(
+            String MKioskTy1,
+            String MKioskTy2,
+            String MKioskTy3,
+            String MKioskTy4,
+            String MKioskTy5,
+            String MKioskTy6,
+            String MKioskTy23,
+            String MKioskTy24,
+            String MKioskTy11,
+            String MKioskTy13,
+            String MKioskTy19,
+            String MKioskTy26,
+            LocalDateTime recordedAt
+    ){
+        this.MKioskTy1 = MKioskTy1;
+        this.MKioskTy2 = MKioskTy2;
+        this.MKioskTy3 = MKioskTy3;
+        this.MKioskTy4 = MKioskTy4;
+        this.MKioskTy5 = MKioskTy5;
+        this.MKioskTy6 = MKioskTy6;
+        this.MKioskTy23 = MKioskTy23;
+        this.MKioskTy24 = MKioskTy24;
+        this.MKioskTy11 = MKioskTy11;
+        this.MKioskTy13 = MKioskTy13;
+        this.MKioskTy19 = MKioskTy19;
+        this.MKioskTy26 = MKioskTy26;
+        this.recordedAt = recordedAt;
+    }
+
 
 }

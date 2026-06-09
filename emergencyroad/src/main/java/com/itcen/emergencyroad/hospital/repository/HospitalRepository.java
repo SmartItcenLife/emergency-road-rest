@@ -45,13 +45,15 @@ public interface HospitalRepository extends JpaRepositoryImplementation<Hospital
             SELECT h as hospital,
                    hd as detail,
                    s as score,
-                   p as general,
-                   prs as generalRealTimeAndStandard
-            FROM Hospital h
-            LEFT JOIN HospitalDetail hd ON hd.hospital = h
-            LEFT JOIN HospitalScore s ON s.hospital = h
-            LEFT JOIN GeneralSrsIll p ON p.hospital = h
-            LEFT JOIN GeneralRealTimeAndStandard prs ON prs.hospital = h
+                   gm as generalMkioskty,
+                          gr as generalRealtime,
+                          gs as generalStandard
+                   FROM Hospital h
+                   LEFT JOIN HospitalDetail hd ON hd.hospital = h
+                   LEFT JOIN HospitalScore s ON s.hospital = h
+                   LEFT JOIN GeneralMkioskty gm ON gm.hospital = h
+                   LEFT JOIN GeneralRealtime gr ON gr.hospital = h
+                   LEFT JOIN GeneralStandard gs ON gs.hospital = h
             """)
     List<GeneralHospitalProjection> findAllGeneralHospitalData();
 

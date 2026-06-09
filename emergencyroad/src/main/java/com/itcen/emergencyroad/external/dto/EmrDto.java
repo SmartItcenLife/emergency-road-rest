@@ -37,7 +37,7 @@ public class EmrDto {
     private Integer hvicc; // 일반 중환자실 실시간 가용 병상 수
     private Integer hvs17; // 일반 중환자실 전체 병상 수
     private Integer hvcc; // 신경과 중환자실 실시간 가용 병상 수
-    private String hvs11; // 신경과 중환자실 전체 병상 수
+    private Integer hvs11; // 신경과 중환자실 전체 병상 수
     private Integer hvccc; // 흉부외과 중환자실 실시간 가용 병상 수
     private Integer hvs16; // 흉부외과 중환자실 전체 병상 수
 

@@ -1,6 +1,8 @@
 package com.itcen.emergencyroad.recommend.service;
 
-import com.itcen.emergencyroad.general.entity.*;
+import com.itcen.emergencyroad.general.entity.GeneralMkioskty;
+import com.itcen.emergencyroad.general.entity.GeneralRealtime;
+import com.itcen.emergencyroad.general.entity.GeneralStandard;
 import com.itcen.emergencyroad.hospital.entity.Hospital;
 import com.itcen.emergencyroad.hospital.repository.HospitalRepository;
 import com.itcen.emergencyroad.recommend.dto.projection.GeneralHospitalProjection;
@@ -60,48 +62,56 @@ public class GeneralRecommendationStrategy implements RecommendationStrategy {
             HospitalScore scoreEntity,
             WeightGeneralConfiguration config
     ) {
-        GeneralRealTimeAndStandard realtime = row.getGeneralRealTimeAndStandard();
+        GeneralRealtime realtime = row.getGeneralRealtime();
+        GeneralStandard standard = row.getGeneralStandard();
+        GeneralMkioskty mkioskty = row.getGeneralMkioskty();
+
         GeneralInfo info = GeneralInfo.builder()
                 .availableBeds(Optional.ofNullable(realtime)
-                        .map(GeneralRealTimeAndStandard::getEmergencyAvailableBeds)
+                        .map(GeneralRealtime::getEmergencyAvailableBeds)
                         .orElse(0))
-                .totalBeds(Optional.ofNullable(realtime)
-                        .map(GeneralRealTimeAndStandard::getEmergencyTotalBeds)
+                .totalBeds(Optional.ofNullable(standard)
+                        .map(GeneralStandard::getEmergencyTotalBeds)
                         .orElse(0))
                 .build();
+
         LocalDateTime recordedAt = (realtime != null && realtime.getRecordedAt() != null)
                 ? realtime.getRecordedAt()
                 : LocalDateTime.now();
 
-        // 필터링: 가용 병상 없음
-        if (realtime == null || realtime.getEmergencyAvailableBeds() == null || realtime.getEmergencyAvailableBeds() <= 0) {
-            scoreEntity.updateGeneralScore(0.0, "응급실 만석",info, recordedAt);
+        if (realtime == null
+                || realtime.getEmergencyAvailableBeds() == null
+                || realtime.getEmergencyAvailableBeds() <= 0) {
+            scoreEntity.updateGeneralScore(0.0, "응급실 만석", info, recordedAt);
             return;
         }
 
         Set<String> tags = new LinkedHashSet<>();
-        tags.add("응급실가능");
+        tags.add("응급실 가능");
+
         double medicalScore = 0;
 
-        //가용 병상 비율 반영
-        if (realtime.getEmergencyTotalBeds() != null
-                && realtime.getEmergencyTotalBeds() > 0) {
-            double erRatio = (double) realtime.getEmergencyAvailableBeds() / realtime.getEmergencyTotalBeds();
+        if (standard != null
+                && standard.getEmergencyTotalBeds() != null
+                && standard.getEmergencyTotalBeds() > 0) {
+            double erRatio =
+                    (double) realtime.getEmergencyAvailableBeds()
+                            / standard.getEmergencyTotalBeds();
+
             medicalScore += erRatio * config.getEmergencyRoomWeight();
         }
 
-        medicalScore += calculateSevereScore(row.getGeneral(), config, tags);
+        medicalScore += calculateSevereScore(mkioskty, config, tags);
         medicalScore += calculateIcuScore(realtime, config);
-        medicalScore += calculateEquipmentScore(realtime, config, tags);
+        medicalScore += calculateEquipmentScore(standard, config, tags);
 
-        double availabilityScore = calculateAvailabilityScore(realtime, config);
+        double availabilityScore = calculateAvailabilityScore(realtime, standard, config);
 
         double finalScore = Math.min(medicalScore + availabilityScore, 100);
-        scoreEntity.updateGeneralScore(finalScore, String.join(" | ", tags),info, recordedAt);
-
+        scoreEntity.updateGeneralScore(finalScore, String.join(" | ", tags), info, recordedAt);
     }
 
-    private double calculateSevereScore(GeneralSrsIll severe, WeightGeneralConfiguration config, Set<String> tags) {
+    private double calculateSevereScore(GeneralMkioskty severe, WeightGeneralConfiguration config, Set<String> tags) {
         if (severe == null) return 0.0;
 
         double score = 0.0;
@@ -129,7 +139,7 @@ public class GeneralRecommendationStrategy implements RecommendationStrategy {
         return (score / maxScore) * config.getSevereDiseaseWeight();
     }
 
-    private double calculateIcuScore(GeneralRealTimeAndStandard realtime, WeightGeneralConfiguration config) {
+    private double calculateIcuScore(GeneralRealtime realtime, WeightGeneralConfiguration config) {
         double score = 0;
         double maxScore = 10;
         if(realtime.getIcuAvailableBeds() != null && realtime.getIcuAvailableBeds() >0){
@@ -144,36 +154,36 @@ public class GeneralRecommendationStrategy implements RecommendationStrategy {
         return (score/maxScore) * config.getIcuWeight();
     }
 
-    private double calculateEquipmentScore(GeneralRealTimeAndStandard realtime, WeightGeneralConfiguration config, Set<String> tags) {
+    private double calculateEquipmentScore(GeneralStandard standard, WeightGeneralConfiguration config, Set<String> tags) {
 
         double score = 0.0;
         double maxScore = 25.0; // 2+3+10+7+3
-        if (isAvailable(realtime.getCtAvailable())) {
+        if (isAvailable(standard.getCtAvailable())) {
             score += 2;
             tags.add("CT");
         }
-        if (isAvailable(realtime.getMriAvailable())) {
+        if (isAvailable(standard.getMriAvailable())) {
             score += 3;
             tags.add("MRI");
         }
-        if (isAvailable(realtime.getEcmoAvailable())) {
+        if (isAvailable(standard.getEcmoAvailable())) {
             score += 10;
             tags.add("ECMO");
         }
-        if (isAvailable(realtime.getCrrtAvailable())) {
+        if (isAvailable(standard.getCrrtAvailable())) {
             score += 7;
             //tags.add("CRRT");
         }
-        if (isAvailable(realtime.getAngioAvailable())) {
+        if (isAvailable(standard.getAngioAvailable())) {
             score += 3;
             //tags.add("혈관조영");
         }
         return (score / maxScore) * config.getEquipmentWeight();
     }
 
-    private double calculateAvailabilityScore(GeneralRealTimeAndStandard realtime, WeightGeneralConfiguration config) {
-        if (realtime.getEmergencyTotalBeds() == null || realtime.getEmergencyTotalBeds() <= 0) return 0.0;
-        double ratio = (double) realtime.getEmergencyAvailableBeds() / realtime.getEmergencyTotalBeds();
+    private double calculateAvailabilityScore(GeneralRealtime realtime, GeneralStandard standard, WeightGeneralConfiguration config) {
+        if (standard.getEmergencyTotalBeds() == null || standard.getEmergencyTotalBeds() <= 0) return 0.0;
+        double ratio = (double) realtime.getEmergencyAvailableBeds() / standard.getEmergencyTotalBeds();
 
         // 0~1 → 0~25점 //병상이 많을수록 점수 증가
         return ratio *

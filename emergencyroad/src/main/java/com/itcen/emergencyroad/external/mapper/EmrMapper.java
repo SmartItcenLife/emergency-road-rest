@@ -1,8 +1,9 @@
 package com.itcen.emergencyroad.external.mapper;
 
 import com.itcen.emergencyroad.external.dto.EmrDto;
-import com.itcen.emergencyroad.general.entity.GeneralRealTimeAndStandard;
-import com.itcen.emergencyroad.general.entity.GeneralSrsIll;
+import com.itcen.emergencyroad.general.entity.GeneralMkioskty;
+import com.itcen.emergencyroad.general.entity.GeneralRealtime;
+import com.itcen.emergencyroad.general.entity.GeneralStandard;
 import com.itcen.emergencyroad.hospital.entity.Hospital;
 import com.itcen.emergencyroad.pediatric.dto.PediatricRealtimeDto;
 import com.itcen.emergencyroad.pediatric.dto.PediatricRealtimeMkiosktyDto;
@@ -206,69 +207,93 @@ public class EmrMapper {
 
     //TODO
     //일반 Mapper
-    public GeneralRealTimeAndStandard toGeneralEntity(EmrDto dto, Hospital hospital) {
+    public GeneralRealtime toGeneralRealtimeEntity(EmrDto dto, Hospital hospital){
+        if(dto==null) return null;
 
-        if (dto == null) return null;
-
-        return GeneralRealTimeAndStandard.builder()
+        return GeneralRealtime.builder()
                 .hospital(hospital)
-                // --- 병상 정보 ---
                 .emergencyAvailableBeds(dto.getHvec())
-                .emergencyTotalBeds(dto.getHvs01())
-
                 .icuAvailableBeds(dto.getHvicc())
-                .icuTotalBeds(dto.getHvs17())
-
                 .neuroIcuAvailableBeds(dto.getHvcc())
-                .neuroIcuTotalBeds(dto.getHvs11())
-
                 .chestIcuAvailableBeds(dto.getHvccc())
-                .chestIcuTotalBeds(dto.getHvs16())
+                .recordedAt(parseDateTime(dto.getHvidate()))
+                .build();
+    }
 
+    public void updateGeneralRealtimeEntity(GeneralRealtime entity, EmrDto dto){
+        if(dto==null || entity ==null) return;
+
+        entity.updateGeneralRealtimeData(
+                dto.getHvec(),
+                dto.getHvicc(),
+                dto.getHvcc(),
+                dto.getHvccc(),
+                parseDateTime(dto.getHvidate())
+        );
+    }
+
+    public GeneralStandard toGeneralStandardEntity(EmrDto dto, Hospital hospital){
+        if(dto == null ) return null;
+
+        return GeneralStandard.builder()
+                .hospital(hospital)
+                .emergencyTotalBeds(dto.getHvs01())
+                .icuTotalBeds(dto.getHvs17())
+                .neuroIcuTotalBeds(dto.getHvs11())
+                .chestIcuTotalBeds(dto.getHvs16())
                 .ctAvailable(dto.getHvctayn())
                 .mriAvailable(dto.getHvmriayn())
                 .ventilatorAvailable(dto.getHvventiayn())
                 .crrtAvailable(dto.getHvcrrtayn())
                 .ecmoAvailable(dto.getHvecmoayn())
                 .angioAvailable(dto.getHvangioayn())
-
                 .recordedAt(parseDateTime(dto.getHvidate()))
                 .build();
     }
 
-    public void updateGeneralEntity(GeneralRealTimeAndStandard entity, EmrDto dto) {
-        if (dto == null) return;
-// --- 병상 정보 ---
-        entity.setEmergencyAvailableBeds(dto.getHvec());
-        entity.setEmergencyTotalBeds(dto.getHvs01());
+    public void updateGeneralStandardEntity(GeneralStandard entity, EmrDto dto){
+        if(dto==null || entity == null) return;
 
-        entity.setIcuAvailableBeds(dto.getHvicc());
-        entity.setIcuTotalBeds(dto.getHvs17());
+        entity.updateGeneralStandardData(
+                dto.getHvs01(),
+                dto.getHvs17(),
+                dto.getHvs11(),
+                dto.getHvs16(),
+                dto.getHvctayn(),
+                dto.getHvmriayn(),
+                dto.getHvventiayn(),
+                dto.getHvcrrtayn(),
+                dto.getHvecmoayn(),
+                dto.getHvangioayn(),
+                parseDateTime(dto.getHvidate())
+        );
+    }
 
-        entity.setNeuroIcuAvailableBeds(dto.getHvcc());
-        entity.setNeuroIcuTotalBeds(dto.getHvs11());
+    public void updateGeneralMkiosktyEntity(GeneralMkioskty entity, EmrDto dto){
+        if(dto==null || entity==null) return;
 
-        entity.setChestIcuAvailableBeds(dto.getHvccc());
-        entity.setChestIcuTotalBeds(dto.getHvs16());
-
-        entity.setCtAvailable(dto.getHvctayn());
-        entity.setMriAvailable(dto.getHvmriayn());
-        entity.setVentilatorAvailable(dto.getHvventiayn());
-        entity.setCrrtAvailable(dto.getHvcrrtayn());
-        entity.setEcmoAvailable(dto.getHvecmoayn());
-        entity.setAngioAvailable(dto.getHvangioayn());
-
-        entity.setRecordedAt(parseDateTime(dto.getHvidate()));
+        entity.updateGeneralMkiosktyData(
+                dto.getMKioskTy1(),
+                dto.getMKioskTy2(),
+                dto.getMKioskTy3(),
+                dto.getMKioskTy4(),
+                dto.getMKioskTy5(),
+                dto.getMKioskTy6(),
+                dto.getMKioskTy23(),
+                dto.getMKioskTy24(),
+                dto.getMKioskTy11(),
+                dto.getMKioskTy13(),
+                dto.getMKioskTy19(),
+                dto.getMKioskTy26(),
+                parseDateTime(dto.getHvidate())
+        );
     }
 
     // TODO
     // 중증질환 수용 가능 여부
-    public GeneralSrsIll toSrsillEntity(EmrDto dto, Hospital hospital) {
-        if (dto == null) return null;
-
-        return GeneralSrsIll.builder()
+    public GeneralMkioskty toGeneralMkiosktyEntity(EmrDto dto, Hospital hospital) {
+        return GeneralMkioskty.builder()
                 .hospital(hospital)
-                // --- 일반 ---
                 .MKioskTy1(dto.getMKioskTy1())
                 .MKioskTy2(dto.getMKioskTy2())
                 .MKioskTy3(dto.getMKioskTy3())
@@ -281,53 +306,8 @@ public class EmrMapper {
                 .MKioskTy13(dto.getMKioskTy13())
                 .MKioskTy19(dto.getMKioskTy19())
                 .MKioskTy26(dto.getMKioskTy26())
-                // --- 임산부 ---
-                //.MKioskTy2(dto.getMKioskTy22())
-                //.MKioskTy16(dto.getMKioskTy16())
-                //.MKioskTy17(dto.getMKioskTy17())
-                //.MKioskTy18(dto.getMKioskTy18())
-                // --- 소아 ---
-//                .MKioskTy10(dto.getMKioskTy10())
-//                .MKioskTy12(dto.getMKioskTy12())
-//                .MKioskTy14(dto.getMKioskTy14())
-//                .MKioskTy15(dto.getMKioskTy15())
-//                .MKioskTy27(dto.getMKioskTy27())
+                .recordedAt(parseDateTime(dto.getHvidate()))
                 .build();
     }
 
-    public void updateSrsillData(GeneralSrsIll entity, EmrDto dto) {
-        if(dto==null || entity == null) return;
-
-        // 일반
-        entity.setMKioskTy1(dto.getMKioskTy1());
-        entity.setMKioskTy2(dto.getMKioskTy2());
-        entity.setMKioskTy3(dto.getMKioskTy3());
-        entity.setMKioskTy4(dto.getMKioskTy4());
-        entity.setMKioskTy5(dto.getMKioskTy5());
-        entity.setMKioskTy6(dto.getMKioskTy6());
-        entity.setMKioskTy23(dto.getMKioskTy23());
-        entity.setMKioskTy24(dto.getMKioskTy24());
-        entity.setMKioskTy11(dto.getMKioskTy11());
-        entity.setMKioskTy13(dto.getMKioskTy13());
-        entity.setMKioskTy19(dto.getMKioskTy19());
-        entity.setMKioskTy26(dto.getMKioskTy26());
-
-//        // 임산부
-//        entity.setMKioskTy22(dto.getMKioskTy22());
-//        entity.setMKioskTy16(dto.getMKioskTy16());
-//        entity.setMKioskTy17(dto.getMKioskTy17());
-//        entity.setMKioskTy18(dto.getMKioskTy18());
-//
-//        // 소아
-//        entity.setMKioskTy10(dto.getMKioskTy10());
-//        entity.setMKioskTy12(dto.getMKioskTy12());
-//        entity.setMKioskTy14(dto.getMKioskTy14());
-//        entity.setMKioskTy15(dto.getMKioskTy15());
-//        entity.setMKioskTy27(dto.getMKioskTy27());
-    }
-
 }
-
-
-
-
