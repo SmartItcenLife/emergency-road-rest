@@ -1,12 +1,18 @@
 package com.itcen.emergencyroad.community.repository;
 
+import com.itcen.emergencyroad.community.entity.Comment;
 import com.itcen.emergencyroad.community.entity.CommentLike;
+import com.itcen.emergencyroad.community.entity.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
+
+  void deleteAllByUser(User user);
+
+  void deleteAllByComment(Comment comment);
 
   @Query("select cl.comment.id, count(cl) from CommentLike cl " +
       "where cl.comment.id in :commentIds group by cl.comment.id")

@@ -1,12 +1,18 @@
 package com.itcen.emergencyroad.community.repository;
 
 import com.itcen.emergencyroad.community.entity.Comment;
+import com.itcen.emergencyroad.community.entity.Post;
+import com.itcen.emergencyroad.community.entity.User;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
+
+  List<Comment> findAllByUser(User user);
+
+  List<Comment> findAllByPost(Post post);
 
   List<Comment> findByPostIdAndIsDeletedFalseOrderByCreatedAtAsc(Long postId);
 
