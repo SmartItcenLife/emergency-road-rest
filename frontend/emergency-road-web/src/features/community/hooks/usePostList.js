@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { getPosts } from "../api/api";
+import { getHospital, getPosts } from "../api/api";
+import { saveLastCommunityLocation } from "../utils/communityLocation";
 
 export function usePostList(hpid) {
   const [posts, setPosts] = useState([]);
@@ -12,10 +13,15 @@ export function usePostList(hpid) {
 
   // 병원 이름 조회 — 게시글 없어도 표시
   useEffect(() => {
-    fetch(`/api/hospitals/${hpid}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.data?.hospitalName) setHospitalName(data.data.hospitalName);
+    saveLastCommunityLocation({ hpid, postId: null });
+
+    getHospital(hpid)
+      .then((hospital) => {
+        const name = hospital?.hospitalName;
+        if (name) {
+          setHospitalName(name);
+          saveLastCommunityLocation({ hpid, postId: null, hospitalName: name });
+        }
       })
       .catch(() => setHospitalName(hpid));
   }, [hpid]);
@@ -34,7 +40,7 @@ export function usePostList(hpid) {
   }
 
   useEffect(() => {
-    fetchPosts(0, "", true);
+    fetchPosts(0, "");
   }, [hpid]);
 
   function onSearch(e) {

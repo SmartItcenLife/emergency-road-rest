@@ -1,10 +1,10 @@
-package com.itcen.emergencyroad.community.dto.auth;
+package com.itcen.emergencyroad.auth.dto;
 
 import com.itcen.emergencyroad.community.entity.User;
+import com.itcen.emergencyroad.community.enums.Role;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
-import com.itcen.emergencyroad.community.enums.Role;
 
 @Getter
 @Builder

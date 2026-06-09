@@ -1,0 +1,110 @@
+.my-page {
+  min-height: 100dvh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  max-width: 430px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.my-page__back-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  color: #0f1422;
+  cursor: pointer;
+}
+
+.my-page__edit-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
+  cursor: pointer;
+  font: 600 14px inherit;
+  color: #2563eb;
+}
+
+.my-page__cancel-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 10px;
+  cursor: pointer;
+  font: 500 14px inherit;
+  color: #404757;
+}
+
+.my-page__profile-block {
+  background: #fff;
+  padding: 32px 24px 28px;
+  border-bottom: 1px solid #e2e6ee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.my-page__avatar-btn {
+  position: relative;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.my-page__profile-img {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid #e2e6ee;
+  display: block;
+}
+
+.my-page__fallback-avatar {
+  display: none;
+}
+
+.my-page__camera-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: white;
+  border: 3px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.my-page__file-input {
+  display: none;
+}
+
+.my-page__nickname-field {
+  width: 100%;
+  max-width: 280px;
+}
+
+.my-page__info {
+  text-align: center;
+}
+
+.my-page__name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f1422;
+  letter-spacing: -0.015em;
+}
+
+.my-page__email {
+  font-size: 13px;
+  color: #7b8392;
+  margin-top: 4px;
+}
+
+.my-page__logout-wrap {
+  padding: 20px 20px 28px;
+}

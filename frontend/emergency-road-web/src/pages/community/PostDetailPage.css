@@ -1,0 +1,148 @@
+.post-detail-page {
+  max-width: 430px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.post-detail-page__back-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  color: #0f1422;
+  cursor: pointer;
+}
+
+.post-detail-page__login-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.post-detail-page__appbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.post-detail-page__avatar-btn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+}
+
+.post-detail-page__body {
+  min-height: 100dvh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 72px;
+  max-width: 430px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.post-detail-page__hospital-chip-wrap {
+  padding: 12px 20px 0;
+  display: flex;
+}
+
+.post-detail-page__hospital-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eff6ff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #2563eb;
+  font-weight: 600;
+  border: 1px solid #dbeafe;
+}
+
+.post-detail-page__author {
+  padding: 10px 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.post-detail-page__author-nickname {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.post-detail-page__author-date {
+  font-size: 12px;
+  color: #7b8392;
+  font-variant-numeric: tabular-nums;
+}
+
+.post-detail-page__report-btn {
+  cursor: pointer;
+  border: 1px solid #ebeef2;
+  background: #ffffff;
+  color: #505866;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  margin: 15px;
+  font-family: inherit;
+}
+
+.post-detail-page__comment-header {
+  padding: 16px 20px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #404757;
+  text-align: left;
+}
+
+.post-detail-page__comment-count {
+  color: #2563eb;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.post-detail-page__comment-empty {
+  padding: 32px 24px;
+  text-align: center;
+  color: #7b8392;
+  font-size: 14px;
+}
+
+.post-detail-page__spacer {
+  height: 80px;
+}
+
+.post-detail-page__loading {
+  padding: 60px 24px;
+  text-align: center;
+  color: #7b8392;
+}
+
+.post-detail-page__report-toast {
+  position: fixed;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  white-space: nowrap;
+  cursor: pointer;
+}

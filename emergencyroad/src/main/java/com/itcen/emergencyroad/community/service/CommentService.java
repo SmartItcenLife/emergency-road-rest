@@ -8,6 +8,7 @@ import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.User;
 import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.repository.CommentLikeRepository;
+import com.itcen.emergencyroad.global.util.SecurityUtil;
 import com.itcen.emergencyroad.community.repository.CommentRepository;
 import com.itcen.emergencyroad.community.repository.PostRepository;
 import com.itcen.emergencyroad.community.repository.UserRepository;
@@ -86,12 +87,12 @@ public class CommentService {
   }
 
   @Transactional
-  public void deleteComment(Long commentId, Long userId, String role) {
+  public void deleteComment(Long commentId, Long userId) {
     Comment comment = commentRepository.findById(commentId)
         .orElseThrow(() -> new CustomException(ExceptionStatus.NOT_FOUND));
 
     boolean isAuthor = Objects.equals(comment.getUser().getId(), userId);
-    boolean isAdmin = Role.ADMIN.name().equals(role);
+    boolean isAdmin = Role.ADMIN.name().equals(SecurityUtil.getCurrentUserRole());
 
     if (!isAuthor && !isAdmin) {
       throw new CustomException(ExceptionStatus.DELETE_FORBIDDEN);

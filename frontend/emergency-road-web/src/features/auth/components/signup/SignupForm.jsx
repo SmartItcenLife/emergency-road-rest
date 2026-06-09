@@ -2,9 +2,7 @@ import { Link } from "react-router-dom";
 import { Button, Field, Input, Icon } from "../../../../shared/components/ui";
 import { PasswordStrength } from "./PasswordStrength";
 import { ProfileImagePicker } from "./ProfileImagePicker";
-
-const ACCENT = "#2563EB";
-const INK3 = "#7B8392";
+import "./SignupForm.css";
 
 /**
  * SignupForm — 회원가입 폼 UI
@@ -26,33 +24,13 @@ export function SignupForm({
   onSubmit,
 }) {
   return (
-    <form
-      onSubmit={onSubmit}
-      style={{
-        padding: "20px 24px 32px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 18,
-        overflowY: "auto",
-      }}
-    >
+    <form onSubmit={onSubmit} className="signup-form">
       {/* 프로필 이미지 */}
       <ProfileImagePicker previewUrl={previewUrl} onChange={onChangeImage} />
 
       {/* 서버 에러 */}
       {serverError && (
-        <div
-          style={{
-            padding: "12px 14px",
-            background: "#FEF2F2",
-            border: "1px solid #FECACA",
-            borderRadius: 8,
-            color: "#DC2626",
-            fontSize: 14,
-          }}
-        >
-          {serverError}
-        </div>
+        <div className="signup-form__server-error">{serverError}</div>
       )}
 
       {/* 아이디 */}
@@ -83,14 +61,7 @@ export function SignupForm({
             <button
               type="button"
               onClick={onTogglePw}
-              style={{
-                background: "transparent",
-                border: "none",
-                cursor: "pointer",
-                padding: 6,
-                color: INK3,
-                display: "flex",
-              }}
+              className="signup-form__pw-toggle"
             >
               <Icon name={showPw ? "eyeOff" : "eye"} size={18} />
             </button>
@@ -136,19 +107,9 @@ export function SignupForm({
         {loading ? "가입 중..." : "회원 가입"}
       </Button>
 
-      <p
-        style={{
-          textAlign: "center",
-          fontSize: 13,
-          color: "#404757",
-          margin: 0,
-        }}
-      >
+      <p className="signup-form__footer">
         이미 계정이 있으신가요?{" "}
-        <Link
-          to="/login"
-          style={{ color: ACCENT, fontWeight: 600, textDecoration: "none" }}
-        >
+        <Link to="/login" className="signup-form__login-link">
           로그인
         </Link>
       </p>

@@ -7,6 +7,7 @@ import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.User;
 import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.repository.CommentRepository;
+import com.itcen.emergencyroad.global.util.SecurityUtil;
 import com.itcen.emergencyroad.community.repository.PostLikeRepository;
 import com.itcen.emergencyroad.community.repository.PostRepository;
 import com.itcen.emergencyroad.community.repository.UserRepository;
@@ -67,13 +68,6 @@ public class PostService {
   public PostResponseDto getPost(Long postId, Long userId) {
     Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ExceptionStatus.POST_NOT_FOUND));
 
-    // 해당 조건문이 존재하면, 삭제된 게시글은 관리자인지 확인하기 전에 예외가 발생함
-    // -> 관리자가 삭제된 게시글 확인 못하게 됨
-    // 그래서 주석 처리 했습니다_정연
-//    if(post.isDeleted()){
-//      throw new CustomException(ExceptionStatus.POST_NOT_FOUND);
-//    }
-
     List<Long> postIds = List.of(postId);
 
     List<String> imageUrls = postImageService.getImageUrlMap(postIds)
@@ -126,11 +120,11 @@ public class PostService {
   }
 
   @Transactional
-  public void deletePost(Long postId, Long userId, String role) {
+  public void deletePost(Long postId, Long userId) {
     Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ExceptionStatus.POST_NOT_FOUND));
 
     boolean isAuthor = Objects.equals(post.getUser().getId(), userId);
-    boolean isAdmin = Role.ADMIN.name().equals(role);
+    boolean isAdmin = Role.ADMIN.name().equals(SecurityUtil.getCurrentUserRole());
 
     if (!isAdmin && !isAuthor) {
       throw new CustomException(ExceptionStatus.DELETE_FORBIDDEN);

@@ -1,17 +1,17 @@
-package com.itcen.emergencyroad.community.service;
+package com.itcen.emergencyroad.auth.service;
 
-import com.itcen.emergencyroad.community.dto.auth.LoginRequestDto;
-import com.itcen.emergencyroad.community.dto.auth.SignupRequestDto;
-import com.itcen.emergencyroad.community.dto.auth.UpdateUserRequestDto;
-import com.itcen.emergencyroad.community.dto.auth.AuthTokenResponseDto;
-import com.itcen.emergencyroad.community.dto.auth.UserResponseDto;
-import com.itcen.emergencyroad.community.dto.kakao.KakaoUserInfoDto;
+import com.itcen.emergencyroad.auth.dto.AuthTokenResponseDto;
+import com.itcen.emergencyroad.auth.dto.LoginRequestDto;
+import com.itcen.emergencyroad.auth.dto.SignupRequestDto;
+import com.itcen.emergencyroad.auth.dto.kakao.KakaoUserInfoDto;
 import com.itcen.emergencyroad.community.entity.User;
 import com.itcen.emergencyroad.community.enums.LoginType;
 import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.repository.UserRepository;
+import com.itcen.emergencyroad.community.service.ProfileImageService;
 import com.itcen.emergencyroad.global.exception.CustomException;
 import com.itcen.emergencyroad.global.exception.ExceptionStatus;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,12 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class AuthService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
@@ -32,16 +30,15 @@ public class UserService {
   private final TokenService tokenService;
   private final ProfileImageService profileImageService;
 
-  // 회원가입
   @Transactional
   public void signUp(SignupRequestDto dto, MultipartFile profileImage) {
-    if (userRepository.existsByUserName(((dto.getUserName())))){
+    if (userRepository.existsByUserName(dto.getUserName())) {
       throw new CustomException(ExceptionStatus.DUPLICATED_USERNAME);
     }
-    if (userRepository.existsByNickname(((dto.getNickname())))){
+    if (userRepository.existsByNickname(dto.getNickname())) {
       throw new CustomException(ExceptionStatus.DUPLICATED_NICKNAME);
     }
-    if (userRepository.existsByEmail(((dto.getEmail())))){
+    if (userRepository.existsByEmail(dto.getEmail())) {
       throw new CustomException(ExceptionStatus.DUPLICATED_EMAIL);
     }
 
@@ -65,19 +62,18 @@ public class UserService {
     );
   }
 
-  // 로컬 로그인
   @Transactional
   public AuthTokenResponseDto login(LoginRequestDto dto) {
     User user = userRepository.findByUserName(dto.getUserName())
         .orElseThrow(() -> new CustomException(ExceptionStatus.AUTHENTICATION_FAIL));
 
-    if (!passwordEncoder.matches(dto.getPassword(), user.getPassword()))
+    if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
       throw new CustomException(ExceptionStatus.AUTHENTICATION_FAIL);
+    }
 
     return tokenService.issueTokens(user);
   }
 
-  // 카카오 로그인
   @Transactional
   public AuthTokenResponseDto kakaoLogin(String code) {
     String kakaoAccessToken = kakaoService.getAccessToken(code);
@@ -103,37 +99,7 @@ public class UserService {
         });
 
     user.updateKakaoProfile(kakaoUserInfo.getNickname(), kakaoUserInfo.getProfileImageUrl());
-    // 카카오 accessToken은 더 이상 저장하지 않음 (자체 JWT로 대체)
 
     return tokenService.issueTokens(user);
-  }
-
-  // 내 정보 조회
-  @Transactional(readOnly = true)
-  public UserResponseDto getUser(Long userId) {
-    User user =  userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(ExceptionStatus.USER_NOT_FOUND));
-
-    return UserResponseDto.from(user);
-  }
-
-  // 회원정보 수정
-  @Transactional
-  public void updateUser(Long userId, UpdateUserRequestDto dto, MultipartFile profileImage) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(ExceptionStatus.USER_NOT_FOUND));
-
-    if (dto.getNickname() != null && !dto.getNickname().isBlank()) {
-      if (!dto.getNickname().equals(user.getNickname()) &&
-          userRepository.existsByNickname(dto.getNickname())) {
-        throw new CustomException(ExceptionStatus.DUPLICATED_NICKNAME);
-      }
-      user.updateNickname(dto.getNickname());
-    }
-
-    if (profileImage != null && !profileImage.isEmpty()) {
-      String imageUrl = profileImageService.uploadProfileImage(profileImage);
-      user.updateProfileImage(imageUrl);
-    }
   }
 }

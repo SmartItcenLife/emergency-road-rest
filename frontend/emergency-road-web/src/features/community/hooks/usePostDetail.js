@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   getPost,
   togglePostLike,
@@ -12,6 +12,7 @@ import {
   reportPost,
   reportComment,
 } from "../api/api";
+import { saveLastCommunityLocation } from "../utils/communityLocation";
 
 /**
  * usePostDetail — 게시글 상세 상태 + 로직
@@ -21,12 +22,21 @@ import {
  */
 export function usePostDetail(hpid, postId, user) {
   const navigate = useNavigate();
-  const location = useLocation();
+  const boardPath = `/community/${hpid}`;
+  const detailPath = `${boardPath}/posts/${postId}`;
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [confirmTarget, setConfirmTarget] = useState(null);
+  const [reportTarget, setReportTarget] = useState(null);
+  const [reportSuccess, setReportSuccess] = useState(false);
+
+  useEffect(() => {
+    if (hpid && postId) {
+      saveLastCommunityLocation({ hpid, postId });
+    }
+  }, [hpid, postId]);
 
   useEffect(() => {
     async function load() {
@@ -37,6 +47,11 @@ export function usePostDetail(hpid, postId, user) {
         ]);
         setPost(p);
         setComments(cs);
+        saveLastCommunityLocation({
+          hpid,
+          postId,
+          hospitalName: p?.hospitalName,
+        });
       } finally {
         setLoading(false);
       }
@@ -47,7 +62,7 @@ export function usePostDetail(hpid, postId, user) {
   async function handleLike() {
     if (!user)
       return navigate("/login", {
-        state: { from: location.pathname.replace(/\/$/, "") },
+        state: { from: detailPath },
       });
     const isLiked = await togglePostLike(hpid, postId);
     setPost((p) => ({
@@ -60,7 +75,7 @@ export function usePostDetail(hpid, postId, user) {
   async function handleCommentLike(commentId) {
     if (!user)
       return navigate("/login", {
-        state: { from: location.pathname.replace(/\/$/, "") },
+        state: { from: detailPath },
       });
     const isLiked = await toggleCommentLike(hpid, postId, commentId);
     setComments((cs) =>
@@ -86,7 +101,6 @@ export function usePostDetail(hpid, postId, user) {
     setEditing(null);
   }
 
-  // 수정 저장
   async function handleSubmitEdit(newContent) {
     if (!editing) return;
     await updateComment(hpid, postId, editing.id, newContent);
@@ -96,17 +110,14 @@ export function usePostDetail(hpid, postId, user) {
     setEditing(null);
   }
 
-  // 댓글 삭제 확인 요청
   function handleAskDeleteComment(commentId) {
     setConfirmTarget({ kind: "comment", target: commentId });
   }
 
-  // 게시글 삭제 확인 요청
   function handleAskDeletePost() {
     setConfirmTarget({ kind: "post", target: postId });
   }
 
-  // 확인 모달 승인
   async function handleConfirmDelete() {
     if (!confirmTarget) return;
     if (confirmTarget.kind === "post") {
@@ -119,47 +130,45 @@ export function usePostDetail(hpid, postId, user) {
     setConfirmTarget(null);
   }
 
-  const [reportTarget, setReportTarget] = useState(null);
-// 신고 메서드(1.게시글, 2.댓글)
-  function handleAskReportPost(){
-    if(!user){
-      return navigate("/login",{
-        state: {from:location.pathname.replace(/\/$/, "")},
-      });
-    }
-
-    console.log("게시글 신고 버튼 클릭");
-
-    setReportTarget({
-      kind: "post",
-      target: postId
-    });
+  function handleCloseConfirm() {
+    setConfirmTarget(null);
   }
 
-  function handleAskReportComment(commentId){
-    if(!user){
-      return navigate("/login",{
-        state: {from:location.pathname.replace(/\/$/, "")},
-      })
+  function handleAskReportPost() {
+    if (!user) {
+      return navigate("/login", { state: { from: detailPath } });
     }
-
-    setReportTarget({
-      kind: "comment",
-      target: commentId
-    });
+    setReportTarget({ kind: "post", target: postId });
   }
-// 신고 처리 메서드(type 별로 나눔)
-  async function handleSubmitReport(reason){
-    if(!reportTarget) return;
 
-    if(reportTarget.kind==="post"){
-      await reportPost(hpid, postId, reason);
-    } else {
-      await reportComment(hpid, postId, reportTarget.target, reason);
+  function handleAskReportComment(commentId) {
+    if (!user) {
+      return navigate("/login", { state: { from: detailPath } });
     }
+    setReportTarget({ kind: "comment", target: commentId });
+  }
 
+  async function handleSubmitReport(reason) {
+    if (!reportTarget) return;
+    try {
+      if (reportTarget.kind === "post") {
+        await reportPost(hpid, postId, reason);
+      } else {
+        await reportComment(hpid, postId, reportTarget.target, reason);
+      }
+      setReportTarget(null);
+      setReportSuccess(true);
+    } catch (err) {
+      alert(err.message || "신고 처리에 실패했어요.");
+    }
+  }
+
+  function handleCloseReport() {
     setReportTarget(null);
-    alert("신고가 접수되었습니다.");
+  }
+
+  function handleCloseReportSuccess() {
+    setReportSuccess(false);
   }
 
   return {
@@ -168,7 +177,6 @@ export function usePostDetail(hpid, postId, user) {
     loading,
     editing,
     confirmTarget,
-    setConfirmTarget,
     handleLike,
     handleCommentLike,
     handleAddComment,
@@ -178,11 +186,14 @@ export function usePostDetail(hpid, postId, user) {
     handleAskDeleteComment,
     handleAskDeletePost,
     handleConfirmDelete,
+    handleCloseConfirm,
     handleAskReportPost,
     handleAskReportComment,
     handleSubmitReport,
     reportTarget,
-    setReportTarget,
+    handleCloseReport,
+    reportSuccess,
+    handleCloseReportSuccess,
   };
 }
 

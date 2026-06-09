@@ -1,18 +1,11 @@
 /**
  * Auth API — /api/auth/*
- * JWT는 localStorage의 accessToken/refreshToken 사용
+ * accessToken은 localStorage, refreshToken은 HttpOnly 쿠키로 관리
  */
 
+import { authHeaders } from "../../../shared/utils/authHeaders";
+
 const BASE = "/api/auth";
-
-function getToken() {
-  return localStorage.getItem("accessToken");
-}
-
-function authHeaders() {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 /** POST /api/auth/signup  (multipart/form-data) */
 export async function signup({
@@ -29,7 +22,11 @@ export async function signup({
   form.append("email", email);
   if (profileImage) form.append("profileImage", profileImage);
 
-  const res = await fetch(`${BASE}/signup`, { method: "POST", body: form });
+  const res = await fetch(`${BASE}/signup`, {
+    method: "POST",
+    body: form,
+    credentials: "include",
+  });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "회원가입에 실패했어요.");
   return data;
@@ -41,28 +38,35 @@ export async function login({ userName, password }) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userName, password }),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok)
     throw new Error(data.message || "아이디 또는 비밀번호를 확인해 주세요.");
-  return data.data; // { accessToken, refreshToken }
+  return data.data; // { accessToken, userId, nickname, ... } — refreshToken은 쿠키로 전달
 }
 
 /** POST /api/auth/logout */
-export async function logout(refreshToken) {
+export async function logout() {
   await fetch(`${BASE}/logout`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...authHeaders() },
-    body: JSON.stringify({ refreshToken }),
+    headers: { ...authHeaders() },
+    credentials: "include",
   });
 }
 
-/** POST /api/auth/refresh */
-export async function refreshToken(token) {
+/** GET /api/auth/kakao/redirect */
+export async function getKakaoRedirectUrl() {
+  const res = await fetch(`${BASE}/kakao/redirect`);
+  const data = await res.json();
+  return data.data;
+}
+
+/** POST /api/auth/refresh — refreshToken은 쿠키로 자동 전송 */
+export async function refreshToken() {
   const res = await fetch(`${BASE}/refresh`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken: token }),
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error("토큰 재발급에 실패했어요.");
@@ -73,6 +77,7 @@ export async function refreshToken(token) {
 export async function getMe() {
   const res = await fetch(`${BASE}/me`, {
     headers: { ...authHeaders() },
+    credentials: "include",
   });
   if (res.status === 401) throw new Error("UNAUTHORIZED");
   const data = await res.json();
@@ -96,6 +101,7 @@ export async function updateMe({ nickname, profileImage }) {
     method: "PUT",
     headers: { ...authHeaders() },
     body: form,
+    credentials: "include",
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || "회원정보 수정에 실패했어요.");

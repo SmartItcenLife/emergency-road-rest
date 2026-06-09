@@ -1,6 +1,6 @@
-package com.itcen.emergencyroad.community.service;
+package com.itcen.emergencyroad.auth.service;
 
-import com.itcen.emergencyroad.community.dto.auth.AuthTokenResponseDto;
+import com.itcen.emergencyroad.auth.dto.AuthTokenResponseDto;
 import com.itcen.emergencyroad.community.entity.RefreshToken;
 import com.itcen.emergencyroad.community.entity.User;
 import com.itcen.emergencyroad.community.repository.RefreshTokenRepository;
@@ -22,7 +22,7 @@ public class TokenService {
   private final RefreshTokenRepository refreshTokenRepository;
 
   @Transactional
-  public AuthTokenResponseDto issueTokens(User user){
+  public AuthTokenResponseDto issueTokens(User user) {
     String accessToken = jwtProvider.createAccessToken(user.getId(), String.valueOf(user.getRole()));
     String refreshToken = jwtProvider.createRefreshToken(user.getId());
 
@@ -34,8 +34,8 @@ public class TokenService {
             .user(user)
             .token(refreshToken)
             .expiresAt(LocalDateTime.now().plusSeconds(
-            jwtProvider.getRefreshTokenExpiry() / 1000
-        )).build()
+                jwtProvider.getRefreshTokenExpiry() / 1000
+            )).build()
     );
 
     return AuthTokenResponseDto.builder()
@@ -46,6 +46,13 @@ public class TokenService {
         .profileImageUrl(user.getProfileImageUrl())
         .role(user.getRole().name())
         .build();
+  }
+
+  @Transactional(readOnly = true)
+  public User findUserByToken(String refreshTokenStr) {
+    return refreshTokenRepository.findByToken(refreshTokenStr)
+        .map(RefreshToken::getUser)
+        .orElse(null);
   }
 
   @Transactional
@@ -59,16 +66,11 @@ public class TokenService {
     // 1) JWT 서명 / 만료 검증
     jwtProvider.parseToken(refreshTokenStr);
 
-    // 2) DB 조회
+    // 2) DB 존재 여부로 폐기(revoke) 확인
     RefreshToken stored = refreshTokenRepository.findByToken(refreshTokenStr)
         .orElseThrow(() -> new CustomException(ExceptionStatus.TOKEN_NOT_FOUND));
 
-    // 3) 만료 확인
-    if (stored.getExpiresAt().isBefore(LocalDateTime.now())) {
-      throw new CustomException(ExceptionStatus.EXPIRED_TOKEN);
-    }
-
-    // 4) 새 토큰 쌍 발급
+    // 3) 새 토큰 쌍 발급
     return issueTokens(stored.getUser());
   }
 }

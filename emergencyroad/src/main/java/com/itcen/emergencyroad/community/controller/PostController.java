@@ -1,11 +1,10 @@
 package com.itcen.emergencyroad.community.controller;
 
-import static com.itcen.emergencyroad.global.util.SecurityUtil.getCurrentUserRole;
-import com.itcen.emergencyroad.community.dto.report.ReportRequestDTO;
 import com.itcen.emergencyroad.community.dto.post.PostRequestDto;
+import com.itcen.emergencyroad.community.dto.report.ReportRequestDTO;
+import com.itcen.emergencyroad.global.util.SecurityUtil;
 import com.itcen.emergencyroad.community.dto.post.PostResponseDto;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
-import com.itcen.emergencyroad.community.enums.Role;
 import com.itcen.emergencyroad.community.service.PostService;
 import com.itcen.emergencyroad.community.service.ReportService;
 import com.itcen.emergencyroad.global.common.ApiResponseDto;
@@ -16,9 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -64,7 +61,7 @@ public class PostController {
     PostResponseDto post = postService.getPost(postId, userId);
 
     // 관리자가 아닐 때에는 '삭제된 게시글입니다' 띄우기_정연 수정
-    if (post.isDeleted() && !ADMIN.equals(getCurrentUserRole())) {
+    if (post.isDeleted() && !ADMIN.equals(SecurityUtil.getCurrentUserRole())) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)
           .body(ApiResponseDto.fail(HttpStatus.NOT_FOUND, "삭제된 게시글입니다."));
     }
@@ -102,20 +99,8 @@ public class PostController {
       @PathVariable Long postId,
       @AuthenticationPrincipal Long userId) {
 
-    postService.deletePost(postId, userId, getCurrentUserRole());
+    postService.deletePost(postId, userId);
     return ResponseEntity.ok(ApiResponseDto.success("게시글이 삭제되었습니다."));
-  }
-
-  private String getCurrentUserRole() {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null) {
-      return String.valueOf(Role.USER);
-    }
-
-    return auth.getAuthorities().stream()
-        .findFirst()
-        .map(a -> a.getAuthority().replace(ROLE_PREFIX, ""))
-        .orElse(USER);
   }
 
   // 게시글 신고 접수
@@ -125,11 +110,6 @@ public class PostController {
           @PathVariable Long postId,
           @Valid @RequestBody ReportRequestDTO requestDto,
           @AuthenticationPrincipal Long userId) {
-
-    if (userId == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-              .body(ApiResponseDto.fail(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."));
-    }
 
     reportService.createReport(
             userId,

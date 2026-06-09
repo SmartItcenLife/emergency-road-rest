@@ -1,0 +1,38 @@
+.signup-form {
+  padding: 20px 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+}
+
+.signup-form__server-error {
+  padding: 12px 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.signup-form__pw-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #7b8392;
+  display: flex;
+}
+
+.signup-form__footer {
+  text-align: center;
+  font-size: 13px;
+  color: #404757;
+  margin: 0;
+}
+
+.signup-form__login-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}

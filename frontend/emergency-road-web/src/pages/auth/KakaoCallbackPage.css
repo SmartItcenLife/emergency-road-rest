@@ -1,0 +1,63 @@
+.kakao-callback-page {
+  min-height: 100dvh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32px;
+}
+
+.kakao-callback-page__inner {
+  text-align: center;
+}
+
+.kakao-callback-page__error-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #fef2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.kakao-callback-page__error-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f1422;
+}
+
+.kakao-callback-page__error-message {
+  margin: 0 0 32px;
+  font-size: 15px;
+  color: #404757;
+  line-height: 1.6;
+}
+
+.kakao-callback-page__retry-btn {
+  font: 600 16px inherit;
+  color: #fff;
+  background: #2563eb;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 24px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.kakao-callback-page--loading {
+  min-height: 100dvh;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kakao-callback-page__loading-text {
+  text-align: center;
+  color: #7b8392;
+  font-size: 15px;
+}

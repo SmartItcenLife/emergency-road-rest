@@ -1,0 +1,17 @@
+.signup-page {
+  min-height: 100dvh;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  max-width: 430px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.signup-page__back-btn {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  color: #0f1422;
+  cursor: pointer;
+}

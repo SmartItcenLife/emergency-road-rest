@@ -1,4 +1,9 @@
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import { useAuthContext } from "../../app/providers/AuthProvider";
 import { usePostDetail } from "../../features/community/hooks/usePostDetail";
 import { PostBody } from "../../features/community/components/PostBody";
@@ -9,15 +14,12 @@ import { CommentComposer } from "../../features/community/components/CommentComp
 import { AppBar, Avatar, Icon, ConfirmModal } from "../../shared/components/ui";
 import { formatDate } from "../../features/community/utils/dateFormat";
 import ReportModal from "../../features/community/components/ReportModal";
-
-const INK1 = "#0F1422";
-const INK3 = "#7B8392";
-const ACCENT = "#2563EB";
-const ACCENT_SOFT = "#EFF6FF";
+import "./PostDetailPage.css";
 
 export default function PostDetailPage() {
   const { hpid, postId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthContext();
   const {
     post,
@@ -25,7 +27,6 @@ export default function PostDetailPage() {
     loading,
     editing,
     confirmTarget,
-    setConfirmTarget,
     handleLike,
     handleCommentLike,
     handleAddComment,
@@ -35,28 +36,23 @@ export default function PostDetailPage() {
     handleAskDeleteComment,
     handleAskDeletePost,
     handleConfirmDelete,
+    handleCloseConfirm,
     handleAskReportPost,
     handleAskReportComment,
     handleSubmitReport,
     reportTarget,
-    setReportTarget,
+    handleCloseReport,
+    reportSuccess,
+    handleCloseReportSuccess,
   } = usePostDetail(hpid, postId, user);
 
   const [searchParams] = useSearchParams();
   const commentId = searchParams.get("commentId");
 
   if (loading)
-    return (
-      <div style={{ padding: "60px 24px", textAlign: "center", color: INK3 }}>
-        불러오는 중...
-      </div>
-    );
+    return <div className="post-detail-page__loading">불러오는 중...</div>;
   if (!post)
-    return (
-      <div style={{ padding: "60px 24px", textAlign: "center", color: INK3 }}>
-        삭제됐거나 없는 글이에요.
-      </div>
-    );
+    return <div className="post-detail-page__loading">삭제됐거나 없는 글이에요.</div>;
 
   const isMyPost = user?.userId === post.userId;
   const isAdmin = user?.role === "ADMIN";
@@ -70,88 +66,60 @@ export default function PostDetailPage() {
   }
 
   return (
-    <div style={{ maxWidth: 430, margin: "0 auto", width: "100%" }}>
+    <div className="post-detail-page">
       <AppBar
         title="게시글 상세"
         leftAction={
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              background: "transparent",
-              border: "none",
-              padding: 8,
-              color: INK1,
-              cursor: "pointer",
-            }}
-          >
+          <button onClick={() => navigate(-1)} className="post-detail-page__back-btn">
             <Icon name="arrowLeft" size={22} />
           </button>
         }
         rightAction={
-          (isMyPost || isAdmin) && (
-            <MoreMenu
-              onEdit={() => navigate(`/community/${hpid}/posts/${postId}/edit`)}
-              onDelete={handleAskDeletePost}
-            />
+          !user ? (
+            <button
+              onClick={() =>
+                navigate("/login", {
+                  state: { from: location.pathname.replace(/\/$/, "") },
+                })
+              }
+              className="post-detail-page__login-btn"
+            >
+              로그인
+            </button>
+          ) : (
+            <div className="post-detail-page__appbar-actions">
+              <button
+                onClick={() => navigate("/mypage")}
+                className="post-detail-page__avatar-btn"
+              >
+                <Avatar name={user.nickname} src={user.profileImageUrl} size={28} />
+              </button>
+              {(isMyPost || isAdmin) && (
+                <MoreMenu
+                  onEdit={() =>
+                    navigate(`/community/${hpid}/posts/${postId}/edit`)
+                  }
+                  onDelete={handleAskDeletePost}
+                />
+              )}
+            </div>
           )
         }
       />
 
-      <div
-        style={{
-          minHeight: "100dvh",
-          background: "#fff",
-          display: "flex",
-          flexDirection: "column",
-          paddingBottom: 72,
-          maxWidth: 430,
-          margin: "0 auto",
-          width: "100%",
-        }}
-      >
-        {/* 병원 칩 */}
-        <div style={{ padding: "12px 20px 0", display: "flex" }}>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              background: ACCENT_SOFT,
-              padding: "6px 12px",
-              borderRadius: 999,
-              fontSize: 12,
-              color: ACCENT,
-              fontWeight: 600,
-              border: "1px solid #DBEAFE",
-            }}
-          >
+      <div className="post-detail-page__body">
+        <div className="post-detail-page__hospital-chip-wrap">
+          <span className="post-detail-page__hospital-chip">
             <Icon name="mapPin" size={12} />
             {post.hospitalName}
           </span>
         </div>
 
-        {/* 작성자 */}
-        <div
-          style={{
-            padding: "10px 20px 0",
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            marginBottom: 12,
-          }}
-        >
+        <div className="post-detail-page__author">
           <Avatar name={post.nickname} src={post.profileImageUrl} size={36} />
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: ACCENT }}>
-              {post.nickname}
-            </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: INK3,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
+            <div className="post-detail-page__author-nickname">{post.nickname}</div>
+            <div className="post-detail-page__author-date">
               {formatDate(post.createdAt)}
             </div>
           </div>
@@ -170,65 +138,25 @@ export default function PostDetailPage() {
           onLike={handleLike}
         />
 
-        {/* 게시글 신고하기 버튼 */}
         {user && user.userId !== post.userId && (
           <div>
             <button
               type="button"
               onClick={handleAskReportPost}
-              style={{
-                cursor: "pointer",
-                border: "1px solid #ebeef2",
-                background: "#ffffff",
-                color: "#505866",
-                minWidth: 36,
-                height: 36,
-                padding: "0 12px",
-                borderRadius: 8,
-                fontWeight: 700,
-                transition: "all 0.2s ease",
-                margin: "15px",
-              }}
+              className="post-detail-page__report-btn"
             >
               게시글 신고하기
             </button>
           </div>
         )}
 
-        {/* 댓글 헤더 */}
-        <div
-          style={{
-            padding: "16px 20px 8px",
-            fontSize: 13,
-            fontWeight: 600,
-            color: "#404757",
-            textAlign: "left",
-          }}
-        >
+        <div className="post-detail-page__comment-header">
           댓글{" "}
-          <span
-            style={{
-              color: ACCENT,
-              fontWeight: 700,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {comments.length}
-          </span>
+          <span className="post-detail-page__comment-count">{comments.length}</span>
         </div>
 
-        {/* 댓글 목록 */}
         {comments.length === 0 ? (
-          <div
-            style={{
-              padding: "32px 24px",
-              textAlign: "center",
-              color: INK3,
-              fontSize: 14,
-            }}
-          >
-            첫 댓글을 남겨 주세요.
-          </div>
+          <div className="post-detail-page__comment-empty">첫 댓글을 남겨 주세요.</div>
         ) : (
           comments.map((c) => (
             <CommentItem
@@ -245,7 +173,7 @@ export default function PostDetailPage() {
           ))
         )}
 
-        <div style={{ height: 80 }} />
+        <div className="post-detail-page__spacer" />
         <CommentComposer
           editing={editing}
           onSubmit={handleComposerSubmit}
@@ -253,7 +181,6 @@ export default function PostDetailPage() {
           disabled={!user}
         />
 
-        {/* 삭제 확인 모달 */}
         <ConfirmModal
           open={!!confirmTarget}
           title={confirmTarget?.kind === "post" ? "게시글 삭제" : "댓글 삭제"}
@@ -266,16 +193,24 @@ export default function PostDetailPage() {
           cancelLabel="취소"
           danger
           onConfirm={handleConfirmDelete}
-          onClose={() => setConfirmTarget(null)}
+          onClose={handleCloseConfirm}
         />
 
-        {/* 게시글 신고 모달 창(사유) 띄우기 */}
         <ReportModal
           open={!!reportTarget}
           type={reportTarget?.kind}
           onSubmit={handleSubmitReport}
-          onClose={() => setReportTarget(null)}
+          onClose={handleCloseReport}
         />
+
+        {reportSuccess && (
+          <div
+            className="post-detail-page__report-toast"
+            onClick={handleCloseReportSuccess}
+          >
+            신고가 접수되었습니다.
+          </div>
+        )}
       </div>
     </div>
   );

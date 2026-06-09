@@ -31,18 +31,14 @@ export function AuthProvider({ children }) {
         const me = await getMe();
         setUser(me);
       } catch (e) {
-        // AccessToken 만료 → refresh 시도
+        // AccessToken 만료 → refreshToken 쿠키로 재발급 시도
         try {
-          const rt = localStorage.getItem("refreshToken");
-          if (!rt) throw new Error("no refresh token");
-          const tokens = await refreshToken(rt);
+          const tokens = await refreshToken();
           localStorage.setItem("accessToken", tokens.accessToken);
-          localStorage.setItem("refreshToken", tokens.refreshToken);
           const me = await getMe();
           setUser(me);
         } catch {
           localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
         }
       } finally {
         setLoading(false);
@@ -54,21 +50,18 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (credentials) => {
     const tokens = await apiLogin(credentials);
     localStorage.setItem("accessToken", tokens.accessToken);
-    localStorage.setItem("refreshToken", tokens.refreshToken);
     const me = await getMe();
     setUser(me);
     return me;
   }, []);
 
   const logout = useCallback(async () => {
-    const rt = localStorage.getItem("refreshToken");
     try {
-      if (rt) await apiLogout(rt);
+      await apiLogout();
     } catch {
       /* ignore */
     }
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     setUser(null);
   }, []);
 
@@ -76,6 +69,7 @@ export function AuthProvider({ children }) {
     try {
       const me = await getMe();
       setUser(me);
+      return me;
     } catch {
       /* ignore */
     }

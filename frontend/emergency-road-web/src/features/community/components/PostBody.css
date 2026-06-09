@@ -1,0 +1,30 @@
+.post-body {
+  padding: 0 20px 20px;
+}
+
+.post-body__title {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f1422;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.post-body__content {
+  margin: 0;
+  font-size: 15px;
+  color: #0f1422;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.post-body__image {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 14px;
+  border: 1px solid #e2e6ee;
+  display: block;
+}

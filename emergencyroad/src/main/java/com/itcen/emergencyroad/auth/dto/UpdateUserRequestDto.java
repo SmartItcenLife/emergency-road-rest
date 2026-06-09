@@ -1,4 +1,4 @@
-package com.itcen.emergencyroad.community.dto.auth;
+package com.itcen.emergencyroad.auth.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

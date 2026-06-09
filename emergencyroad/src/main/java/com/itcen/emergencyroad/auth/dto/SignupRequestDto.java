@@ -1,4 +1,4 @@
-package com.itcen.emergencyroad.community.dto.auth;
+package com.itcen.emergencyroad.auth.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
