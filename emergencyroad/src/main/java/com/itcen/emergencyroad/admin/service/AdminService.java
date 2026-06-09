@@ -7,9 +7,13 @@ import com.itcen.emergencyroad.community.dto.report.ReportResponseDTO;
 import com.itcen.emergencyroad.community.entity.Comment;
 import com.itcen.emergencyroad.community.entity.Post;
 import com.itcen.emergencyroad.community.entity.Report;
+import com.itcen.emergencyroad.community.entity.User;
 import com.itcen.emergencyroad.community.enums.ReportTargetType;
+import com.itcen.emergencyroad.community.repository.CommentLikeRepository;
 import com.itcen.emergencyroad.community.repository.CommentRepository;
+import com.itcen.emergencyroad.community.repository.PostLikeRepository;
 import com.itcen.emergencyroad.community.repository.PostRepository;
+import com.itcen.emergencyroad.community.repository.RefreshTokenRepository;
 import com.itcen.emergencyroad.community.repository.ReportRepository;
 import com.itcen.emergencyroad.community.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +31,9 @@ public class AdminService {
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
     private final CommentRepository commentRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 전체 회원 목록 조회
     public List<AdminUserResponseDTO> findAllUsers() {
@@ -35,9 +42,45 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
     // 사용자 삭제하기
-    @Transactional // 데이터 베이스의 데이터를 변경(생성, 수정, 삭제)할 때 안전장치
-    public void deleteUser(Long id){
-        userRepository.deleteById(id);
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // ① 리프레시 토큰 삭제
+        refreshTokenRepository.deleteAllByUser(user);
+
+        // ② 유저가 누른 좋아요 삭제
+        postLikeRepository.deleteAllByUser(user);
+        commentLikeRepository.deleteAllByUser(user);
+
+        // ③ 유저가 작성한 신고 삭제
+        reportRepository.deleteAllByReporter(user);
+
+        // ④ 유저의 게시글 및 게시글에 달린 모든 연관 데이터 삭제
+        List<Post> userPosts = postRepository.findAllByUser(user);
+        for (Post post : userPosts) {
+            List<Comment> postComments = commentRepository.findAllByPost(post);
+            for (Comment comment : postComments) {
+                reportRepository.deleteAllByTargetTypeAndTargetId(ReportTargetType.COMMENT, comment.getId());
+                commentLikeRepository.deleteAllByComment(comment);
+            }
+            commentRepository.deleteAll(postComments);
+            postLikeRepository.deleteAllByPost(post);
+            reportRepository.deleteAllByTargetTypeAndTargetId(ReportTargetType.POST, post.getId());
+        }
+        postRepository.deleteAll(userPosts);
+
+        // ⑤ 유저의 나머지 댓글(다른 사람 게시글에 작성한 것) 삭제
+        List<Comment> userComments = commentRepository.findAllByUser(user);
+        for (Comment comment : userComments) {
+            reportRepository.deleteAllByTargetTypeAndTargetId(ReportTargetType.COMMENT, comment.getId());
+            commentLikeRepository.deleteAllByComment(comment);
+        }
+        commentRepository.deleteAll(userComments);
+
+        // ⑥ 유저 삭제
+        userRepository.delete(user);
     }
 
     // 관리자용 전체 게시글 목록 조회(최신순)
