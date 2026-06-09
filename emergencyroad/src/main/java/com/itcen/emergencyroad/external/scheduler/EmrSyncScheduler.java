@@ -3,13 +3,12 @@ package com.itcen.emergencyroad.external.scheduler;
 import com.itcen.emergencyroad.external.RegionCode;
 import com.itcen.emergencyroad.external.dto.EmrDto;
 import com.itcen.emergencyroad.external.service.EmrSyncService;
-import com.itcen.emergencyroad.general.service.GeneralService;
+import com.itcen.emergencyroad.general.service.GeneralAllService;
 import com.itcen.emergencyroad.pregnant.service.PregnantRealtimeSyncService;
 import com.itcen.emergencyroad.hospital.service.HospitalSyncService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class EmrSyncScheduler {
     private final EmrSyncService emrSyncService;
     private final HospitalSyncService hospitalSyncService;
     private final PregnantRealtimeSyncService pregnantRealtimeSyncService;
-    private  final GeneralService generalService;
+    private  final GeneralAllService generalAllService;
 
     // 2분 주기 + 첫 실행은 서버 켜지고 10초 대기 후 시작 (트래픽 분산)
     //@Scheduled(initialDelay = 10000, fixedDelay = 180000)  //3분
@@ -40,27 +39,27 @@ public class EmrSyncScheduler {
 
             //List<String> sigunguList = RegionCode.MAP.getOrDefault(sido, List.of());
 
-           // for (String sigungu : sigunguList) {
+            // for (String sigungu : sigunguList) {
 
-                try {
-                    List<EmrDto> list = emrSyncService.fetchAll(sido);
+            try {
+                List<EmrDto> list = emrSyncService.fetchAll(sido);
 
-                    hospitalSyncService.saveOrUpdate(list);
-                    pregnantRealtimeSyncService.saveOrUpdate(list);
-                    generalService.saveOrUpdate(list);
+                hospitalSyncService.saveOrUpdate(list);
+                pregnantRealtimeSyncService.saveOrUpdate(list);
+                generalAllService.saveOrUpdate(list);
 
 
-                    log.info("{} emrSyncService 동기화 완료 size={}", sido, list.size());
+                log.info("{} emrSyncService 동기화 완료 size={}", sido, list.size());
 
-                    log.info("{} generalService 동기화 완료 size={}", sido, list.size());
+                log.info("{} generalService 동기화 완료 size={}", sido, list.size());
 
-                    if (!list.isEmpty()) {
-                        log.info("sample hpId={}", list.get(0).getHpid());
-                    }
-
-                } catch (Exception e) {
-                    log.error("{} 동기화 실패", sido, e);
+                if (!list.isEmpty()) {
+                    log.info("sample hpId={}", list.get(0).getHpid());
                 }
+
+            } catch (Exception e) {
+                log.error("{} 동기화 실패", sido, e);
+            }
         }
     }
 }

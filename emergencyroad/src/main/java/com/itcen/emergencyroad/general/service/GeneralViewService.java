@@ -3,7 +3,7 @@ package com.itcen.emergencyroad.general.service;
 import com.itcen.emergencyroad.findpath.dto.PathResponseDto;
 import com.itcen.emergencyroad.general.dto.GeneralHospitalDetailDto;
 import com.itcen.emergencyroad.general.dto.GeneralHospitalListDto;
-import com.itcen.emergencyroad.general.repository.GeneralRepository;
+import com.itcen.emergencyroad.general.repository.GeneralRealtimeRepository;
 import com.itcen.emergencyroad.recommend.dto.GeneralHospitalResponseDto;
 import com.itcen.emergencyroad.recommend.dto.HospitalResponseDto;
 import com.itcen.emergencyroad.recommend.entity.HospitalCategory;
@@ -22,9 +22,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class GeneralViewService {
-    private final GeneralRepository generalRepository;
+    private final GeneralRealtimeRepository generalRealtimeRepository;
     private final HospitalRecommendationService hospitalRecommendationService;
-
 
     /*
         기존 코드 : 추천 결과 목록을 만들자마자 반환 ( sort 할 수 없음 )
@@ -156,7 +155,7 @@ public class GeneralViewService {
     }
 
     public GeneralHospitalDetailDto getGeneralHospitalDetail(String hpid) {
-        return generalRepository.findGeneralHospitalDetail(hpid)
+        return generalRealtimeRepository.findGeneralHospitalDetail(hpid)
                 .orElseThrow(() -> new IllegalArgumentException("일반 병원 상세 정보가 없습니다. hpid=" + hpid));
     }
 }

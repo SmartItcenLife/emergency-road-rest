@@ -115,7 +115,7 @@ public class EmrSyncService {
                 .hvicc(parseInt(getText(item, "hvicc")))
                 .hvs17(parseInt(getText(item, "hvs17"))) // hvicc 중복이었던 부분 수정!
                 .hvcc(parseInt(getText(item, "hvcc")))
-                .hvs11(getText(item, "hvs11"))
+                .hvs11(parseInt(getText(item, "hvs11")))
                 .hvccc(parseInt(getText(item, "hvccc")))
                 .hvs16(parseInt(getText(item, "hvs16")))
 

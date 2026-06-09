@@ -3,13 +3,11 @@ package com.itcen.emergencyroad.external.scheduler;
 import com.itcen.emergencyroad.external.RegionCode;
 import com.itcen.emergencyroad.external.dto.EmrDto;
 import com.itcen.emergencyroad.external.service.SrsillSyncService;
-import com.itcen.emergencyroad.general.service.GeneralService;
-import com.itcen.emergencyroad.general.service.SrsIllService;
+import com.itcen.emergencyroad.general.service.GeneralAllService;
 import com.itcen.emergencyroad.pregnant.service.PregnantSyncService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,9 +19,9 @@ import java.util.List;
         name = "scheduler.api.enabled",
         havingValue = "true"
 )
-public class SrsillSyncScheduler {
+public class GeneralMkiostySyncScheduler {
     private final SrsillSyncService srsillSyncService;
-    private final SrsIllService srsIllService;
+    private final GeneralAllService GeneralAllService;
     private final PregnantSyncService pregnantSyncService;
 
 
@@ -41,7 +39,7 @@ public class SrsillSyncScheduler {
             try {
                 List<EmrDto> list = srsillSyncService.fetchAll(sido);
                 pregnantSyncService.saveOrUpdate(list);
-                srsIllService.saveOrUpdate(list);
+                GeneralAllService.saveOrUpdate(list);
 
                 log.info("{} srsillSyncService 동기화 완료 size={}", sido, list.size());
 
